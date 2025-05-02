@@ -1,0 +1,109 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color:rgb(244, 242, 242);
+}
+header {
+    
+    background-color: white;
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.grade {
+    display: grid;
+    grid-template-rows: auto auto auto;
+}
+.Logotipo{
+    width:160px;
+    height:50px;   
+margin-right:1000px;
+
+}
+.Avatar{
+width:40px;
+height:40px;
+}
+.search{
+    width:40px;
+    height:40px; 
+    margin-right:15px;
+     
+}
+.Questões{
+    width:100px;
+    height:40px;
+    margin-right:15px;    
+}
+.Foguete{
+    width:70px ;
+    height:70px;
+}
+.container {
+    display: flex;
+     /* alinha verticalmente */
+    gap: 610px; /* espaço entre imagem e texto */
+    padding: 30px 30px;
+    font-size: 24px;
+  }
+
+  .container img {
+    width: 520px; /* ajustável */
+    height: 520px;
+  }
+
+.header-right {
+    display: flex;
+    align-items: center;
+}
+.historia{
+    width:500px ;
+    height:500px;
+}
+.navegação{
+    background-color: white;
+    color: rgb(0, 0, 0);
+    padding: 20px 30px;
+    display: flex;
+    
+    align-items: center;
+    
+}
+.SDEL{
+margin-right:880px;    
+}
+.Matérias{
+margin-right:240px;
+}
+
+.navegação2{
+    background-color: white;
+    color: rgb(0, 0, 0);
+    padding: 10px 30px;
+    display: flex;
+    align-items: center;
+
+}
+.Pagina1{
+    margin-left:925px;
+    
+}
+.Pagina2{
+   margin-left:250px;
+}
+.navegação3{
+    background-color: white;
+    color: rgb(0, 0, 0);
+    padding: 10px 30px;
+    display: flex;
+    align-items: center;
+}
+.Pagina3{
+    margin-left:805px;
+    
+}
+.Pagina4{
+   margin-left:250px;
+}

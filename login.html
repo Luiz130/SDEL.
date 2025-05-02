@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="login.css">
+    <title>Página de Login | SDEL</title>
+</head>
+
+<body>
+
+    <div class="container" id="container">
+        <div class="form-container sign-up">
+            <form class="formLogin">
+                <h1>Criar Conta</h1>
+                <div class="social-icons">
+                    <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-linkedin-in"></i></a>
+                </div>
+                <span>Usando Email</span>
+                <input type="text"id="nome" name="nome" placeholder="Nome completo">
+                <input type="email" id="email" name="email" placeholder="Email">
+                <input type="password" id="senha" name="senha" placeholder="Senha">
+                <!--<button>Criar</button>-->
+                <button type="submit" class="Criar">Criar</button>
+            </form>
+        </div>
+        <div class="form-container sign-in">
+            <form id="loginForm">
+                <h1>Entrar</h1>
+                <div class="social-icons">
+                    <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
+                </div>
+                <span>Senha Email</span>
+                <input type="email"id="email" placeholder="Email">
+                <input type="password"  id="password" placeholder="Password">
+                <a href="recuperarsenha.html">Esqueceu sua senha?</a>
+                <!--<button>Entrar</button>-->
+                <button type="submit" class="Entrar">Entrar</button>
+            </form>
+        </div>
+        <div class="toggle-container">
+            <div class="toggle">
+                <div class="toggle-panel toggle-left">
+                    <h1>Bem vindo de Volta!</h1>
+                    <p>Entrar com a sua conta</p>
+                    <button class="hidden" id="login">Entrar</button>
+                </div>
+                <div class="toggle-panel toggle-right">
+                    <h1>Olá, Amigo!</h1>
+                    <p>Clique aqui para registrar-se</p>
+                    <button class="hidden" id="register">Inscrever-se</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+<script>
+
+    //improvisório
+    // Função criarlogin
+    function criarlogin(event) {
+        event.preventDefault(); // Previne o envio padrão do formulário
+
+        let formE1 = document.querySelector('.formLogin');
+        const formData = new FormData(formE1);
+        const data = Object.fromEntries(formData);
+
+        // Verifica se o e-mail já existe
+        fetch('https://67eec1c0c11d5ff4bf7ad24d.mockapi.io/usuarios')
+            .then(res => res.json())
+            .then(usuarios => {
+                const emailExistente = usuarios.some(usuario => usuario.email === data.email);
+
+                if (emailExistente) {
+                    alert('Este e-mail já está cadastrado!');
+                } else {
+                    // Cria um novo usuário
+                    fetch('https://67eec1c0c11d5ff4bf7ad24d.mockapi.io/usuarios', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log(data);
+                        // Após criar o usuário, redireciona para a página index.html
+                        window.location.href = 'index.html';
+                    })
+                    .catch(error => console.error('Erro ao cadastrar:', error));
+                }
+            })
+            .catch(error => console.error('Erro ao verificar e-mails:', error));
+    }
+
+    // Garantir que a função criarlogin seja chamada ao enviar o formulário
+    document.addEventListener('DOMContentLoaded', function() {
+        const formE1 = document.querySelector('.formLogin');
+        formE1.onsubmit = function(event) {
+            criarlogin(event); // Chama a função e previne o envio padrão do formulário
+        };
+    });
+</script>
+<script>
+    // Substitua pela URL da sua MockAPI
+    const API_URL = 'https://67eec1c0c11d5ff4bf7ad24d.mockapi.io/usuarios';
+
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const email = document.getElementById('email').value;
+    const senha = document.getElementById('password').value;
+
+    try {
+        const response = await fetch(`${API_URL}?email=${email}`);
+        const users = await response.json();
+
+        if (users.length > 0 && users[0].senha === senha) {
+            window.location.href = 'index.html';
+        } else {
+            alert('E-mail ou senha inválidos.');
+        }
+    } catch (error) {
+        console.error('Erro ao conectar com a API:', error);
+        alert('Erro ao fazer login. Tente novamente mais tarde.');
+    }
+});
+    </script>
+</html>

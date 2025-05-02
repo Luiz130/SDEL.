@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Recuperar Senha</title>
+<link rel="stylesheet" href="recuperarsenha.css">
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+<script>
+  (function(){
+    emailjs.init("F6vjeYM3mFIUz3CZN"); // Sua public key do EmailJS
+  })();
+</script>
+</head>
+
+<body>
+
+<div class="page">
+  <form id="formRecuperar" method="post" class="formLogin">
+    <div class="centro">
+      <h1>Recuperar senha</h1>
+      <a>Enviaremos um código para o seu e-mail</a>
+    </div>
+
+    <label for="email">E-mail</label>
+    <input type="email" id="email" name="email" placeholder="Digite seu Gmail" required autofocus />
+
+    <input type="button" value="Enviar Código" class="btn" onclick="enviarCodigo()" />
+    <br>
+
+    <div id="resultado" style="margin-top: 10px; color: green;"></div>
+
+    <div id="verificacao" style="display:none; margin-top: 20px;">
+      <label for="codigo">Código de verificação</label>
+      <div>
+      <input type="text" id="codigo" placeholder="Digite o código recebido" required />
+    </div>
+
+      <label for="novaSenha">Nova senha</label>
+      <div>
+      <input type="password" id="novaSenha" placeholder="Digite sua nova senha" required />
+      </div>
+      
+      
+      <label for="confirmarSenha">Confirmar nova senha</label>
+      <div>
+      <input type="password" id="confirmarSenha" placeholder="Confirme sua nova senha" required />
+    </div>
+
+      <button type="button" onclick="trocarSenha()" class="btn">Trocar Senha</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  let codigoGerado = "";
+  const API_URL = 'https://67eec1c0c11d5ff4bf7ad24d.mockapi.io/usuarios'; // Troque pelo seu link MockAPI
+
+  function enviarCodigo() {
+    const email = document.getElementById('email').value;
+    if (!email) {
+      alert("Por favor, digite um e-mail válido.");
+      return;
+    }
+
+    codigoGerado = Math.floor(100000 + Math.random() * 900000); // Código aleatório de 6 dígitos
+
+    emailjs.send("service_sysnwx3", "template_aqpld7i", {
+      to_email: email,
+      message: "Seu código de verificação é: " + codigoGerado
+    })
+    .then(function(response) {
+      document.getElementById('resultado').innerHTML = "✅ Código enviado para seu e-mail!";
+      document.getElementById('verificacao').style.display = "block";
+    }, function(error) {
+      document.getElementById('resultado').innerHTML = "❌ Erro ao enviar e-mail: " + error.text;
+    });
+  }
+
+  async function trocarSenha() {
+    const codigoDigitado = document.getElementById('codigo').value;
+    const novaSenha = document.getElementById('novaSenha').value;
+    const confirmarSenha = document.getElementById('confirmarSenha').value;
+    const email = document.getElementById('email').value;
+
+    if (codigoDigitado != codigoGerado) {
+      alert("❌ Código incorreto. Verifique o e-mail!");
+      return;
+    }
+
+    if (novaSenha !== confirmarSenha) {
+      alert("❌ As senhas não conferem!");
+      return;
+    }
+
+    if (novaSenha.length < 6) {
+      alert("❌ A senha deve ter pelo menos 6 caracteres!");
+      return;
+    }
+
+    try {
+      // 1. Buscar todos usuários
+      const response = await fetch(API_URL);
+      const usuarios = await response.json();
+
+      // 2. Procurar o usuário pelo e-mail
+      const usuario = usuarios.find(u => u.email === email);
+
+      if (!usuario) {
+        alert("❌ Usuário não encontrado no sistema!");
+        return;
+      }
+
+      // 3. Atualizar a senha no MockAPI
+      const update = await fetch(`${API_URL}/${usuario.id}`, {
+        method: "PUT",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ senha: novaSenha })
+      });
+
+      if (update.ok) {
+        alert("✅ Senha redefinida com sucesso! Agora você pode fazer login com a nova senha.");
+        location.reload();
+      } else {
+        alert("❌ Erro ao atualizar a senha.");
+      }
+
+    } catch (error) {
+      console.error(error);
+      alert("❌ Erro de conexão.");
+    }
+  }
+</script>
+
+</body>
+</html>
