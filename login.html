@@ -67,6 +67,7 @@
   import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+  // Sua configuração do Firebase (configuração que você pegou no Firebase Console)
   const firebaseConfig = {
     apiKey: "AIzaSyATG5P2NvdecjCPO7gzFNGs6l7plDrxY04",
     authDomain: "sdel-16c6a.firebaseapp.com",
@@ -77,36 +78,38 @@
     measurementId: "G-F462EW033X"
   };
 
+  // Inicializar Firebase
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  // Função para cadastrar usuário
+  // Função para cadastrar usuário e salvar dados no Firestore
   async function cadastrar() {
     const nome = document.getElementById("nome").value;
     const email = document.getElementById("email").value;
     const senha = document.getElementById("senha").value;
 
     try {
-      // Criação do usuário
+      // Criar o usuário com email e senha no Firebase Authentication
       const cred = await createUserWithEmailAndPassword(auth, email, senha);
-      
-      // Salvando nome e email no Firestore
-      await setDoc(doc(db, "usuarios", cred.user.uid), {
+
+      // Salvar os dados do usuário no Firestore (com o UID do Firebase Authentication como ID)
+      const docRef = doc(db, "usuarios", cred.user.uid);  // Usando o UID do usuário como ID do documento
+      await setDoc(docRef, {
         nome: nome,
-        email: email
+        email: email,
       });
 
-      alert("Usuário cadastrado com sucesso!");
+      alert("Usuário criado com sucesso e salvo no Firestore!");
     } catch (error) {
       console.error("Erro ao criar usuário:", error.message);
       alert("Erro: " + error.message);
     }
   }
 
-  // Adicionando o evento ao botão
-  document.querySelector(".Criar").addEventListener("click", function(event) {
-    event.preventDefault();  // Impede o envio do formulário
+  // Evento para enviar o formulário
+  document.getElementById("cadastroForm").addEventListener("submit", function(event) {
+    event.preventDefault();  // Impede o envio padrão do formulário
     cadastrar();
   });
 </script>
