@@ -63,11 +63,13 @@
 </body>
 
 <script type="module">
+<script type="module">
+  // Importando as funções necessárias do Firebase
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  // Sua configuração do Firebase (configuração que você pegou no Firebase Console)
+  // Configuração do Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyATG5P2NvdecjCPO7gzFNGs6l7plDrxY04",
     authDomain: "sdel-16c6a.firebaseapp.com",
@@ -78,67 +80,41 @@
     measurementId: "G-F462EW033X"
   };
 
-  // Inicializar Firebase
+  // Inicializando o Firebase
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  // Função para cadastrar usuário e salvar dados no Firestore
+  // Função para criar um usuário e salvar seus dados no Firestore
   async function cadastrar() {
     const nome = document.getElementById("nome").value;
     const email = document.getElementById("email").value;
     const senha = document.getElementById("senha").value;
 
     try {
-      // Criar o usuário com email e senha no Firebase Authentication
+      // Criando o usuário no Firebase Authentication
       const cred = await createUserWithEmailAndPassword(auth, email, senha);
 
-      // Salvar os dados do usuário no Firestore (com o UID do Firebase Authentication como ID)
-      const docRef = doc(db, "usuarios", cred.user.uid);  // Usando o UID do usuário como ID do documento
+      // Salvando os dados do usuário no Firestore
+      const docRef = doc(db, "usuarios", cred.user.uid); // Usando o UID do Firebase Authentication
       await setDoc(docRef, {
         nome: nome,
         email: email,
       });
 
-      alert("Usuário criado com sucesso e salvo no Firestore!");
+      alert("Usuário criado com sucesso!");
+      // Redirecionar para uma outra página após o cadastro, por exemplo:
+      window.location.href = "index.html"; // Substitua pela página desejada
+
     } catch (error) {
       console.error("Erro ao criar usuário:", error.message);
-      alert("Erro: " + error.message);
+      alert("Erro ao criar usuário: " + error.message);
     }
   }
 
-  // Evento para enviar o formulário
-  document.getElementById("cadastroForm").addEventListener("submit", function(event) {
-    event.preventDefault();  // Impede o envio padrão do formulário
-    cadastrar();
-  });
-</script>
-<script type="module">
-  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-  // Inicializar Firebase
-  const auth = getAuth();
-
-  // Função de login
-  async function login() {
-    const email = document.getElementById('email').value;
-    const senha = document.getElementById('senha').value;
-
-    try {
-      // Fazer login com email e senha
-      const userCredential = await signInWithEmailAndPassword(auth, email, senha);
-
-      // Redirecionar para a página principal (ou qualquer outra ação)
-      window.location.href = 'index.html';  // Redireciona após login bem-sucedido
-    } catch (error) {
-      console.error("Erro ao fazer login:", error.message);
-      alert("Erro: " + error.message);
-    }
-  }
-
-  // Evento para enviar o formulário de login
-  document.getElementById('loginForm').addEventListener('submit', function(e) {
-    e.preventDefault();  // Impede o envio padrão do formulário
-    login();
+  // Evento para enviar o formulário e criar o usuário
+  document.querySelector(".Criar").addEventListener("click", function(event) {
+    event.preventDefault(); // Impede o envio padrão do formulário
+    cadastrar(); // Chama a função de cadastro
   });
 </script>
