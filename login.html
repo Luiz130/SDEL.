@@ -62,53 +62,53 @@
     <script src="script.js"></script>
 </body>
 
-<script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    //improvisório
-    // Função criarlogin
-    function criarlogin(event) {
-        event.preventDefault(); // Previne o envio padrão do formulário
+  const firebaseConfig = {
+    apiKey: "AIzaSyATG5P2NvdecjCPO7gzFNGs6l7plDrxY04",
+    authDomain: "sdel-16c6a.firebaseapp.com",
+    projectId: "sdel-16c6a",
+    storageBucket: "sdel-16c6a.firebasestorage.app",
+    messagingSenderId: "676676370586",
+    appId: "1:676676370586:web:587ca158c46d18e1d9df23",
+    measurementId: "G-F462EW033X"
+  };
 
-        let formE1 = document.querySelector('.formLogin');
-        const formData = new FormData(formE1);
-        const data = Object.fromEntries(formData);
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-        // Verifica se o e-mail já existe
-        fetch('https://67eec1c0c11d5ff4bf7ad24d.mockapi.io/usuarios')
-            .then(res => res.json())
-            .then(usuarios => {
-                const emailExistente = usuarios.some(usuario => usuario.email === data.email);
+  // Função para cadastrar usuário
+  async function cadastrar() {
+    const nome = document.getElementById("nome").value;
+    const email = document.getElementById("email").value;
+    const senha = document.getElementById("senha").value;
 
-                if (emailExistente) {
-                    alert('Este e-mail já está cadastrado!');
-                } else {
-                    // Cria um novo usuário
-                    fetch('https://67eec1c0c11d5ff4bf7ad24d.mockapi.io/usuarios', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(data)
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        console.log(data);
-                        // Após criar o usuário, redireciona para a página index.html
-                        window.location.href = 'index.html';
-                    })
-                    .catch(error => console.error('Erro ao cadastrar:', error));
-                }
-            })
-            .catch(error => console.error('Erro ao verificar e-mails:', error));
+    try {
+      // Criação do usuário
+      const cred = await createUserWithEmailAndPassword(auth, email, senha);
+      
+      // Salvando nome e email no Firestore
+      await setDoc(doc(db, "usuarios", cred.user.uid), {
+        nome: nome,
+        email: email
+      });
+
+      alert("Usuário cadastrado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao criar usuário:", error.message);
+      alert("Erro: " + error.message);
     }
+  }
 
-    // Garantir que a função criarlogin seja chamada ao enviar o formulário
-    document.addEventListener('DOMContentLoaded', function() {
-        const formE1 = document.querySelector('.formLogin');
-        formE1.onsubmit = function(event) {
-            criarlogin(event); // Chama a função e previne o envio padrão do formulário
-        };
-    });
+  // Adicionando o evento ao botão
+  document.querySelector(".Criar").addEventListener("click", function(event) {
+    event.preventDefault();  // Impede o envio do formulário
+    cadastrar();
+  });
 </script>
 <script>
     // Substitua pela URL da sua MockAPI
