@@ -113,29 +113,32 @@
     cadastrar();
   });
 </script>
-<script>
-    // Substitua pela URL da sua MockAPI
-    const API_URL = 'https://67eec1c0c11d5ff4bf7ad24d.mockapi.io/usuarios';
+<script type="module">
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-document.getElementById('loginForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
+  // Inicializar Firebase
+  const auth = getAuth();
 
+  // Função de login
+  async function login() {
     const email = document.getElementById('email').value;
-    const senha = document.getElementById('password').value;
+    const senha = document.getElementById('senha').value;
 
     try {
-        const response = await fetch(`${API_URL}?email=${email}`);
-        const users = await response.json();
+      // Fazer login com email e senha
+      const userCredential = await signInWithEmailAndPassword(auth, email, senha);
 
-        if (users.length > 0 && users[0].senha === senha) {
-            window.location.href = 'index.html';
-        } else {
-            alert('E-mail ou senha inválidos.');
-        }
+      // Redirecionar para a página principal (ou qualquer outra ação)
+      window.location.href = 'index.html';  // Redireciona após login bem-sucedido
     } catch (error) {
-        console.error('Erro ao conectar com a API:', error);
-        alert('Erro ao fazer login. Tente novamente mais tarde.');
+      console.error("Erro ao fazer login:", error.message);
+      alert("Erro: " + error.message);
     }
-});
-    </script>
-</html>
+  }
+
+  // Evento para enviar o formulário de login
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();  // Impede o envio padrão do formulário
+    login();
+  });
+</script>
