@@ -124,19 +124,21 @@
       });
   };
 
-  // Login com Google
-  document.getElementById('googleLogin').addEventListener('click', (e) => {
-    e.preventDefault();
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        const user = result.user;
-        alert(`Bem-vindo(a), ${user.displayName}!`);
-        window.location.href = "index.html";
-      })
-      .catch((error) => {
-        alert("Erro no login com Google: " + error.message);
-      });
-  });
+// Login com Google
+document.getElementById('googleLogin').addEventListener('click', (e) => {
+  e.preventDefault();
+  signInWithPopup(auth, provider)
+    .then((result) => {
+      const user = result.user;
+      console.log('Usuário autenticado:', user); // Verifique os detalhes do usuário
+      alert(`Bem-vindo(a), ${user.displayName}!`);
+      window.location.href = "index.html"; // Redireciona após o login
+    })
+    .catch((error) => {
+      console.error("Erro no login com Google:", error); // Verifique o erro
+      alert("Erro no login com Google: " + error.message);
+    });
+});
 </script>
   
 </html>
