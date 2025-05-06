@@ -67,121 +67,63 @@
 </body>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
-  import {
-    getAuth,
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
-    GoogleAuthProvider,
-    signInWithPopup,
-    sendEmailVerification,
-    onAuthStateChanged,
-    signOut
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyATG5P2NvdecjCPO7gzFNGs6l7plDrxY04",
-    authDomain: "sdel-16c6a.firebaseapp.com",
-    projectId: "sdel-16c6a",
-    storageBucket: "sdel-16c6a.appspot.com",
-    messagingSenderId: "676676370586",
-    appId: "1:676676370586:web:444947d3dda78a80d9df23",
-    measurementId: "G-FZWQ9FYZG5"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-  const provider = new GoogleAuthProvider();
-
-  // Cadastro de usuário
-  window.fazerCadastro = function () {
+ // Cadastro do Usuário
+window.fazerCadastro = function () {
     const nome = document.getElementById("nomeCadastro").value;
     const email = document.getElementById("emailCadastro").value;
     const senha = document.getElementById("senhaCadastro").value;
 
     createUserWithEmailAndPassword(auth, email, senha)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        // Envia o e-mail de verificação
-        sendEmailVerification(user)
-          .then(() => {
-            alert("Cadastro realizado com sucesso! Verifique seu e-mail antes de fazer login.");
-            window.location.href = "verifique-email.html"; // página para o usuário verificar o e-mail
-          })
-          .catch((error) => {
-            alert("Erro ao enviar e-mail de verificação: " + error.message);
-          });
-      })
-      .catch((error) => {
-        alert("Erro no cadastro: " + error.message);
-      });
-  };
+        .then((userCredential) => {
+            const user = userCredential.user;
+            // Enviar e-mail de verificação
+            sendEmailVerification(user)
+                .then(() => {
+                    alert("Cadastro realizado com sucesso! Verifique seu email antes de fazer login.");
+                    window.location.href = "verifique-email.html"; // Redireciona para uma página de confirmação
+                })
+                .catch((error) => {
+                    alert("Erro ao enviar email de verificação: " + error.message);
+                });
+        })
+        .catch((error) => {
+            alert("Erro no cadastro: " + error.message);
+        });
+};
 
-  // Login com verificação de e-mail
-  window.fazerLogin = function () {
+// Login do Usuário
+window.fazerLogin = function () {
     const email = document.getElementById("emailLogin").value;
     const senha = document.getElementById("senhaLogin").value;
 
     signInWithEmailAndPassword(auth, email, senha)
-      .then((userCredential) => {
-        const user = userCredential.user;
+        .then((userCredential) => {
+            const user = userCredential.user;
 
-        // Verifica se o e-mail do usuário foi verificado
-        if (user.emailVerified) {
-          // Salva os dados no Firestore apenas após a verificação do e-mail
-          const userRef = doc(db, "users", user.uid);
-          setDoc(userRef, {
-            nome: user.displayName || "Usuário",
-            email: user.email
-          })
-          .then(() => {
-            alert("Login realizado com sucesso!");
-            window.location.href = "index.html"; // redireciona para a página principal
-          })
-          .catch((error) => {
-            alert("Erro ao salvar dados no Firestore: " + error.message);
-          });
+            // Verificar se o e-mail foi verificado
+            if (!user.emailVerified) {
+                alert("Por favor, verifique seu email antes de fazer login.");
+                return;
+            }
 
-        } else {
-          alert("Por favor, verifique seu e-mail antes de fazer login.");
-          signOut(auth); // Faz logout do usuário
-        }
-      })
-      .catch((error) => {
-        alert("Erro no login: " + error.message);
-      });
-  };
-
-  // Login com Google
-  document.getElementById('googleLogin').addEventListener('click', (e) => {
-    e.preventDefault();
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        const user = result.user;
-        alert(`Bem-vindo(a), ${user.displayName}!`);
-        window.location.href = "index.html"; // Redireciona para a página principal
-      })
-      .catch((error) => {
-        alert("Erro no login com Google: " + error.message);
-      });
-  });
-
-  // Monitoramento do estado de autenticação
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      // Verifica se o e-mail foi verificado
-      if (!user.emailVerified) {
-        // Se o e-mail não foi verificado, desloga e envia para a página de verificação
-        alert("Por favor, verifique seu e-mail.");
-        signOut(auth); // Desloga o usuário
-        window.location.href = "verifique-email.html"; // Página para instruções de verificação
-      }
-    }
-  });
+            // Agora que o e-mail foi verificado, salvar os dados no Firestore
+            const userRef = doc(db, "users", user.uid);
+            setDoc(userRef, {
+                nome: nome,
+                email: email
+            }).then(() => {
+                console.log("Nome salvo no Firestore!");
+                alert("Login realizado com sucesso!");
+                window.location.href = "index.html"; // Redireciona para a página principal após login bem-sucedido
+            })
+            .catch((error) => {
+                alert("Erro ao salvar os dados no Firestore: " + error.message);
+            });
+        })
+        .catch((error) => {
+            alert("Erro no login: " + error.message);
+        });
+};
 </script>
 
 
