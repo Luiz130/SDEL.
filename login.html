@@ -66,7 +66,40 @@
     <script src="script.js"></script>
 </body>
 
- <script type="module">
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro e Login</title>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+</head>
+<body>
+
+    <!-- Formulário de Cadastro -->
+    <form id="formCadastro">
+        <input type="text" id="nomeCadastro" placeholder="Nome" required>
+        <input type="email" id="emailCadastro" placeholder="Email" required>
+        <input type="password" id="senhaCadastro" placeholder="Senha" required>
+        <button type="button" onclick="fazerCadastro()">Criar Conta</button>
+    </form>
+
+    <!-- Formulário de Login -->
+    <form id="formLogin">
+        <input type="email" id="emailLogin" placeholder="Email" required>
+        <input type="password" id="senhaLogin" placeholder="Senha" required>
+        <button type="button" onclick="fazerLogin()">Entrar</button>
+        <a href="recuperarsenha.html">Esqueceu a senha?</a>
+    </form>
+
+    <!-- Login com Google -->
+    <a href="#" class="icon" id="googleLogin">
+        <i class="fa-brands fa-google-plus-g"></i> Entrar com Google
+    </a>
+
+    <script type="module">
         // Importações do Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -108,6 +141,22 @@
                         .catch((error) => {
                             alert("Erro ao enviar o e-mail de verificação: " + error.message);
                         });
+
+                    // Informações só serão salvas no Firestore depois de verificar o e-mail
+                    auth.onAuthStateChanged(function(user) {
+                        if (user && user.emailVerified) {
+                            // Salva no Firestore apenas depois da verificação de email
+                            const userRef = doc(db, "users", user.uid);
+                            setDoc(userRef, {
+                                nome: nome,
+                                email: email
+                            }).then(() => {
+                                console.log("Nome salvo no Firestore após verificação do e-mail.");
+                            }).catch((error) => {
+                                console.log("Erro ao salvar dados no Firestore: ", error);
+                            });
+                        }
+                    });
                 })
                 .catch((error) => {
                     alert("Erro no cadastro: " + error.message);
@@ -158,5 +207,9 @@
                 });
         });
     </script>
+
+</body>
+</html>
+
   
 </html>
