@@ -84,6 +84,7 @@ import {
   setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+// CONFIGURAÇÃO FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyATG5P2NvdecjCPO7gzFNGs6l7plDrxY04",
   authDomain: "sdel-16c6a.firebaseapp.com",
@@ -94,13 +95,14 @@ const firebaseConfig = {
   measurementId: "G-FZWQ9FYZG5"
 };
 
+// INICIALIZAÇÃO
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
-// === CADASTRO COM VERIFICAÇÃO DE EMAIL ===
+// === CADASTRO COM ENVIO DE VERIFICAÇÃO ===
 window.fazerCadastro = function () {
   const nome = document.getElementById("nomeCadastro").value;
   const email = document.getElementById("emailCadastro").value;
@@ -110,22 +112,19 @@ window.fazerCadastro = function () {
     .then((userCredential) => {
       const user = userCredential.user;
 
-      // Salva nome no Firestore
-      setDoc(doc(db, "users", user.uid), {
+      // Salva o nome no Firestore
+      return setDoc(doc(db, "users", user.uid), {
         nome: nome,
         email: email
+      }).then(() => {
+        // Envia verificação por e-mail
+        return sendEmailVerification(user)
+          .then(() => {
+            alert("Cadastro realizado com sucesso! Verifique seu email antes de entrar.");
+            signOut(auth); // desloga até verificar
+            window.location.href = "verifique-email.html"; // redireciona para uma tela de aviso
+          });
       });
-
-      // Envia e-mail de verificação
-      sendEmailVerification(user)
-        .then(() => {
-          alert("Verifique seu email antes de entrar no sistema.");
-          signOut(auth); // Desloga até verificar
-          window.location.href = "verifique-email.html"; // ou onde preferir
-        })
-        .catch((error) => {
-          alert("Erro ao enviar verificação: " + error.message);
-        });
     })
     .catch((error) => {
       alert("Erro no cadastro: " + error.message);
@@ -145,7 +144,7 @@ window.fazerLogin = function () {
         alert("Login realizado com sucesso!");
         window.location.href = "index.html";
       } else {
-        alert("Email ainda não verificado. Por favor, verifique seu email.");
+        alert("Você precisa verificar seu e-mail antes de entrar.");
         signOut(auth);
       }
     })
@@ -154,9 +153,10 @@ window.fazerLogin = function () {
     });
 };
 
-// === LOGIN COM GOOGLE (já vem verificado) ===
+// === LOGIN COM GOOGLE (email já verificado pelo Google) ===
 document.getElementById('googleLogin').addEventListener('click', (e) => {
   e.preventDefault();
+
   signInWithPopup(auth, provider)
     .then((result) => {
       const user = result.user;
