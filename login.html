@@ -75,13 +75,10 @@
     createUserWithEmailAndPassword,
     GoogleAuthProvider,
     signInWithPopup,
-    sendEmailVerification
+    sendEmailVerification,
+    onAuthStateChanged
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import {
-    getFirestore,
-    doc,
-    setDoc
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyATG5P2NvdecjCPO7gzFNGs6l7plDrxY04",
@@ -112,9 +109,9 @@
         // Envia verificação de e-mail
         sendEmailVerification(user)
           .then(() => {
-            alert("Cadastro criado com sucesso! Verifique seu e-mail antes de fazer login.");
-            // Redireciona para uma página de instrução ou apenas alerta
-            window.location.href = "verifique-email.html";
+            alert("Cadastro realizado com sucesso! Verifique seu e-mail antes de fazer login.");
+            // Não salvar no Firestore até o e-mail ser verificado
+            window.location.href = "verifique-email.html"; // página de instrução
           })
           .catch((error) => {
             alert("Erro ao enviar e-mail de verificação: " + error.message);
@@ -135,7 +132,7 @@
         const user = userCredential.user;
 
         if (user.emailVerified) {
-          // Dados no Firestore só são salvos após a verificação do e-mail
+          // Salvar dados no Firestore APENAS quando o e-mail for verificado
           const userRef = doc(db, "users", user.uid);
           setDoc(userRef, {
             nome: user.displayName || "Usuário",
@@ -171,6 +168,17 @@
       .catch((error) => {
         alert("Erro no login com Google: " + error.message);
       });
+  });
+
+  // Monitorar o estado de autenticação
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      // Se o usuário estiver autenticado, você pode decidir salvar os dados do Firestore aqui
+      if (!user.emailVerified) {
+        // Caso o e-mail ainda não tenha sido verificado, fazemos logout automaticamente
+        auth.signOut();
+      }
+    }
   });
 </script>
 
