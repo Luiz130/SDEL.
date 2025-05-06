@@ -137,6 +137,16 @@
         alert("Erro no login com Google: " + error.message);
       });
   });
+
+  sendEmailVerification(userCredential.user)
+  .then(() => {
+    alert("Cadastro criado com sucesso! Verifique seu email antes de fazer login.");
+    // Opcional: redirecionar ou exibir uma mensagem
+    window.location.href = "verifique-email.html"; // opcional
+  })
+  .catch((error) => {
+    alert("Erro ao enviar email de verificação: " + error.message);
+  });
 </script>
   
 </html>
