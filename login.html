@@ -99,7 +99,7 @@
         <i class="fa-brands fa-google-plus-g"></i> Entrar com Google
     </a>
 
-    <script type="module">
+  <script type="module">
         // Importações do Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -142,21 +142,7 @@
                             alert("Erro ao enviar o e-mail de verificação: " + error.message);
                         });
 
-                    // Informações só serão salvas no Firestore depois de verificar o e-mail
-                    auth.onAuthStateChanged(function(user) {
-                        if (user && user.emailVerified) {
-                            // Salva no Firestore apenas depois da verificação de email
-                            const userRef = doc(db, "users", user.uid);
-                            setDoc(userRef, {
-                                nome: nome,
-                                email: email
-                            }).then(() => {
-                                console.log("Nome salvo no Firestore após verificação do e-mail.");
-                            }).catch((error) => {
-                                console.log("Erro ao salvar dados no Firestore: ", error);
-                            });
-                        }
-                    });
+                    // Não salva nada no Firestore ainda.
                 })
                 .catch((error) => {
                     alert("Erro no cadastro: " + error.message);
@@ -206,6 +192,24 @@
                     alert("Erro no login com Google: " + error.message);
                 });
         });
+
+        // Salvar no Firestore após verificação de e-mail
+        auth.onAuthStateChanged(function(user) {
+            if (user && user.emailVerified) {
+                const nome = document.getElementById("nomeCadastro").value;
+                const email = document.getElementById("emailCadastro").value;
+                const userRef = doc(db, "users", user.uid);
+                setDoc(userRef, {
+                    nome: nome,
+                    email: email
+                }).then(() => {
+                    console.log("Nome salvo no Firestore após verificação do e-mail.");
+                }).catch((error) => {
+                    console.log("Erro ao salvar dados no Firestore: ", error);
+                });
+            }
+        });
+
     </script>
 
 </body>
