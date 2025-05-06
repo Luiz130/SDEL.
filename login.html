@@ -67,7 +67,7 @@
 </body>
 
 <script type="module">
- import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 import {
   getAuth,
@@ -75,7 +75,8 @@ import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
-  sendEmailVerification
+  sendEmailVerification,
+  signOut
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getFirestore,
@@ -109,21 +110,21 @@ window.fazerCadastro = function () {
     .then((userCredential) => {
       const user = userCredential.user;
 
-      // Salvar dados no Firestore
-      const userRef = doc(db, "users", user.uid);
-      setDoc(userRef, {
+      // Salva nome no Firestore
+      setDoc(doc(db, "users", user.uid), {
         nome: nome,
         email: email
       });
 
-      // Enviar e-mail de verificação
+      // Envia e-mail de verificação
       sendEmailVerification(user)
         .then(() => {
-          alert("Cadastro criado com sucesso! Verifique seu email antes de fazer login.");
-          window.location.href = "verifique-email.html"; // ou onde quiser redirecionar
+          alert("Verifique seu email antes de entrar no sistema.");
+          signOut(auth); // Desloga até verificar
+          window.location.href = "verifique-email.html"; // ou onde preferir
         })
         .catch((error) => {
-          alert("Erro ao enviar email de verificação: " + error.message);
+          alert("Erro ao enviar verificação: " + error.message);
         });
     })
     .catch((error) => {
@@ -144,8 +145,8 @@ window.fazerLogin = function () {
         alert("Login realizado com sucesso!");
         window.location.href = "index.html";
       } else {
-        alert("Por favor, verifique seu email antes de fazer login.");
-        auth.signOut(); // Deslogar o usuário
+        alert("Email ainda não verificado. Por favor, verifique seu email.");
+        signOut(auth);
       }
     })
     .catch((error) => {
@@ -153,7 +154,7 @@ window.fazerLogin = function () {
     });
 };
 
-// === LOGIN COM GOOGLE ===
+// === LOGIN COM GOOGLE (já vem verificado) ===
 document.getElementById('googleLogin').addEventListener('click', (e) => {
   e.preventDefault();
   signInWithPopup(auth, provider)
