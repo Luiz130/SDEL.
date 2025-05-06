@@ -176,7 +176,9 @@
       // Se o usuário estiver autenticado, você pode decidir salvar os dados do Firestore aqui
       if (!user.emailVerified) {
         // Caso o e-mail ainda não tenha sido verificado, fazemos logout automaticamente
-        auth.signOut();
+        alert("Por favor, verifique seu e-mail.");
+        auth.signOut(); // desloga o usuário
+        window.location.href = "verifique-email.html"; // página para o usuário verificar o e-mail
       }
     }
   });
