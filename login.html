@@ -67,86 +67,87 @@
 </body>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
-  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+ <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyATG5P2NvdecjCPO7gzFNGs6l7plDrxY04",
-    authDomain: "sdel-16c6a.firebaseapp.com",
-    projectId: "sdel-16c6a",
-    storageBucket: "sdel-16c6a.appspot.com", // Corrigido .app para .appspot.com
-    messagingSenderId: "676676370586",
-    appId: "1:676676370586:web:444947d3dda78a80d9df23",
-    measurementId: "G-FZWQ9FYZG5"
-  };
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyATG5P2NvdecjCPO7gzFNGs6l7plDrxY04",
+  authDomain: "sdel-16c6a.firebaseapp.com",
+  projectId: "sdel-16c6a",
+  storageBucket: "sdel-16c6a.appspot.com",
+  messagingSenderId: "676676370586",
+  appId: "1:676676370586:web:444947d3dda78a80d9df23",
+  measurementId: "G-FZWQ9FYZG5"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-  const provider = new GoogleAuthProvider(); // <== ESTA LINHA FALTAVA
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const provider = new GoogleAuthProvider();
 
-  window.fazerCadastro = function () {
-    const nome = document.getElementById("nomeCadastro").value;
-    const email = document.getElementById("emailCadastro").value;
-    const senha = document.getElementById("senhaCadastro").value;
+// === CADASTRO ===
+window.fazerCadastro = function () {
+  const nome = document.getElementById("nomeCadastro").value;
+  const email = document.getElementById("emailCadastro").value;
+  const senha = document.getElementById("senhaCadastro").value;
 
-    createUserWithEmailAndPassword(auth, email, senha)
-      .then((userCredential) => {
-        alert("Cadastro realizado com sucesso!");
-        const userRef = doc(db, "users", userCredential.user.uid);
-        setDoc(userRef, {
-          nome: nome,
-          email: email
-        }).then(() => {
-          console.log("Nome salvo no Firestore!");
+  createUserWithEmailAndPassword(auth, email, senha)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      sendEmailVerification(user)
+        .then(() => {
+          alert("Verifique seu email antes de entrar.");
+          signOut(auth); // Sai da conta logo após o cadastro
+        })
+        .catch((error) => {
+          alert("Erro ao enviar email de verificação: " + error.message);
         });
-        window.location.href = "index.html";
-      })
-      .catch((error) => {
-        alert("Erro no cadastro: " + error.message);
+    })
+    .catch((error) => {
+      alert("Erro no cadastro: " + error.message);
+    });
+};
+
+// === LOGIN ===
+window.fazerLogin = async function () {
+  const email = document.getElementById("emailLogin").value;
+  const senha = document.getElementById("senhaLogin").value;
+
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, senha);
+    const user = userCredential.user;
+
+    if (!user.emailVerified) {
+      alert("Por favor, verifique seu email antes de fazer login.");
+      await signOut(auth);
+      return;
+    }
+
+    // Verifica se já existe no Firestore
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      const nome = document.getElementById("nomeCadastro").value || "Usuário"; // Fallback
+      await setDoc(userRef, {
+        nome: nome,
+        email: user.email
       });
-  };
+      console.log("Usuário salvo no Firestore");
+    }
 
-  window.fazerLogin = function () {
-    const email = document.getElementById("emailLogin").value;
-    const senha = document.getElementById("senhaLogin").value;
+    alert("Login realizado com sucesso!");
+    window.location.href = "index.html";
 
-    signInWithEmailAndPassword(auth, email, senha)
-      .then((userCredential) => {
-        alert("Login realizado com sucesso!");
-        window.location.href = "index.html";
-      })
-      .catch((error) => {
-        alert("Erro no login: " + error.message);
-      });
-  };
+  } catch (error) {
+    alert("Erro no login: " + error.message);
+  }
+};
+</script>
 
-  // Login com Google
-  document.getElementById('googleLogin').addEventListener('click', (e) => {
-    e.preventDefault();
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        const user = result.user;
-        alert(`Bem-vindo(a), ${user.displayName}!`);
-        window.location.href = "index.html";
-      })
-      .catch((error) => {
-        alert("Erro no login com Google: " + error.message);
-      });
-  });
-
-  sendEmailVerification(userCredential.user)
-  .then(() => {
-    alert("Cadastro criado com sucesso! Verifique seu email antes de fazer login.");
-    // Opcional: redirecionar ou exibir uma mensagem
-    window.location.href = "verifique-email.html"; // opcional
-  })
-  .catch((error) => {
-    alert("Erro ao enviar email de verificação: " + error.message);
-  });
 </script>
   
 </html>
