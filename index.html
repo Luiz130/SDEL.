@@ -1,222 +1,142 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>SDEL - Página Inicial</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="login.css">
+    <title>Página de Login | SDEL</title>
 </head>
+
 <body>
-<div class="grate">
-<header>
 
-    <div class="logo1">
-   <img src="https://cdn-icons-png.flaticon.com/512/1356/1356604.png" width="70" height="70">
-   <a class="SDEL">SDEL</a>
-  </div>
-    <div class="header-right">
-       <p class="Facilite">Facilite seu estudo</p>
-        <!--<p class="Festudo">Facilite seu estudo</p>-->
-        <button class="APP-SDEL">
-            <div class="menu">
-                <a href="https://play.google.com/store/apps/details?id=com.supercell.clashroyale&hl=pt_BR">APP SDEL</a>
-            </div>    
-
-
-        </button>
-        <a href="login.html">
-        <button class="login-btn">LOGIN</button>
-        </a>
-        <div class="search-container">
-            <input type="text" class="search-box" id="searchInput" placeholder="Buscar aqui..." onblur="hideSearch()">
-            <img src="https://images.icon-icons.com/1350/PNG/512/magnifyingglassicon_87860.png" width="30" height="30"
-                 alt="Lupa" class="search-icon" onclick="toggleSearch()">
+    <div class="container" id="container">
+        <div class="form-container sign-up">
+            <form class="formLogin">
+                <h1>Criar Conta</h1>
+                <div class="social-icons">
+                    <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-linkedin-in"></i></a>
+                </div>
+                <span>Usando Email</span>
+                <input type="text" id="nomeCadastro" name="nome" placeholder="Nome completo">
+                <input type="email" id="emailCadastro" name="email" placeholder="Email">
+                 <input type="password" id="senhaCadastro" name="senha" placeholder="Senha">
+                 <button type="button" onclick="fazerCadastro()">Criar</button>
+            </form>
         </div>
-        
-        <div class="menu-container">
-            <img src="https://w7.pngwing.com/pngs/265/983/png-transparent-magnifying-glass-computer-icons-magnifier-symbol-magnifying-glass-glass-text-magnifier-thumbnail.png" class="menu-image" id="profileImage" alt="Perfil" width="30" height="30">
-            
-            <div class="perfil-options" id="perfilOptions">
-              <a href="perfil.html">Perfil</a>
-              <a href="login.html">Sair</a>
+        <div class="form-container sign-in">
+            <form id="loginForm">
+                <h1>Entrar</h1>
+                <div class="social-icons">
+                    <a href="#" class="icon" id="googleLogin">
+                   <i class="fa-brands fa-google-plus-g"></i></a>
+                </div>
+                <span>Senha Email</span>
+              
+               
+                <!--<button>Entrar</button>-->
+
+                <input type="email" id="emailLogin" placeholder="Email">
+               <input type="password" id="senhaLogin" placeholder="Password">
+               <a href="recuperarsenha.html">Esqueceu sua senha?</a>
+<button type="button" onclick="fazerLogin()">Entrar</button>
+
+            </form>
+        </div>
+        <div class="toggle-container">
+            <div class="toggle">
+                <div class="toggle-panel toggle-left">
+                    <h1>Bem vindo de Volta!</h1>
+                    <p>Entrar com a sua conta</p>
+                    <button class="hidden" id="login">Entrar</button>
+                </div>
+                <div class="toggle-panel toggle-right">
+                    <h1>Olá, Amigo!</h1>
+                    <p>Clique aqui para registrar-se</p>
+                    <button class="hidden" id="register">Inscrever-se</button>
+                </div>
             </div>
         </div>
-        </div>
-
-</header>
-
-
-
-     
-    <div class="subheader-right">
-        
-        <select class="Matérias-slc" onchange="location.href=this.value">
-            <option value="#">Selecione</option>
-            <option value= "geografia.html">Geografia</option>
-            <option value="historia.html">Historia</option>
-            <option value="http://www.fluminense.com.br">Matemática</option>
-            <option value="http://www.vasco.com.br">Português</option>
-           </select>
-           
-   <!--<button class="Redação-btn">Redação</button>-->
-   <!--<button class="Exercícios-btn">Exercícios</button> -->
-   </div>
-
-
-   
-
-  
-   
-  
-   <div class="centralizador">
-    <div class="retangulo">
-      <!-- Seta Esquerda -->
-      <!--<img class="seta" src="https://cdn-icons-png.flaticon.com/512/271/271220.png" alt="Seta Esquerda">-->
-
-      <!-- Conteúdo principal -->
-      <div class="conteudo">
-        <div class="texto">
-          <h1>Decole nos estudos</h1>
-          <p>Estude com confiança com os nossos temas e decole nos estudos!</p>
-        </div>
-        <img class="imagem" src="https://cdn-icons-png.flaticon.com/512/12535/12535010.png" alt="Imagem principal">
-      </div>
-
-      <!-- Seta Direita -->
-    <!-- <img class="seta" src="https://cdn-icons-png.flaticon.com/512/271/271228.png" alt="Seta Direita">-->
-    </div>
-  </div>
-    
-
-  </div>
- </body>
- </html>
- <br>
- <br>
-   <div class="titulo">
-   <h1>Estude conosco</h1>
-   </div>
-
-   <br>
-   <div class="carrossel-wrapper">
-    <!-- Setas com imagem -->
-    <img src="https://cdn-icons-png.flaticon.com/512/159/159605.png" class="seta seta-esquerda" onclick="rolar(-1)" alt="Seta Esquerda">
-    <img src="https://cdn-icons-png.flaticon.com/512/159/159606.png" class="seta seta-direita" onclick="rolar(1)" alt="Seta Direita">
-  
-    <!-- Conteúdo rolável -->
-    <div class="carrossel-container" id="carrossel">
-      <div class="card">
-        <a href="geografia.html"><img src="https://cdn-icons-png.flaticon.com/512/2134/2134313.png" alt="Biologia"></a>
-        <p>Biologia</p>
-      </div>
-      
-      <div class="card">
-        <a href="geografia.html"><img src="https://cdn-icons-png.flaticon.com/512/8327/8327668.png" alt="Geografia"></a>
-        <p>Geografia</p>
-      </div>
-
-      <div class="card">
-        <img src="https://cdn-icons-png.flaticon.com/512/1183/1183815.png" alt="História">
-        <p>História</p>
-      </div>
-
-      <div class="card">
-        <img src=https://cdn-icons-png.flaticon.com/512/5833/5833290.png alt="Português">
-        <p>Português</p>
-      </div>
-      
-      <div class="card">
-        <img src="https://cdn-icons-png.flaticon.com/128/8986/8986389.png" alt="Química">
-        <p>Química</p>
-      </div>
-
-      <div class="card">
-        <img src="https://cdn-icons-png.flaticon.com/512/1651/1651656.png" alt="Sociologia">
-        <p>Sociologia</p>
-      </div>
-
-      <div class="card">
-        <img src="https://cdn-icons-png.flaticon.com/512/1172/1172835.png" alt="filosofia">
-        <p>Filosofia</p>
-      </div>
-  
-
-   
-    </div>
-  </div>
-  
-  
-
-  <div class="titulo2">
-  <h1>Ferramentas</h1>
-  <br>
-  <br>
-  
-  </div>
-   
-  <div class="ferramentas">
-    
-
-    <div class="bloco-questoes">
-      <h2>Questões</h2>
-      <img src="https://cdn-icons-png.flaticon.com/512/987/987818.png" alt="Imagem de Questões">
-    </div>
-  
-
-    <div class="bloco-flashcards">
-      <h2>Flashcards</h2>
-      <img src="https://cdn-icons-png.flaticon.com/512/667/667828.png" alt="Imagem Flashcards">
     </div>
 
-    <div class="bloco-cronograma">
-      <h2>Cronograma</h2>
-      <img src="https://cdn-icons-png.flaticon.com/512/5214/5214181.png" alt="Imagem Cronograma">
-    </div>
-</div>
-
-
-
-
-
-
-</div>
-
-<!--java-script-->
-<script>
-    function toggleSearch() {
-        let searchBox = document.getElementById("searchInput");
-        searchBox.classList.add("active");
-        searchBox.focus();
-    }
-
-    function hideSearch() {
-        let searchBox = document.getElementById("searchInput");
-        if (searchBox.value === "") { 
-            searchBox.classList.remove("active");
-        }
-    }
-</script>
-   
-<script>
-    const image = document.getElementById('profileImage');
-    const menu = document.getElementById('perfilOptions');
-  
-    image.addEventListener('click', () => {
-      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-    });
-  
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.perfil-container')) {
-        perfil.style.display = 'none';
-      }
-    });
-  </script>
-
-<script>
-  function rolar(direcao) {
-    const carrossel = document.getElementById("carrossel");
-    const larguraItem = 130; // largura + espaço
-    carrossel.scrollLeft += direcao * larguraItem;
-  }
-</script>
-
+    <script src="script.js"></script>
 </body>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
+  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyATG5P2NvdecjCPO7gzFNGs6l7plDrxY04",
+    authDomain: "sdel-16c6a.firebaseapp.com",
+    projectId: "sdel-16c6a",
+    storageBucket: "sdel-16c6a.appspot.com", // Corrigido .app para .appspot.com
+    messagingSenderId: "676676370586",
+    appId: "1:676676370586:web:444947d3dda78a80d9df23",
+    measurementId: "G-FZWQ9FYZG5"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const provider = new GoogleAuthProvider(); // <== ESTA LINHA FALTAVA
+
+  window.fazerCadastro = function () {
+    const nome = document.getElementById("nomeCadastro").value;
+    const email = document.getElementById("emailCadastro").value;
+    const senha = document.getElementById("senhaCadastro").value;
+
+    createUserWithEmailAndPassword(auth, email, senha)
+      .then((userCredential) => {
+        alert("Cadastro realizado com sucesso!");
+        const userRef = doc(db, "users", userCredential.user.uid);
+        setDoc(userRef, {
+          nome: nome,
+          email: email
+        }).then(() => {
+          console.log("Nome salvo no Firestore!");
+        });
+        window.location.href = "index.html";
+      })
+      .catch((error) => {
+        alert("Erro no cadastro: " + error.message);
+      });
+  };
+
+  window.fazerLogin = function () {
+    const email = document.getElementById("emailLogin").value;
+    const senha = document.getElementById("senhaLogin").value;
+
+    signInWithEmailAndPassword(auth, email, senha)
+      .then((userCredential) => {
+        alert("Login realizado com sucesso!");
+        window.location.href = "index.html";
+      })
+      .catch((error) => {
+        alert("Erro no login: " + error.message);
+      });
+  };
+
+  // Login com Google
+  document.getElementById('googleLogin').addEventListener('click', (e) => {
+    e.preventDefault();
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const user = result.user;
+        alert(`Bem-vindo(a), ${user.displayName}!`);
+        window.location.href = "index.html";
+      })
+      .catch((error) => {
+        alert("Erro no login com Google: " + error.message);
+      });
+  });
+</script>
+  
+</html>
