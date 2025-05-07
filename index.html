@@ -33,7 +33,7 @@
         </div>
         
         <div class="menu-container">
-            <img src="https://w7.pngwing.com/pngs/265/983/png-transparent-magnifying-glass-computer-icons-magnifier-symbol-magnifying-glass-glass-text-magnifier-thumbnail.png" class="menu-image" id="profileImage" alt="Perfil" width="30" height="30">
+          <img id="profileImage" src="default.png" width="50" height="50" alt="Perfil">
 
             
             <div class="perfil-options" id="perfilOptions">
@@ -219,17 +219,17 @@
     carrossel.scrollLeft += direcao * larguraItem;
   }
 
-  firebase.auth().onAuthStateChanged(function(user) {
-  if (user) {
-    // O usuário está logado
-    const photoURL = user.photoURL;
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
 
-    // Agora atualiza a imagem de perfil
-    document.getElementById('profileImage').src = photoURL;
-  } else {
-    // Usuário não está logado
-  }
-});
+  // Espera o Firebase identificar o usuário
+  onAuthStateChanged(auth, (user) => {
+    if (user && user.photoURL) {
+      document.getElementById('profileImage').src = user.photoURL;
+    } else {
+      console.warn("Usuário não autenticado ou sem photoURL");
+    }
+  });
 </script>
 
 </body>
