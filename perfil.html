@@ -7,7 +7,201 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #2196F3, #21CBF3);
+      background: linear-gradient(to right, #2196F3, #21CBF3);<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil do Usuário</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #1E3A8A, #2563EB);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .profile-container {
+      background: #ffffff;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      width: 100%;
+      max-width: 460px;
+    }
+
+    .profile-container img {
+      border-radius: 50%;
+      width: 110px;
+      height: 110px;
+      margin-bottom: 1rem;
+      border: 3px solid #1E3A8A;
+    }
+
+    .profile-container h2 {
+      margin: 0.5rem 0;
+      color: #1E3A8A;
+      font-size: 1.5rem;
+    }
+
+    .profile-container p {
+      color: #333;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .info-box {
+      background: #e0e7ff;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      color: #1E3A8A;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+    .input-group {
+      margin-top: 1.5rem;
+      text-align: left;
+    }
+
+    .input-group label {
+      font-weight: bold;
+      color: #1E3A8A;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .input-group textarea {
+      width: 100%;
+      height: 100px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 0.75rem;
+      resize: none;
+      font-size: 0.95rem;
+    }
+
+    .char-count {
+      text-align: right;
+      font-size: 0.85rem;
+      color: #555;
+      margin-top: 0.25rem;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+    }
+
+    .btn {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      flex: 1;
+      margin: 0 0.5rem;
+      background-color: #1E3A8A;
+      color: #fff;
+      transition: background-color 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #0f1e60;
+    }
+  </style>
+</head>
+<body>
+  <div class="profile-container" id="profile">
+    <img id="userPhoto" alt="Foto do usuário">
+    <h2 id="userName">Nome</h2>
+    <p id="userEmail">Email</p>
+
+    <div class="info-box">
+      Plano: Comum
+    </div>
+
+    <div class="input-group">
+      <label for="biografia">Biografia (máx. 300 caracteres):</label>
+      <textarea id="biografia" maxlength="300" placeholder="Escreva algo sobre você..."></textarea>
+      <div class="char-count" id="charCount">0/300</div>
+    </div>
+
+    <div class="button-container">
+      <button class="btn" onclick="window.location.href='index.html'">Voltar à Página Inicial</button>
+      <button class="btn" id="logout">Encerrar Sessão</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-analytics.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyATG5P2NvdecjCPO7gzFNGs6l7plDrxY04",
+      authDomain: "sdel-16c6a.firebaseapp.com",
+      projectId: "sdel-16c6a",
+      storageBucket: "sdel-16c6a.firebasestorage.app",
+      messagingSenderId: "676676370586",
+      appId: "1:676676370586:web:444947d3dda78a80d9df23",
+      measurementId: "G-FZWQ9FYZG5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+
+    const userName = document.getElementById('userName');
+    const userEmail = document.getElementById('userEmail');
+    const userPhoto = document.getElementById('userPhoto');
+    const logoutBtn = document.getElementById('logout');
+    const bioInput = document.getElementById('biografia');
+    const charCount = document.getElementById('charCount');
+
+    function salvarBiografia(email, texto) {
+      localStorage.setItem('bio_' + email, texto);
+    }
+
+    function carregarBiografia(email) {
+      return localStorage.getItem('bio_' + email) || '';
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        userName.textContent = user.displayName;
+        userEmail.textContent = user.email;
+        userPhoto.src = user.photoURL;
+
+        const bio = carregarBiografia(user.email);
+        bioInput.value = bio;
+        charCount.textContent = `${bio.length}/300`;
+
+        bioInput.addEventListener('input', () => {
+          const texto = bioInput.value;
+          salvarBiografia(user.email, texto);
+          charCount.textContent = `${texto.length}/300`;
+        });
+      } else {
+        window.location.href = "login.html";
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      signOut(auth).then(() => {
+        window.location.href = "login.html";
+      });
+    });
+  </script>
+</body>
+</html>
+
       display: flex;
       justify-content: center;
       align-items: center;
