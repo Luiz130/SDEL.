@@ -6,24 +6,151 @@
   <link rel="stylesheet" href="perfil.css">
   <title>Perfil Pessoal</title>
   <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f6fc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
+    .navbar {
+      width: 100%;
+      background-color: #6c63ff;
+      padding: 1rem 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.3s;
+    }
+
+    .navbar a:hover {
+      color: #d1d1ff;
+    }
+
+    .profile-container {
+      margin-top: 2rem;
+      background-color: white;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .profile-img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin-bottom: 1rem;
+    }
+
+    .full-name {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .display-name {
+      font-size: 1.1rem;
+      color: #777;
+    }
+
+    .plan {
+      margin-top: 1rem;
+      font-weight: bold;
+      color: #6c63ff;
+    }
+
+    .bio-title {
+      margin-top: 1.5rem;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #444;
+    }
+
+    .bio {
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      color: #555;
+    }
   </style>
 </head>
 <body>
+
+  <div class="navbar">
+    <span>Meu Perfil</span>
+    <a href="index.html">🏠 Página Inicial</a>
+  </div>
+
   <div class="profile-container">
     <img 
+      id="profile-img"
       src="https://api.dicebear.com/7.x/initials/svg?seed=L&backgroundColor=6c63ff,83aaff&radius=50" 
       alt="Imagem de perfil com letra L" 
       class="profile-img"
     />
 
-    <div class="full-name">Luiz Otávio</div>
-    <div class="display-name">Santiago da Silva</div>
-
-    <div class="plan">Plano Premium</div>
+    <div id="full-name" class="full-name">Carregando...</div>
+    <div id="display-name" class="display-name">Carregando...</div>
+    <div id="plan" class="plan">Carregando...</div>
 
     <div class="bio-title">Biografia</div>
-    <div class="bio">Aqui você pode escrever uma breve descrição sobre você, suas habilidades, experiências ou interesses.</div>
+    <div id="bio" class="bio">Carregando...</div>
   </div>
+
+  <!-- Firebase compat scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyATG5P2NvdecjCPO7gzFNGs6l7plDrxY04",
+      authDomain: "sdel-16c6a.firebaseapp.com",
+      projectId: "sdel-16c6a",
+      storageBucket: "sdel-16c6a.appspot.com",
+      messagingSenderId: "676676370586",
+      appId: "1:676676370586:web:444947d3dda78a80d9df23",
+      measurementId: "G-FZWQ9FYZG5"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        const uid = user.uid;
+        db.collection("usuarios").doc(uid).get().then(doc => {
+          if (doc.exists) {
+            const dados = doc.data();
+            document.getElementById("full-name").textContent = dados.nomeCompleto || "Nome completo";
+            document.getElementById("display-name").textContent = dados.nomeExibicao || "Nome de exibição";
+            document.getElementById("plan").textContent = dados.plano || "Plano não definido";
+            document.getElementById("bio").textContent = dados.bio || "Sem biografia.";
+            document.getElementById("profile-img").src = dados.foto || `https://api.dicebear.com/7.x/initials/svg?seed=${(dados.nomeExibicao || 'L')[0]}&backgroundColor=6c63ff,83aaff&radius=50`;
+          } else {
+            alert("Dados de usuário não encontrados.");
+          }
+        }).catch(error => {
+          console.error("Erro ao buscar dados:", error);
+        });
+      } else {
+        window.location.href = "login.html";
+      }
+    });
+  </script>
+
 </body>
 </html>
