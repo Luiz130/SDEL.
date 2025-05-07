@@ -33,7 +33,12 @@
         </div>
         
         <div class="menu-container">
-          <img id="profileImage" src="default.png" width="50" height="50" alt="Perfil">
+          <img src="https://w7.pngwing.com/pngs/265/983/png-transparent-magnifying-glass-computer-icons-magnifier-symbol-magnifying-glass-glass-text-magnifier-thumbnail.png" 
+          class="menu-image" 
+          id="profileImage" 
+          alt="Perfil" 
+          width="30" 
+          height="30">
 
             
             <div class="perfil-options" id="perfilOptions">
@@ -228,6 +233,29 @@
       document.getElementById('profileImage').src = user.photoURL;
     } else {
       console.warn("Usuário não autenticado ou sem photoURL");
+    }
+  });
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "SUA_API_KEY",
+    authDomain: "SEU_DOMINIO.firebaseapp.com",
+    projectId: "SEU_PROJETO_ID",
+    appId: "SEU_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  onAuthStateChanged(auth, (user) => {
+    if (user && user.photoURL) {
+      document.getElementById("profileImage").src = user.photoURL;
+    } else {
+      console.log("Usuário não autenticado ou sem imagem.");
     }
   });
 </script>
