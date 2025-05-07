@@ -2,7 +2,8 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Login com Google</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login e Perfil com Google</title>
   <style>
     * {
       margin: 0;
@@ -64,13 +65,15 @@
 </head>
 <body>
   <div class="container">
+    <!-- Login Section -->
     <div id="loginSection">
       <h2>Entrar com Google</h2>
       <button id="googleLogin">Login com Google</button>
     </div>
 
+    <!-- Profile Section -->
     <div id="profileSection" style="display: none;">
-      <h2>Perfil</h2>
+      <h2>Perfil do Usuário</h2>
       <img id="userPhoto" alt="Foto de perfil" width="100">
       <p><strong>Nome:</strong> <span id="userName"></span></p>
       <p><strong>Email:</strong> <span id="userEmail"></span></p>
@@ -80,31 +83,37 @@
 
   <!-- Firebase SDKs -->
   <script type="module">
+    // Importações do Firebase
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
-    import {
-      getAuth,
-      GoogleAuthProvider,
-      signInWithPopup,
-      signOut,
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-analytics.js";
 
+    // Configuração do Firebase
     const firebaseConfig = {
-      apiKey: "SUA_API_KEY",
-      authDomain: "SEU_DOMINIO.firebaseapp.com",
-      projectId: "SEU_PROJECT_ID",
-      appId: "SEU_APP_ID"
+      apiKey: "AIzaSyATG5P2NvdecjCPO7gzFNGs6l7plDrxY04",
+      authDomain: "sdel-16c6a.firebaseapp.com",
+      projectId: "sdel-16c6a",
+      storageBucket: "sdel-16c6a.firebasestorage.app",
+      messagingSenderId: "676676370586",
+      appId: "1:676676370586:web:444947d3dda78a80d9df23",
+      measurementId: "G-FZWQ9FYZG5"
     };
 
+    // Inicializa o Firebase
     const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+
+    // Inicializa o Auth e GoogleAuthProvider
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
+    // Elementos da página
     const loginBtn = document.getElementById("googleLogin");
     const logoutBtn = document.getElementById("logoutBtn");
     const loginSection = document.getElementById("loginSection");
     const profileSection = document.getElementById("profileSection");
 
+    // Ação de login com Google
     loginBtn.addEventListener("click", (e) => {
       e.preventDefault();
       signInWithPopup(auth, provider)
@@ -116,14 +125,19 @@
         });
     });
 
+    // Ação de logout
     logoutBtn.addEventListener("click", () => {
       signOut(auth).then(() => {
         alert("Você saiu.");
+      }).catch((error) => {
+        alert("Erro ao sair: " + error.message);
       });
     });
 
+    // Verifica se o usuário está logado
     onAuthStateChanged(auth, (user) => {
       if (user) {
+        // Usuário logado: exibe o perfil
         loginSection.style.display = "none";
         profileSection.style.display = "block";
 
@@ -131,6 +145,7 @@
         document.getElementById("userEmail").textContent = user.email;
         document.getElementById("userPhoto").src = user.photoURL;
       } else {
+        // Usuário não logado: exibe a tela de login
         loginSection.style.display = "block";
         profileSection.style.display = "none";
       }
