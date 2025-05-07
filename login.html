@@ -65,18 +65,29 @@
 
     <script src="script.js"></script>
 </body>
-
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
-  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import {
+    getAuth,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    GoogleAuthProvider,
+    signInWithPopup,
+    sendEmailVerification,
+    deleteUser
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import {
+    getFirestore,
+    doc,
+    setDoc
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyATG5P2NvdecjCPO7gzFNGs6l7plDrxY04",
     authDomain: "sdel-16c6a.firebaseapp.com",
     projectId: "sdel-16c6a",
-    storageBucket: "sdel-16c6a.appspot.com", // Corrigido .app para .appspot.com
+    storageBucket: "sdel-16c6a.appspot.com",
     messagingSenderId: "676676370586",
     appId: "1:676676370586:web:444947d3dda78a80d9df23",
     measurementId: "G-FZWQ9FYZG5"
@@ -86,8 +97,9 @@
   const analytics = getAnalytics(app);
   const auth = getAuth(app);
   const db = getFirestore(app);
-  const provider = new GoogleAuthProvider(); // <== ESTA LINHA FALTAVA
+  const provider = new GoogleAuthProvider();
 
+  // === CADASTRO COM VERIFICAÇÃO DE EMAIL E REDIRECIONAMENTO PÓS-VERIFICAÇÃO ===
   window.fazerCadastro = function () {
     const nome = document.getElementById("nomeCadastro").value;
     const email = document.getElementById("emailCadastro").value;
@@ -95,36 +107,64 @@
 
     createUserWithEmailAndPassword(auth, email, senha)
       .then((userCredential) => {
-        alert("Cadastro realizado com sucesso!");
-        const userRef = doc(db, "users", userCredential.user.uid);
+        const user = userCredential.user;
+
+        // Salvar no Firestore
+        const userRef = doc(db, "users", user.uid);
         setDoc(userRef, {
           nome: nome,
-          email: email
-        }).then(() => {
-          console.log("Nome salvo no Firestore!");
+          email: email,
+          createdAt: new Date()
         });
-        window.location.href = "index.html";
+
+        // Envia email de verificação
+        sendEmailVerification(user)
+          .then(() => {
+            alert("Verifique seu e-mail. Redirecionaremos automaticamente quando a verificação for feita.");
+
+            // Verifica se o email foi verificado automaticamente a cada 3 segundos
+            const intervalId = setInterval(async () => {
+              await auth.currentUser.reload();
+              if (auth.currentUser.emailVerified) {
+                clearInterval(intervalId);
+                alert("Email verificado com sucesso!");
+                window.location.href = "index.html";
+              }
+            }, 3000);
+          })
+          .catch((error) => {
+            alert("Erro ao enviar email de verificação: " + error.message);
+          });
       })
       .catch((error) => {
         alert("Erro no cadastro: " + error.message);
       });
   };
 
+  // === LOGIN COM VERIFICAÇÃO DE EMAIL ===
   window.fazerLogin = function () {
     const email = document.getElementById("emailLogin").value;
     const senha = document.getElementById("senhaLogin").value;
 
     signInWithEmailAndPassword(auth, email, senha)
-      .then((userCredential) => {
-        alert("Login realizado com sucesso!");
-        window.location.href = "index.html";
+      .then(async (userCredential) => {
+        const user = userCredential.user;
+        await user.reload();
+
+        if (user.emailVerified) {
+          alert("Login realizado com sucesso!");
+          window.location.href = "index.html";
+        } else {
+          alert("Por favor, verifique seu email antes de fazer login.");
+          auth.signOut();
+        }
       })
       .catch((error) => {
         alert("Erro no login: " + error.message);
       });
   };
 
-  // Login com Google
+  // === LOGIN COM GOOGLE ===
   document.getElementById('googleLogin').addEventListener('click', (e) => {
     e.preventDefault();
     signInWithPopup(auth, provider)
@@ -138,15 +178,36 @@
       });
   });
 
-  sendEmailVerification(userCredential.user)
-  .then(() => {
-    alert("Cadastro criado com sucesso! Verifique seu email antes de fazer login.");
-    // Opcional: redirecionar ou exibir uma mensagem
-    window.location.href = "verifique-email.html"; // opcional
-  })
-  .catch((error) => {
-    alert("Erro ao enviar email de verificação: " + error.message);
-  });
+  // === EXCLUSÃO AUTOMÁTICA DE CONTAS NÃO VERIFICADAS APÓS 2 MINUTOS ===
+  window.verificarEmail = function () {
+    const user = auth.currentUser;
+    if (user) {
+      const createdAt = user.metadata.creationTime;
+      const agora = new Date().getTime();
+      const minutos = (agora - new Date(createdAt).getTime()) / 1000 / 60;
+
+      if (!user.emailVerified && minutos > 2) {
+        deleteUser(user)
+          .then(() => {
+            alert("Conta excluída por falta de verificação.");
+          })
+          .catch((error) => {
+            console.error("Erro ao excluir: ", error);
+          });
+      }
+    }
+  };
+
+  // Verifica
+
 </script>
+
+
+
+
+
+
+
+
   
 </html>
