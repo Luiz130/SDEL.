@@ -34,6 +34,7 @@
         
         <div class="menu-container">
             <img src="https://w7.pngwing.com/pngs/265/983/png-transparent-magnifying-glass-computer-icons-magnifier-symbol-magnifying-glass-glass-text-magnifier-thumbnail.png" class="menu-image" id="profileImage" alt="Perfil" width="30" height="30">
+
             
             <div class="perfil-options" id="perfilOptions">
               <a href="perfil.html">Perfil</a>
@@ -217,6 +218,18 @@
     const larguraItem = 130; // largura + espaço
     carrossel.scrollLeft += direcao * larguraItem;
   }
+
+  firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    // O usuário está logado
+    const photoURL = user.photoURL;
+
+    // Agora atualiza a imagem de perfil
+    document.getElementById('profileImage').src = photoURL;
+  } else {
+    // Usuário não está logado
+  }
+});
 </script>
 
 </body>
