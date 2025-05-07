@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f0f2f5;
+      background: linear-gradient(to right, #2196F3, #21CBF3);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -18,11 +18,11 @@
     .profile-container {
       background: white;
       padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 16px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.15);
       text-align: center;
-      width: 90%;
-      max-width: 400px;
+      width: 100%;
+      max-width: 420px;
     }
 
     .profile-container img {
@@ -30,24 +30,26 @@
       width: 100px;
       height: 100px;
       margin-bottom: 1rem;
+      border: 3px solid #2196F3;
     }
 
     .profile-container h2 {
       margin: 0.5rem 0;
+      color: #0d47a1;
     }
 
-    .logout-btn, .back-btn {
-      margin-top: 1rem;
-      padding: 0.5rem 1rem;
-      background: #007bff;
-      color: white;
-      border: none;
+    .profile-container p {
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+
+    .info-box {
+      background: #e3f2fd;
+      padding: 1rem;
       border-radius: 8px;
-      cursor: pointer;
-    }
-
-    .logout-btn {
-      background: #ff5252;
+      margin-top: 1rem;
+      color: #0d47a1;
+      font-weight: bold;
     }
 
     .input-group {
@@ -57,6 +59,7 @@
 
     .input-group label {
       font-weight: bold;
+      color: #0d47a1;
     }
 
     .input-group textarea {
@@ -66,13 +69,33 @@
       border-radius: 8px;
       padding: 0.5rem;
       resize: vertical;
+      margin-top: 0.5rem;
     }
 
-    .info-box {
-      background: #f8f9fa;
-      padding: 1rem;
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1.5rem;
+    }
+
+    .btn {
+      padding: 0.6rem 1rem;
+      border: none;
       border-radius: 8px;
-      margin-top: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      flex: 1;
+      margin: 0 0.5rem;
+    }
+
+    .btn-exit {
+      background: #f44336;
+      color: white;
+    }
+
+    .btn-back {
+      background: #0d47a1;
+      color: white;
     }
   </style>
 </head>
@@ -81,8 +104,9 @@
     <img id="userPhoto" alt="Foto do usuário">
     <h2 id="userName">Nome</h2>
     <p id="userEmail">Email</p>
+
     <div class="info-box">
-      <p><strong>Plano:</strong> Comum</p>
+      Plano: Comum
     </div>
 
     <div class="input-group">
@@ -90,8 +114,10 @@
       <textarea id="biografia" placeholder="Escreva algo sobre você..."></textarea>
     </div>
 
-    <button class="logout-btn" id="logout">Sair</button>
-    <button class="back-btn" onclick="window.location.href='index.html'">Voltar</button>
+    <div class="button-container">
+      <button class="btn btn-back" onclick="window.location.href='index.html'">Voltar à Página Inicial</button>
+      <button class="btn btn-exit" id="logout">Encerrar Sessão</button>
+    </div>
   </div>
 
   <script type="module">
@@ -119,7 +145,6 @@
     const logoutBtn = document.getElementById('logout');
     const bioInput = document.getElementById('biografia');
 
-    // Salva e recupera a biografia localmente (pode ser adaptado para Firebase DB depois)
     function salvarBiografia(email, texto) {
       localStorage.setItem('bio_' + email, texto);
     }
@@ -134,10 +159,7 @@
         userEmail.textContent = user.email;
         userPhoto.src = user.photoURL;
 
-        // Carrega bio salva
         bioInput.value = carregarBiografia(user.email);
-
-        // Salva quando digita
         bioInput.addEventListener('input', () => {
           salvarBiografia(user.email, bioInput.value);
         });
