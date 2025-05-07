@@ -3,92 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login e Perfil com Google</title>
+  <title>Perfil do Usuário</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to right, #e3f2fd, #fce4ec);
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       height: 100vh;
-      padding: 20px;
+      margin: 0;
     }
 
-    .container {
-      background-color: white;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      max-width: 400px;
-      width: 100%;
+    .profile-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
       text-align: center;
     }
 
-    h2 {
-      margin-bottom: 20px;
-      color: #333;
+    .profile-container img {
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      margin-bottom: 1rem;
     }
 
-    button {
-      background-color: #4285F4;
+    .profile-container h2 {
+      margin: 0.5rem 0;
+    }
+
+    .logout-btn {
+      margin-top: 1.5rem;
+      padding: 0.5rem 1rem;
+      background: #ff5252;
       color: white;
       border: none;
-      padding: 12px 20px;
-      font-size: 16px;
       border-radius: 8px;
       cursor: pointer;
-      transition: background-color 0.3s;
-      margin-top: 10px;
-    }
-
-    button:hover {
-      background-color: #3367D6;
-    }
-
-    img {
-      border-radius: 50%;
-      margin-bottom: 15px;
-    }
-
-    p {
-      margin: 8px 0;
-      color: #444;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Login Section -->
-    <div id="loginSection">
-      <h2>Entrar com Google</h2>
-      <button id="googleLogin">Login com Google</button>
-    </div>
-
-    <!-- Profile Section -->
-    <div id="profileSection" style="display: none;">
-      <h2>Perfil do Usuário</h2>
-      <img id="userPhoto" alt="Foto de perfil" width="100">
-      <p><strong>Nome:</strong> <span id="userName"></span></p>
-      <p><strong>Email:</strong> <span id="userEmail"></span></p>
-      <button id="logoutBtn">Sair</button>
-    </div>
+  <div class="profile-container" id="profile">
+    <img id="userPhoto" alt="Foto do usuário">
+    <h2 id="userName">Nome</h2>
+    <p id="userEmail">Email</p>
+    <button class="logout-btn" id="logout">Sair</button>
   </div>
 
-  <!-- Firebase SDKs -->
   <script type="module">
-    // Importações do Firebase
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-analytics.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
 
-    // Configuração do Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyATG5P2NvdecjCPO7gzFNGs6l7plDrxY04",
       authDomain: "sdel-16c6a.firebaseapp.com",
@@ -99,56 +68,29 @@
       measurementId: "G-FZWQ9FYZG5"
     };
 
-    // Inicializa o Firebase
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
-
-    // Inicializa o Auth e GoogleAuthProvider
     const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
 
-    // Elementos da página
-    const loginBtn = document.getElementById("googleLogin");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const loginSection = document.getElementById("loginSection");
-    const profileSection = document.getElementById("profileSection");
+    const userName = document.getElementById('userName');
+    const userEmail = document.getElementById('userEmail');
+    const userPhoto = document.getElementById('userPhoto');
+    const logoutBtn = document.getElementById('logout');
 
-    // Ação de login com Google
-    loginBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      signInWithPopup(auth, provider)
-        .then((result) => {
-          alert(`Bem-vindo(a), ${result.user.displayName}!`);
-        })
-        .catch((error) => {
-          alert("Erro no login com Google: " + error.message);
-        });
-    });
-
-    // Ação de logout
-    logoutBtn.addEventListener("click", () => {
-      signOut(auth).then(() => {
-        alert("Você saiu.");
-      }).catch((error) => {
-        alert("Erro ao sair: " + error.message);
-      });
-    });
-
-    // Verifica se o usuário está logado
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        // Usuário logado: exibe o perfil
-        loginSection.style.display = "none";
-        profileSection.style.display = "block";
-
-        document.getElementById("userName").textContent = user.displayName;
-        document.getElementById("userEmail").textContent = user.email;
-        document.getElementById("userPhoto").src = user.photoURL;
+        userName.textContent = user.displayName;
+        userEmail.textContent = user.email;
+        userPhoto.src = user.photoURL;
       } else {
-        // Usuário não logado: exibe a tela de login
-        loginSection.style.display = "block";
-        profileSection.style.display = "none";
+        window.location.href = "login.html";
       }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      signOut(auth).then(() => {
+        window.location.href = "login.html";
+      });
     });
   </script>
 </body>
