@@ -249,5 +249,11 @@
     }
   });
 </script>
-
+<script>
+  function rolar(direcao) {
+    const carrossel = document.getElementById("carrossel");
+    const larguraItem = 130; // largura + espaço
+    carrossel.scrollLeft += direcao * larguraItem;
+  }
+</script>
 </body>
