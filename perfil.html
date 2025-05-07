@@ -1,156 +1,140 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="stylesheet" href="perfil.css">
-  <title>Perfil Pessoal</title>
+  <meta charset="UTF-8">
+  <title>Login com Google</title>
   <style>
-    body {
+    * {
       margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f4f6fc;
+      background: linear-gradient(to right, #e3f2fd, #fce4ec);
       display: flex;
-      flex-direction: column;
       align-items: center;
+      justify-content: center;
+      height: 100vh;
+      padding: 20px;
     }
 
-    .navbar {
-      width: 100%;
-      background-color: #6c63ff;
-      padding: 1rem 2rem;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      color: white;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .navbar a {
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-      transition: color 0.3s;
-    }
-
-    .navbar a:hover {
-      color: #d1d1ff;
-    }
-
-    .profile-container {
-      margin-top: 2rem;
+    .container {
       background-color: white;
-      padding: 2rem;
-      border-radius: 20px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-      text-align: center;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       max-width: 400px;
-      width: 90%;
+      width: 100%;
+      text-align: center;
     }
 
-    .profile-img {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      margin-bottom: 1rem;
-    }
-
-    .full-name {
-      font-size: 1.5rem;
-      font-weight: bold;
+    h2 {
+      margin-bottom: 20px;
       color: #333;
     }
 
-    .display-name {
-      font-size: 1.1rem;
-      color: #777;
+    button {
+      background-color: #4285F4;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-top: 10px;
     }
 
-    .plan {
-      margin-top: 1rem;
-      font-weight: bold;
-      color: #6c63ff;
+    button:hover {
+      background-color: #3367D6;
     }
 
-    .bio-title {
-      margin-top: 1.5rem;
-      font-size: 1.2rem;
-      font-weight: bold;
+    img {
+      border-radius: 50%;
+      margin-bottom: 15px;
+    }
+
+    p {
+      margin: 8px 0;
       color: #444;
-    }
-
-    .bio {
-      margin-top: 0.5rem;
-      font-size: 1rem;
-      color: #555;
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <div id="loginSection">
+      <h2>Entrar com Google</h2>
+      <button id="googleLogin">Login com Google</button>
+    </div>
 
-  <div class="navbar">
-    <span>Meu Perfil</span>
-    <a href="index.html">🏠 Página Inicial</a>
+    <div id="profileSection" style="display: none;">
+      <h2>Perfil</h2>
+      <img id="userPhoto" alt="Foto de perfil" width="100">
+      <p><strong>Nome:</strong> <span id="userName"></span></p>
+      <p><strong>Email:</strong> <span id="userEmail"></span></p>
+      <button id="logoutBtn">Sair</button>
+    </div>
   </div>
 
-  <div class="profile-container">
-    <img 
-      id="profile-img"
-      src="https://api.dicebear.com/7.x/initials/svg?seed=L&backgroundColor=6c63ff,83aaff&radius=50" 
-      alt="Imagem de perfil com letra L" 
-      class="profile-img"
-    />
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+    import {
+      getAuth,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
 
-    <div id="full-name" class="full-name">Carregando...</div>
-    <div id="display-name" class="display-name">Carregando...</div>
-    <div id="plan" class="plan">Carregando...</div>
-
-    <div class="bio-title">Biografia</div>
-    <div id="bio" class="bio">Carregando...</div>
-  </div>
-
-  <!-- Firebase compat scripts -->
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
-
-  <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyATG5P2NvdecjCPO7gzFNGs6l7plDrxY04",
-      authDomain: "sdel-16c6a.firebaseapp.com",
-      projectId: "sdel-16c6a",
-      storageBucket: "sdel-16c6a.appspot.com",
-      messagingSenderId: "676676370586",
-      appId: "1:676676370586:web:444947d3dda78a80d9df23",
-      measurementId: "G-FZWQ9FYZG5"
+      apiKey: "SUA_API_KEY",
+      authDomain: "SEU_DOMINIO.firebaseapp.com",
+      projectId: "SEU_PROJECT_ID",
+      appId: "SEU_APP_ID"
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
 
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        const uid = user.uid;
-        db.collection("usuarios").doc(uid).get().then(doc => {
-          if (doc.exists) {
-            const dados = doc.data();
-            document.getElementById("full-name").textContent = dados.nomeCompleto || "Nome completo";
-            document.getElementById("display-name").textContent = dados.nomeExibicao || "Nome de exibição";
-            document.getElementById("plan").textContent = dados.plano || "Plano não definido";
-            document.getElementById("bio").textContent = dados.bio || "Sem biografia.";
-            document.getElementById("profile-img").src = dados.foto || `https://api.dicebear.com/7.x/initials/svg?seed=${(dados.nomeExibicao || 'L')[0]}&backgroundColor=6c63ff,83aaff&radius=50`;
-          } else {
-            alert("Dados de usuário não encontrados.");
-          }
-        }).catch(error => {
-          console.error("Erro ao buscar dados:", error);
+    const loginBtn = document.getElementById("googleLogin");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const loginSection = document.getElementById("loginSection");
+    const profileSection = document.getElementById("profileSection");
+
+    loginBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      signInWithPopup(auth, provider)
+        .then((result) => {
+          alert(`Bem-vindo(a), ${result.user.displayName}!`);
+        })
+        .catch((error) => {
+          alert("Erro no login com Google: " + error.message);
         });
+    });
+
+    logoutBtn.addEventListener("click", () => {
+      signOut(auth).then(() => {
+        alert("Você saiu.");
+      });
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        loginSection.style.display = "none";
+        profileSection.style.display = "block";
+
+        document.getElementById("userName").textContent = user.displayName;
+        document.getElementById("userEmail").textContent = user.email;
+        document.getElementById("userPhoto").src = user.photoURL;
       } else {
-        window.location.href = "login.html";
+        loginSection.style.display = "block";
+        profileSection.style.display = "none";
       }
     });
   </script>
-
 </body>
 </html>
