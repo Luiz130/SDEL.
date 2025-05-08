@@ -227,7 +227,7 @@
       signInWithPopup(auth, provider)
         .then((result) => {
           const user = result.user;
-          userPhoto.src = user.photoURL || 'https://via.placeholder.com/110';  // Coloca a foto do Google ou uma imagem padrão
+          userPhoto.src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/3736/3736502.png";  // Coloca a foto do Google ou uma imagem padrão
           alert(`Login bem-sucedido! A foto foi atualizada para a sua foto do Google.`);
         })
         .catch((error) => {
