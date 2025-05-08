@@ -128,7 +128,7 @@
               if (auth.currentUser.emailVerified) {
                 clearInterval(intervalId);
                 alert("Email verificado com sucesso!");
-                window.location.href = "index.html";
+                window.location.href = "perfil.html"; // Redireciona para o perfil
               }
             }, 3000);
           })
@@ -153,7 +153,7 @@
 
         if (user.emailVerified) {
           alert("Login realizado com sucesso!");
-          window.location.href = "perfil.html";
+          window.location.href = "perfil.html"; // Redireciona para o perfil
         } else {
           alert("Por favor, verifique seu email antes de fazer login.");
           auth.signOut();
@@ -171,7 +171,7 @@
       .then((result) => {
         const user = result.user;
         alert(`Bem-vindo(a), ${user.displayName}!`);
-        window.location.href = "perfil.html";
+        window.location.href = "perfil.html"; // Redireciona para o perfil após o login
       })
       .catch((error) => {
         alert("Erro no login com Google: " + error.message);
@@ -199,8 +199,8 @@
   };
 
   // Verifica
-
 </script>
+
 
 
 
