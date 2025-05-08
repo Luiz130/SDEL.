@@ -56,7 +56,7 @@
 
     .input-group {
       margin-top: 1.5rem;
-      text-align: right; /* Alinhando biografia à direita */
+      text-align: left; /* Alinhando biografia à esquerda */
     }
 
     .input-group label {
@@ -64,7 +64,6 @@
       color: #0d47a1;
       display: block;
       margin-bottom: 0.5rem;
-      text-align: right; /* Alinhando label à direita */
     }
 
     .input-group textarea {
@@ -107,14 +106,37 @@
       background-color: #1c3f7c; /* Cor ao passar o mouse (azul mais escuro) */
     }
 
+    /* Estilizando o botão de adicionar foto */
     #choosePhotoBtn {
       background-color: #0d47a1; /* Cor do botão de foto */
+      color: #fff;
+      padding: 0.8rem 1.5rem; /* Tamanho maior */
+      font-size: 1rem; /* Fonte mais legível */
+      border-radius: 12px; /* Bordas arredondadas */
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px; /* Espaçamento entre o texto e o ícone */
+      margin-top: 1.5rem; /* Margem superior para separar do conteúdo */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+      transition: background-color 0.3s, transform 0.3s;
     }
 
     #choosePhotoBtn:hover {
-      background-color: #1c3f7c; /* Cor ao passar o mouse no botão de foto */
+      background-color: #1c3f7c; /* Cor ao passar o mouse */
+      transform: scale(1.05); /* Efeito de aumento ao passar o mouse */
     }
 
+    #choosePhotoBtn i {
+      font-size: 1.2rem; /* Tamanho do ícone */
+    }
+
+    /* Alinhamento do botão de foto abaixo da biografia */
+    .profile-container .button-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-top: 1.5rem; /* Ajuste para ficar mais espaçado */
+    }
   </style>
 </head>
 <body>
@@ -127,19 +149,25 @@
       Plano: Comum
     </div>
 
+    <!-- Campo de biografia alinhado à esquerda -->
     <div class="input-group">
       <label for="biografia">Biografia:</label>
       <textarea id="biografia" maxlength="300" placeholder="Escreva algo sobre você (máx. 300 caracteres)..."></textarea>
       <div class="char-count" id="charCount">0/300</div>
     </div>
 
+    <!-- Botões principais: voltar e logout -->
     <div class="button-container">
       <button class="btn" onclick="window.location.href='index.html'">Voltar à Página Inicial</button>
       <button class="btn" id="logout">Encerrar Sessão</button>
     </div>
 
-    <div>
-      <button class="btn" id="choosePhotoBtn">Colocar Foto</button> <!-- Botão para escolher foto -->
+    <!-- Botão de adicionar foto com ícone -->
+    <div class="button-wrapper">
+      <button class="btn" id="choosePhotoBtn">
+        <i class="material-icons">camera_alt</i> <!-- Ícone de câmera -->
+        Colocar Foto
+      </button>
     </div>
   </div>
 
@@ -171,26 +199,15 @@
     const charCount = document.getElementById('charCount');
     const choosePhotoBtn = document.getElementById('choosePhotoBtn');
 
-    // Colocar foto (login com Google)
-    choosePhotoBtn.addEventListener('click', () => {
-      signInWithPopup(auth, provider)
-        .then((result) => {
-          const user = result.user;
-          userPhoto.src = user.photoURL || 'https://via.placeholder.com/110';  // Coloca a foto do Google ou uma imagem padrão
-          alert(`Login bem-sucedido! A foto foi atualizada para a sua foto do Google.`);
-          choosePhotoBtn.style.display = 'none';  // Esconde o botão de "colocar foto" após login
-        })
-        .catch((error) => {
-          alert("Erro no login com Google: " + error.message);
-        });
-    });
-
-    // Carregar o perfil e foto do usuário
+    // Verifica se o usuário está logado e oculta o botão de foto se necessário
     onAuthStateChanged(auth, (user) => {
       if (user) {
         userName.textContent = user.displayName;
         userEmail.textContent = user.email;
         userPhoto.src = user.photoURL || 'https://via.placeholder.com/110'; // Foto padrão se não tiver foto no perfil
+
+        // Esconde o botão de foto se o usuário já estiver logado
+        choosePhotoBtn.style.display = 'none';
 
         const bio = localStorage.getItem('bio_' + user.email) || '';
         bioInput.value = bio;
@@ -204,6 +221,20 @@
       } else {
         window.location.href = "login.html";
       }
+    });
+
+    // Colocar foto (login com Google)
+    choosePhotoBtn.addEventListener('click', () => {
+      signInWithPopup(auth, provider)
+        .then((result) => {
+          const user = result.user;
+          userPhoto.src = user.photoURL || 'https://via.placeholder.com/110';  // Coloca a foto do Google ou uma imagem padrão
+          alert(`Login bem-sucedido! A foto foi atualizada para a sua foto do Google.`);
+          choosePhotoBtn.style.display = 'none';  // Esconde o botão de "colocar foto" após login
+        })
+        .catch((error) => {
+          alert("Erro no login com Google: " + error.message);
+        });
     });
 
     logoutBtn.addEventListener('click', () => {
