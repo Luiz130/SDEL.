@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #c9d6ff, #1976d2);
+      background-color: #c9d6ff; /* Fundo sólido */
       display: flex;
       justify-content: center;
       align-items: center;
@@ -56,7 +56,7 @@
 
     .input-group {
       margin-top: 1.5rem;
-      text-align: left;
+      text-align: right; /* Alinhando biografia à direita */
     }
 
     .input-group label {
@@ -64,6 +64,7 @@
       color: #0d47a1;
       display: block;
       margin-bottom: 0.5rem;
+      text-align: right; /* Alinhando label à direita */
     }
 
     .input-group textarea {
@@ -97,13 +98,37 @@
       cursor: pointer;
       flex: 1;
       margin: 0 0.5rem;
-      background-color: #0d47a1;
+      background-color: #0d47a1; /* Cor do botão em azul escuro */
       color: #fff;
       transition: background-color 0.3s;
     }
 
     .btn:hover {
-      background-color: #44749D;
+      background-color: #1c3f7c; /* Cor ao passar o mouse (azul mais escuro) */
+    }
+
+    #choosePhotoBtn {
+      background-color: #0d47a1; /* Cor do botão de foto */
+      color: #fff;
+      padding: 0.8rem 1.5rem; /* Tamanho maior */
+      font-size: 1rem; /* Fonte mais legível */
+      border-radius: 12px; /* Bordas arredondadas */
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px; /* Espaçamento entre o texto e o ícone */
+      margin-top: 1.5rem; /* Margem superior para separar do conteúdo */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+      transition: background-color 0.3s, transform 0.3s;
+    }
+
+    #choosePhotoBtn:hover {
+      background-color: #1c3f7c; /* Cor ao passar o mouse */
+      transform: scale(1.05); /* Efeito de aumento ao passar o mouse */
+    }
+
+    #choosePhotoBtn i {
+      font-size: 1.2rem; /* Tamanho do ícone */
     }
   </style>
 </head>
@@ -129,7 +154,10 @@
     </div>
 
     <div>
-      <button class="btn" id="choosePhotoBtn">Colocar Foto</button> <!-- Botão para escolher foto -->
+      <button class="btn" id="choosePhotoBtn">
+        <i class="material-icons">camera_alt</i> <!-- Ícone de câmera -->
+        Colocar Foto
+      </button> <!-- Botão para escolher foto -->
     </div>
   </div>
 
