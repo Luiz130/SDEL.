@@ -219,6 +219,7 @@
         // Se já estiver logado, esconder o botão de foto
         choosePhotoBtn.style.display = 'none';
       } else {
+        choosePhotoBtn.style.display = 'inline-flex'; // Mostrar o botão de foto se não estiver logado
         window.location.href = "login.html";
       }
     });
