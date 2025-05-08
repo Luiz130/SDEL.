@@ -63,9 +63,7 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
-</body>
-<script type="module">
+   <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
   import {
@@ -124,13 +122,13 @@
 
             // Verifica se o email foi verificado automaticamente a cada 3 segundos
             const intervalId = setInterval(async () => {
-              await auth.currentUser.reload();
-              if (auth.currentUser.emailVerified) {
+              await user.reload();
+              if (user.emailVerified) {
                 clearInterval(intervalId);
                 alert("Email verificado com sucesso!");
-                window.location.href = "perfil.html"; // Redireciona para o perfil
+                window.location.href = "perfil.html"; // Redireciona para o perfil após a verificação
               }
-            }, 3000);
+            }, 3000); // Verifica a cada 3 segundos
           })
           .catch((error) => {
             alert("Erro ao enviar email de verificação: " + error.message);
@@ -198,8 +196,8 @@
     }
   };
 
-  // Verifica
 </script>
+
 
 
 
