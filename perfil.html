@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #0d47a1, #1976d2);
+      background: linear-gradient(to right, #c9d6ff, #1976d2);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -68,13 +68,12 @@
 
     .input-group textarea {
       width: 100%;
-      height: 100px;
+      height: 90px;
       border: 1px solid #ccc;
       border-radius: 8px;
       padding: 0.75rem;
       resize: none;
       font-size: 0.95rem;
-      box-sizing: border-box;
     }
 
     .char-count {
@@ -104,13 +103,13 @@
     }
 
     .btn:hover {
-      background-color: #08306b;
+      background-color: #44749D;
     }
   </style>
 </head>
 <body>
   <div class="profile-container" id="profile">
-    <img id="userPhoto" alt="Foto do usuário">
+    <img id="userPhoto" alt="Foto do usuário" src="https://via.placeholder.com/110"> <!-- Foto padrão -->
     <h2 id="userName">Nome</h2>
     <p id="userEmail">Email</p>
 
@@ -119,8 +118,8 @@
     </div>
 
     <div class="input-group">
-      <label for="biografia">Biografia (máx. 300 caracteres):</label>
-      <textarea id="biografia" maxlength="300" placeholder="Escreva algo sobre você..."></textarea>
+      <label for="biografia">Biografia:</label>
+      <textarea id="biografia" maxlength="300" placeholder="Escreva algo sobre você (máx. 300 caracteres)..."></textarea>
       <div class="char-count" id="charCount">0/300</div>
     </div>
 
@@ -129,21 +128,21 @@
       <button class="btn" id="logout">Encerrar Sessão</button>
     </div>
 
-    <div class="button-container">
-      <button class="btn" id="choosePhotoBtn">Colocar Foto</button>
+    <div>
+      <button class="btn" id="choosePhotoBtn">Colocar Foto</button> <!-- Botão para escolher foto -->
     </div>
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-analytics.js";
-    import { getAuth, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyATG5P2NvdecjCPO7gzFNGs6l7plDrxY04",
       authDomain: "sdel-16c6a.firebaseapp.com",
       projectId: "sdel-16c6a",
-      storageBucket: "sdel-16c6a.firebasestorage.app",
+      storageBucket: "sdel-16c6a.appspot.com",
       messagingSenderId: "676676370586",
       appId: "1:676676370586:web:444947d3dda78a80d9df23",
       measurementId: "G-FZWQ9FYZG5"
@@ -152,42 +151,48 @@
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
     const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
 
     const userName = document.getElementById('userName');
     const userEmail = document.getElementById('userEmail');
     const userPhoto = document.getElementById('userPhoto');
     const logoutBtn = document.getElementById('logout');
-    const choosePhotoBtn = document.getElementById('choosePhotoBtn');
     const bioInput = document.getElementById('biografia');
     const charCount = document.getElementById('charCount');
+    const choosePhotoBtn = document.getElementById('choosePhotoBtn');
 
-    function salvarBiografia(email, texto) {
-      localStorage.setItem('bio_' + email, texto);
-    }
+    // Colocar foto (login com Google)
+    choosePhotoBtn.addEventListener('click', () => {
+      signInWithPopup(auth, provider)
+        .then((result) => {
+          const user = result.user;
+          userPhoto.src = user.photoURL || 'https://via.placeholder.com/110';  // Coloca a foto do Google ou uma imagem padrão
+          alert(`Login bem-sucedido! A foto foi atualizada para a sua foto do Google.`);
+          choosePhotoBtn.style.display = 'none';  // Esconde o botão de "colocar foto" após login
+        })
+        .catch((error) => {
+          alert("Erro no login com Google: " + error.message);
+        });
+    });
 
-    function carregarBiografia(email) {
-      return localStorage.getItem('bio_' + email) || '';
-    }
-
+    // Carregar o perfil e foto do usuário
     onAuthStateChanged(auth, (user) => {
       if (user) {
         userName.textContent = user.displayName;
         userEmail.textContent = user.email;
-        userPhoto.src = user.photoURL;
+        userPhoto.src = user.photoURL || 'https://via.placeholder.com/110'; // Foto padrão se não tiver foto no perfil
 
-        const bio = carregarBiografia(user.email);
+        const bio = localStorage.getItem('bio_' + user.email) || '';
         bioInput.value = bio;
         charCount.textContent = `${bio.length}/300`;
 
         bioInput.addEventListener('input', () => {
           const texto = bioInput.value;
-          salvarBiografia(user.email, texto);
+          localStorage.setItem('bio_' + user.email, texto);
           charCount.textContent = `${texto.length}/300`;
         });
-
-        choosePhotoBtn.style.display = "none"; // Esconde o botão de "Colocar Foto" se já estiver logado
       } else {
-        choosePhotoBtn.style.display = "block"; // Mostra o botão de "Colocar Foto" se não estiver logado
+        window.location.href = "login.html";
       }
     });
 
@@ -195,22 +200,6 @@
       signOut(auth).then(() => {
         window.location.href = "login.html";
       });
-    });
-
-    // Função de login com Google
-    choosePhotoBtn.addEventListener('click', () => {
-      const provider = new GoogleAuthProvider();
-      signInWithPopup(auth, provider)
-        .then((result) => {
-          const user = result.user;
-          userPhoto.src = user.photoURL; // Atualiza a foto do perfil com a foto do Google
-          userName.textContent = user.displayName;
-          userEmail.textContent = user.email;
-          choosePhotoBtn.style.display = "none"; // Esconde o botão após login
-        })
-        .catch((error) => {
-          console.log(error.message);
-        });
     });
   </script>
 </body>
