@@ -443,7 +443,7 @@ h1 {
     
     display: flex;
     justify-content: center; /* Centraliza horizontalmente */
-    margin-left:-500px;
+    margin-left:-400px;
   }
   .bloco-questoes {
     width: 200px;
