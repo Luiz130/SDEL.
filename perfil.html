@@ -204,7 +204,7 @@
       if (user) {
         userName.textContent = user.displayName;
         userEmail.textContent = user.email;
-        userPhoto.src = user.photoURL || 'https://via.placeholder.com/110'; // Foto padrão se não tiver foto no perfil
+        userPhoto.src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/3736/3736502.png"; // Foto padrão se não tiver foto no perfil
 
         const bio = localStorage.getItem('bio_' + user.email) || '';
         bioInput.value = bio;
