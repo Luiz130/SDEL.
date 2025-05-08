@@ -167,7 +167,7 @@
     </div>
 
     <div class="button-wrapper">
-      <button class="btn" id="choosePhotoBtn">Adicionar Foto</button> <!-- Botão para escolher foto -->
+      <button class="btn" id="choosePhotoBtn">Adicionar Foto (Google)</button> <!-- Botão para escolher foto -->
     </div>
   </div>
 
@@ -199,7 +199,7 @@
     const charCount = document.getElementById('charCount');
     const choosePhotoBtn = document.getElementById('choosePhotoBtn');
 
-    // Verificar se já está logado e esconder o botão de adicionar foto
+    // Verificar se já está logado
     onAuthStateChanged(auth, (user) => {
       if (user) {
         userName.textContent = user.displayName;
@@ -216,8 +216,8 @@
           charCount.textContent = `${texto.length}/300`;
         });
 
-        // Se já estiver logado, esconder o botão de foto
-        choosePhotoBtn.style.display = 'none';
+        // Se o usuário já estiver logado, não permite logar novamente
+        choosePhotoBtn.style.display = 'none';  // Esconde o botão "Adicionar Foto" após login
       } else {
         choosePhotoBtn.style.display = 'inline-flex'; // Mostrar o botão de foto se não estiver logado
         window.location.href = "login.html";
@@ -231,7 +231,7 @@
           const user = result.user;
           userPhoto.src = user.photoURL || 'https://via.placeholder.com/110';  // Coloca a foto do Google ou uma imagem padrão
           alert(`Login bem-sucedido! A foto foi atualizada para a sua foto do Google.`);
-          choosePhotoBtn.style.display = 'none';  // Esconde o botão de "colocar foto" após login
+          choosePhotoBtn.style.display = 'none';  // Esconde o botão de "Adicionar Foto" após login
         })
         .catch((error) => {
           alert("Erro no login com Google: " + error.message);
