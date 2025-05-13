@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Escolher Foto</title>
+</head>
+<body>
+  <h2>Escolha sua Foto de Perfil</h2>
+  <div id="fotos">
+    <img src="foto1.png" onclick="escolherFoto(this.src)" width="100" style="cursor:pointer;">
+    <img src="foto2.png" onclick="escolherFoto(this.src)" width="100" style="cursor:pointer;">
+    <img src="foto3.png" onclick="escolherFoto(this.src)" width="100" style="cursor:pointer;">
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyATG5P2NvdecjCPO7gzFNGs6l7plDrxY04",
+      authDomain: "sdel-16c6a.firebaseapp.com",
+      projectId: "sdel-16c6a",
+      storageBucket: "sdel-16c6a.appspot.com",
+      messagingSenderId: "676676370586",
+      appId: "1:676676370586:web:444947d3dda78a80d9df23",
+      measurementId: "G-FZWQ9FYZG5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.escolherFoto = function (url) {
+      const user = auth.currentUser;
+      if (user) {
+        updateProfile(user, { photoURL: url })
+          .then(() => {
+            alert("Foto de perfil atualizada!");
+            window.location.href = "index.html";
+          })
+          .catch((error) => {
+            alert("Erro ao salvar a foto: " + error.message);
+          });
+      }
+    };
+  </script>
+</body>
+</html>
