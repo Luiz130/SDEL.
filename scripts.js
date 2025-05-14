@@ -1,106 +1,131 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyATG5P2NvdecjCPO7gzFNGs6l7plDrxY04",
+  authDomain: "sdel-16c6a.firebaseapp.com",
+  projectId: "sdel-16c6a",
+  storageBucket: "sdel-16c6a.appspot.com",
+  messagingSenderId: "676676370586",
+  appId: "1:676676370586:web:444947d3dda78a80d9df23",
+  measurementId: "G-FZWQ9FYZG5"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+let currentUser = null;
+
 const flashcards = document.querySelector(".flashcards");
 const cardForm = document.querySelector(".card-form");
 const question = document.querySelector("#question");
 const answer = document.querySelector("#answer");
 
-let id = 0;
-
-let myLocal = localStorage.getItem("items")
-  ? JSON.parse(localStorage.getItem("items"))
-  : [];
-
-function create() {
-  cardForm.style.display = "flex";
-}
-
-function cancel() {
-  cardForm.style.display = "none";
-}
-
-function removeAll() {
-  if (confirm("Deseja mesmo excluir todos os cards?")) {
-    localStorage.clear();
-    flashcards.innerHTML = "";
-    myLocal = [];
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    currentUser = user;
+    loadCards();
+  } else {
+    window.location.href = "login.html";
   }
-}
+});
 
-function save() {
-  if (question.value.length >= 1 && answer.value.length >= 1) {
-    let flashcardInfo = {
+window.create = function () {
+  cardForm.style.display = "flex";
+};
+
+window.cancel = function () {
+  cardForm.style.display = "none";
+};
+
+window.logout = function () {
+  signOut(auth).then(() => {
+    window.location.href = "login.html";
+  });
+};
+
+window.save = async function () {
+  if (question.value.trim() && answer.value.trim()) {
+    const data = {
       question: question.value,
       answer: answer.value,
-      id: id,
+      uid: currentUser.uid,
+      timestamp: new Date()
     };
-
-    myLocal.push(flashcardInfo);
-    localStorage.setItem("items", JSON.stringify(myLocal));
-
-    addCard(myLocal[myLocal.length - 1]);
+    await addDoc(collection(db, "flashcards"), data);
     question.value = "";
     answer.value = "";
+    cardForm.style.display = "none";
+    await loadCards();
   }
-}
+};
 
-myLocal.forEach(addCard);
-
-function addCard(card) {
-  cardForm.style.display = "none";
-
-  if (card.question.length >= 1 && card.answer.length >= 1) {
-    let div = document.createElement("div");
-    let h2question = document.createElement("h2");
-    let h2answer = document.createElement("h2");
-    let btn = document.createElement("button");
-    let remove = document.createElement("span");
-    let number = document.createElement("span");
-
-    div.className = "flashcard";
-    div.setAttribute("id", id);
-
-    remove.className = "remove";
-    number.className = "number";
-
-    h2question.setAttribute("style", "text-align: justify");
-    h2question.innerHTML = card.question;
-
-    h2answer.setAttribute(
-      "style",
-      "text-align: center; display: none; color: green"
-    );
-    h2answer.innerHTML = card.answer;
-
-    btn.innerHTML = "mostrar";
-    remove.innerHTML = "x";
-    number.innerHTML = id + 1;
-
-    div.appendChild(h2question);
-    div.appendChild(h2answer);
-    div.appendChild(btn);
-    div.appendChild(remove);
-    div.appendChild(number);
-
-    flashcards.appendChild(div);
-
-    btn.addEventListener("click", () => {
-      h2answer.style.display === "none"
-        ? (h2answer.style.display = "block")
-        : (h2answer.style.display = "none");
-
-      btn.innerHTML === "mostrar"
-        ? (btn.innerHTML = "esconder")
-        : (btn.innerHTML = "mostrar");
-    });
-
-    remove.addEventListener("click", (e) => {
-      let flashcardId = e.target.parentNode.id;
-      if (confirm(`Deseja mesmo excluir o card ${Number(flashcardId) + 1}?`)) {
-        myLocal.splice(flashcardId, 1);
-        localStorage.setItem("items", JSON.stringify(myLocal));
-        window.location.reload();
+window.removeAll = async function () {
+  if (confirm("Deseja mesmo excluir todos os cards?")) {
+    const snapshot = await getDocs(collection(db, "flashcards"));
+    const promises = snapshot.docs.map((docSnap) => {
+      if (docSnap.data().uid === currentUser.uid) {
+        return deleteDoc(doc(db, "flashcards", docSnap.id));
       }
     });
-
-    id++;
+    await Promise.all(promises);
+    loadCards();
   }
+};
+
+async function loadCards() {
+  flashcards.innerHTML = "";
+  const snapshot = await getDocs(collection(db, "flashcards"));
+  let count = 1;
+  snapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+    if (data.uid === currentUser.uid) {
+      addCard({ ...data, id: docSnap.id, number: count++ });
+    }
+  });
+}
+
+function addCard(card) {
+  const div = document.createElement("div");
+  div.className = "flashcard";
+  div.setAttribute("data-id", card.id);
+
+  const h2question = document.createElement("h2");
+  h2question.style.textAlign = "justify";
+  h2question.innerText = card.question;
+
+  const h2answer = document.createElement("h2");
+  h2answer.style = "text-align: center; display: none; color: green";
+  h2answer.innerText = card.answer;
+
+  const btn = document.createElement("button");
+  btn.innerText = "mostrar";
+  btn.onclick = () => {
+    h2answer.style.display = h2answer.style.display === "none" ? "block" : "none";
+    btn.innerText = btn.innerText === "mostrar" ? "esconder" : "mostrar";
+  };
+
+  const remove = document.createElement("span");
+  remove.className = "remove";
+  remove.innerText = "x";
+  remove.onclick = async () => {
+    if (confirm("Deseja excluir este card?")) {
+      await deleteDoc(doc(db, "flashcards", card.id));
+      loadCards();
+    }
+  };
+
+  const number = document.createElement("span");
+  number.className = "number";
+  number.innerText = card.number;
+
+  div.appendChild(h2question);
+  div.appendChild(h2answer);
+  div.appendChild(btn);
+  div.appendChild(remove);
+  div.appendChild(number);
+
+  flashcards.appendChild(div);
 }
