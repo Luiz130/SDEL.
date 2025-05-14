@@ -1,38 +1,35 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Flashcards</title>
-    <link rel="stylesheet" href="flashcards.css" />
-  </head>
-  <body>
-    <div class="nav">
-      <h1>Flashcards</h1>
-      <div>
-        <button onclick="create()">Novo card</button>
-        <button onclick="removeAll()">Excluir todos</button>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flashcards</title>
+  <link rel="stylesheet" href="flashcards.css" />
+  <script type="module" src="scripts.js" defer></script>
+</head>
+<body>
+  <div class="nav">
+    <h1>Flashcards</h1>
+    <div>
+      <button onclick="create()">Novo card</button>
+      <button onclick="removeAll()">Excluir todos</button>
+      <button onclick="logout()">Sair</button>
+    </div>
+  </div>
+
+  <div class="card-form">
+    <div class="card-form-box">
+      <h2>Criar card</h2>
+      <input type="text" id="question" placeholder="Insira a questão" />
+      <input type="text" id="answer" placeholder="Insira a resposta" />
+      <span class="obs">Certifique-se de preencher os campos de pergunta e resposta</span>
+      <div class="btns">
+        <button onclick="save()">Salvar</button>
+        <button onclick="cancel()">Cancelar</button>
       </div>
     </div>
+  </div>
 
-    <div class="card-form">
-      <div class="card-form-box">
-        <h2>Criar card</h2>
-        <input type="text" id="question" placeholder="Insira a questão" />
-        <input type="text" id="answer" placeholder="Insira a resposta" />
-
-        <span class="obs"
-          >Certifique-se de preencher os campos de pergunta e resposta</span
-        >
-        <div class="btns">
-          <button onclick="save()">Salvar</button>
-          <button onclick="cancel()">Cancelar</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="flashcards"></div>
-
-    <script src="scripts.js"></script>
-  </body>
+  <div class="flashcards"></div>
+</body>
 </html>
