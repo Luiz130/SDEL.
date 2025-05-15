@@ -208,12 +208,12 @@ const firebaseConfig = {
 
         const bio = localStorage.getItem('bio_' + user.email) || '';
         bioInput.value = bio;
-        charCount.textContent = ${bio.length}/300;
+        charCount.textContent = `${bio.length}/300`;
 
         bioInput.addEventListener('input', () => {
           const texto = bioInput.value;
           localStorage.setItem('bio_' + user.email, texto);
-          charCount.textContent = ${texto.length}/300;
+          charCount.textContent = `${texto.length}/300`;
         });
 
         // O botão "Adicionar Foto" permanece visível, mas o login já foi realizado
@@ -228,7 +228,7 @@ const firebaseConfig = {
         .then((result) => {
           const user = result.user;
           userPhoto.src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/3736/3736502.png";  // Coloca a foto do Google ou uma imagem padrão
-          alert(Login bem-sucedido! A foto foi atualizada para a sua foto do Google.);
+          alert(`Login bem-sucedido! A foto foi atualizada para a sua foto do Google.`);
         })
         .catch((error) => {
           alert("Erro no login com Google: " + error.message);
@@ -243,3 +243,4 @@ const firebaseConfig = {
   </script>
 </body>
 </html>
+
