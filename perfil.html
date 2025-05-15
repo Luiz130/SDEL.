@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Perfil do Usuário</title>
   <style>
     body {
@@ -14,6 +14,7 @@
       height: 100vh;
       margin: 0;
     }
+
     .profile-container {
       background: #ffffff;
       padding: 2rem;
@@ -23,6 +24,7 @@
       width: 100%;
       max-width: 440px;
     }
+
     .profile-container img {
       border-radius: 50%;
       width: 110px;
@@ -30,16 +32,19 @@
       margin-bottom: 1rem;
       border: 3px solid #0d47a1;
     }
+
     .profile-container h2 {
       margin: 0.5rem 0;
       color: #0d47a1;
       font-size: 1.6rem;
     }
+
     .profile-container p {
       color: #333;
       margin-bottom: 0.5rem;
       font-size: 1rem;
     }
+
     .info-box {
       background: #e3f2fd;
       padding: 1rem;
@@ -48,19 +53,23 @@
       color: #0d47a1;
       font-weight: bold;
     }
+
     .input-group {
       margin-top: 1.5rem;
       display: flex;
+      justify-content: flex-start;
       flex-direction: column;
       align-items: flex-start;
       width: 100%;
     }
+
     .input-group label {
       font-weight: bold;
       color: #0d47a1;
       display: block;
       margin-bottom: 0.5rem;
     }
+
     .input-group textarea {
       width: 100%;
       height: 90px;
@@ -71,6 +80,7 @@
       font-size: 0.95rem;
       box-sizing: border-box;
     }
+
     .char-count {
       text-align: right;
       font-size: 0.85rem;
@@ -78,11 +88,13 @@
       margin-top: 0.25rem;
       width: 100%;
     }
+
     .button-container {
       display: flex;
       justify-content: space-between;
       margin-top: 2rem;
     }
+
     .btn {
       padding: 0.6rem 1.2rem;
       border: none;
@@ -95,9 +107,11 @@
       color: #fff;
       transition: background-color 0.3s;
     }
+
     .btn:hover {
       background-color: #1c3f7c;
     }
+
     #choosePhotoBtn {
       background-color: #0d47a1;
       color: #fff;
@@ -112,13 +126,12 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       transition: background-color 0.3s, transform 0.3s;
     }
+
     #choosePhotoBtn:hover {
       background-color: #1c3f7c;
       transform: scale(1.05);
     }
-    #choosePhotoBtn i {
-      font-size: 1.2rem;
-    }
+
     .profile-container .button-wrapper {
       display: flex;
       justify-content: center;
@@ -136,11 +149,7 @@
 
     <div class="input-group">
       <label for="biografia">Biografia:</label>
-      <textarea
-        id="biografia"
-        maxlength="300"
-        placeholder="Escreva algo sobre você (máx. 300 caracteres)..."
-      ></textarea>
+      <textarea id="biografia" maxlength="300" placeholder="Escreva algo sobre você (máx. 300 caracteres)..."></textarea>
       <div class="char-count" id="charCount">0/300</div>
     </div>
 
@@ -156,14 +165,9 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import {
-      getAuth,
-      signInWithPopup,
-      GoogleAuthProvider,
-      onAuthStateChanged,
-      signOut,
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
@@ -172,49 +176,54 @@
       storageBucket: "sdel-b3f65.appspot.com",
       messagingSenderId: "297725999985",
       appId: "1:297725999985:web:d41da68311c190ef8a54d0",
-      measurementId: "G-PT92VECJ2H",
+      measurementId: "G-PT92VECJ2H"
     };
 
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
+    const db = getFirestore(app);
 
-    const userName = document.getElementById("userName");
-    const userEmail = document.getElementById("userEmail");
-    const userPhoto = document.getElementById("userPhoto");
-    const logoutBtn = document.getElementById("logout");
-    const bioInput = document.getElementById("biografia");
-    const charCount = document.getElementById("charCount");
-    const choosePhotoBtn = document.getElementById("choosePhotoBtn");
+    const userName = document.getElementById('userName');
+    const userEmail = document.getElementById('userEmail');
+    const userPhoto = document.getElementById('userPhoto');
+    const logoutBtn = document.getElementById('logout');
+    const bioInput = document.getElementById('biografia');
+    const charCount = document.getElementById('charCount');
+    const choosePhotoBtn = document.getElementById('choosePhotoBtn');
 
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
         userName.textContent = user.displayName;
         userEmail.textContent = user.email;
-        userPhoto.src =
-          user.photoURL || "https://cdn-icons-png.flaticon.com/512/3736/3736502.png";
+        userPhoto.src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/3736/3736502.png";
 
-        const bio = localStorage.getItem("bio_" + user.email) || "";
-        bioInput.value = bio;
-        charCount.textContent = `${bio.length}/300`;
+        const userRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(userRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          bioInput.value = data.bio || "";
+          charCount.textContent = `${bioInput.value.length}/300`;
+        }
 
         bioInput.addEventListener("input", () => {
-          const texto = bioInput.value;
-          localStorage.setItem("bio_" + user.email, texto);
-          charCount.textContent = `${texto.length}/300`;
+          const text = bioInput.value;
+          charCount.textContent = `${text.length}/300`;
+          setDoc(userRef, { bio: text }, { merge: true });
         });
+
       } else {
         window.location.href = "login.html";
       }
     });
 
-    choosePhotoBtn.addEventListener("click", () => {
+    choosePhotoBtn.addEventListener('click', () => {
       signInWithPopup(auth, provider)
         .then((result) => {
           const user = result.user;
-          userPhoto.src =
-            user.photoURL || "https://cdn-icons-png.flaticon.com/512/3736/3736502.png";
+          userPhoto.src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/3736/3736502.png";
           alert("Login bem-sucedido! A foto foi atualizada para a sua foto do Google.");
         })
         .catch((error) => {
@@ -222,7 +231,7 @@
         });
     });
 
-    logoutBtn.addEventListener("click", () => {
+    logoutBtn.addEventListener('click', () => {
       signOut(auth).then(() => {
         window.location.href = "login.html";
       });
