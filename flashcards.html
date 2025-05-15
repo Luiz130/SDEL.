@@ -2,34 +2,102 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Flashcards</title>
-  <link rel="stylesheet" href="flashcards.css" />
-  <script type="module" src="scripts.js" defer></script>
+  <style>
+    body { font-family: Arial; background: #f0f0f0; padding: 20px; }
+    .flashcard { background: white; margin: 10px 0; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .card-form { display: flex; flex-direction: column; gap: 10px; max-width: 400px; margin-bottom: 20px; }
+  </style>
 </head>
 <body>
-  <div class="nav">
-    <h1>Flashcards</h1>
-    <div>
-      <button onclick="create()">Novo card</button>
-      <button onclick="removeAll()">Excluir todos</button>
-
-    </div>
-  </div>
+  <h1>Meus Flashcards</h1>
 
   <div class="card-form">
-    <div class="card-form-box">
-      <h2>Criar card</h2>
-      <input type="text" id="question" placeholder="Insira a questão" />
-      <input type="text" id="answer" placeholder="Insira a resposta" />
-      <span class="obs">Certifique-se de preencher os campos de pergunta e resposta</span>
-      <div class="btns">
-        <button onclick="save()">Salvar</button>
-        <button onclick="cancel()">Cancelar</button>
-      </div>
-    </div>
+    <input type="text" id="question" placeholder="Pergunta"/>
+    <input type="text" id="answer" placeholder="Resposta"/>
+    <button onclick="saveFlashcard()">Salvar</button>
   </div>
 
-  <div class="flashcards"></div>
+  <div id="flashcards"></div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
+      authDomain: "sdel-b3f65.firebaseapp.com",
+      projectId: "sdel-b3f65",
+      storageBucket: "sdel-b3f65.appspot.com",
+      messagingSenderId: "297725999985",
+      appId: "1:297725999985:web:d41da68311c190ef8a54d0",
+      measurementId: "G-PT92VECJ2H"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth();
+
+    const questionInput = document.getElementById("question");
+    const answerInput = document.getElementById("answer");
+    const flashcardsDiv = document.getElementById("flashcards");
+
+    let currentUser = null;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        await loadFlashcards();
+      } else {
+        alert("Você precisa estar logado.");
+        window.location.href = "login.html";
+      }
+    });
+
+    async function saveFlashcard() {
+      const question = questionInput.value.trim();
+      const answer = answerInput.value.trim();
+
+      if (!question || !answer) {
+        alert("Preencha a pergunta e a resposta.");
+        return;
+      }
+
+      try {
+        const docRef = await addDoc(collection(db, "flashcards"), {
+          question,
+          answer,
+          userId: currentUser.uid,
+          createdAt: new Date()
+        });
+
+        addFlashcardToPage({ question, answer });
+        questionInput.value = "";
+        answerInput.value = "";
+      } catch (e) {
+        console.error("Erro ao salvar:", e);
+        alert("Erro ao salvar no Firebase.");
+      }
+    }
+
+    async function loadFlashcards() {
+      const q = query(collection(db, "flashcards"), where("userId", "==", currentUser.uid));
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        addFlashcardToPage(data);
+      });
+    }
+
+    function addFlashcardToPage({ question, answer }) {
+      const div = document.createElement("div");
+      div.className = "flashcard";
+      div.innerHTML = `<strong>Pergunta:</strong> ${question}<br><strong>Resposta:</strong> ${answer}`;
+      flashcardsDiv.appendChild(div);
+    }
+  </script>
 </body>
 </html>
