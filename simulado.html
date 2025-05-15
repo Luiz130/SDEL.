@@ -2,69 +2,53 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Flashcards Firebase</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #eef;
-      padding: 30px;
-    }
-
-    .flashcard {
-      background: #fff;
-      border: 1px solid #ccc;
+      background-color: #eef2f3;
+      margin: 0;
       padding: 20px;
-      margin: 10px 0;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-
-    .card-form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      max-width: 400px;
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
-
-    button {
+    input, textarea, button {
+      display: block;
+      width: 100%;
+      margin-bottom: 15px;
       padding: 10px;
-      background: #2575fc;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    input, textarea {
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 5px;
       border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .flashcard {
+      background-color: #f9f9f9;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
     }
   </style>
 </head>
 <body>
-
-  <h1>Flashcards</h1>
-
-  <div class="card-form">
-    <input type="text" id="question" placeholder="Pergunta">
-    <textarea id="answer" placeholder="Resposta"></textarea>
-    <button onclick="saveFlashcard()">Salvar Flashcard</button>
+  <div class="container">
+    <h1>Meus Flashcards</h1>
+    <input type="text" id="question" placeholder="Digite a pergunta" />
+    <textarea id="answer" placeholder="Digite a resposta"></textarea>
+    <button id="saveBtn">Salvar Flashcard</button>
+    <div class="flashcards"></div>
   </div>
 
-  <h2>Seus Flashcards</h2>
-  <div id="flashcards"></div>
-
-  <!-- Firebase SDKs -->
   <script type="module">
-    // Importa os pacotes Firebase
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-    // Configuração do seu projeto Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
       authDomain: "sdel-b3f65.firebaseapp.com",
@@ -75,71 +59,52 @@
       measurementId: "G-PT92VECJ2H"
     };
 
-    // Inicializa Firebase
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getFirestore(app);
-    const auth = getAuth();
 
-    let currentUserId = null;
+    const question = document.querySelector("#question");
+    const answer = document.querySelector("#answer");
+    const saveBtn = document.querySelector("#saveBtn");
+    const flashcardsDiv = document.querySelector(".flashcards");
 
-    // Espera login
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
-        currentUserId = user.uid;
-        loadFlashcards();
+        const userId = user.uid;
+
+        // Carregar flashcards existentes
+        const qSnap = await getDocs(query(collection(db, "biografia"), where("userId", "==", userId)));
+        qSnap.forEach(doc => {
+          const data = doc.data();
+          showFlashcard(data.question, data.answer);
+        });
+
+        saveBtn.addEventListener("click", async () => {
+          const q = question.value.trim();
+          const a = answer.value.trim();
+
+          if (q && a) {
+            await addDoc(collection(db, "biografia"), {
+              question: q,
+              answer: a,
+              userId: userId,
+              createdAt: new Date()
+            });
+            showFlashcard(q, a);
+            question.value = "";
+            answer.value = "";
+          }
+        });
       } else {
-        alert("Você precisa estar logado!");
-        // Redirecionar para login se necessário
+        alert("Você precisa estar logado para usar os flashcards.");
       }
     });
 
-    // Salva flashcard no Firestore
-    async function saveFlashcard() {
-      const question = document.getElementById("question").value.trim();
-      const answer = document.getElementById("answer").value.trim();
-
-      if (!question || !answer) {
-        alert("Preencha os dois campos!");
-        return;
-      }
-
-      try {
-        await addDoc(collection(db, "flashcards"), {
-          question,
-          answer,
-          userId: currentUserId,
-          timestamp: new Date()
-        });
-
-        document.getElementById("question").value = "";
-        document.getElementById("answer").value = "";
-
-        loadFlashcards();
-      } catch (error) {
-        console.error("Erro ao salvar flashcard:", error);
-        alert("Erro ao salvar.");
-      }
-    }
-
-    // Carrega os flashcards do Firestore
-    async function loadFlashcards() {
-      const flashcardsDiv = document.getElementById("flashcards");
-      flashcardsDiv.innerHTML = "";
-
-      const q = query(collection(db, "flashcards"), where("userId", "==", currentUserId));
-      const querySnapshot = await getDocs(q);
-
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-
-        const div = document.createElement("div");
-        div.className = "flashcard";
-        div.innerHTML = `
-          <strong>Pergunta:</strong> ${data.question}<br>
-          <strong>Resposta:</strong> ${data.answer}
-        `;
-        flashcardsDiv.appendChild(div);
-      });
+    function showFlashcard(q, a) {
+      const card = document.createElement("div");
+      card.className = "flashcard";
+      card.innerHTML = `<strong>${q}</strong><p>${a}</p>`;
+      flashcardsDiv.appendChild(card);
     }
   </script>
 </body>
