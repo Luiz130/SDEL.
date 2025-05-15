@@ -51,7 +51,6 @@
     .input-group {
       margin-top: 1.5rem;
       display: flex;
-      justify-content: flex-start;
       flex-direction: column;
       align-items: flex-start;
       width: 100%;
@@ -59,8 +58,8 @@
     .input-group label {
       font-weight: bold;
       color: #0d47a1;
-      display: block;
       margin-bottom: 0.5rem;
+      display: block;
     }
     .input-group textarea {
       width: 100%;
@@ -112,6 +111,7 @@
       margin-top: 1.5rem;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       transition: background-color 0.3s, transform 0.3s;
+      border: none;
     }
     #choosePhotoBtn:hover {
       background-color: #1c3f7c;
@@ -129,7 +129,11 @@
 </head>
 <body>
   <div class="profile-container" id="profile">
-    <img id="userPhoto" alt="Foto do usuário" src="https://via.placeholder.com/110" />
+    <img
+      id="userPhoto"
+      alt="Foto do usuário"
+      src="https://via.placeholder.com/110"
+    />
     <h2 id="userName">Nome</h2>
     <p id="userEmail">Email</p>
 
@@ -146,31 +150,36 @@
     </div>
 
     <div class="button-container">
-      <button class="btn" onclick="window.location.href='index.html'">Voltar à Página Inicial</button>
+      <button class="btn" onclick="window.location.href='index.html'">
+        Voltar à Página Inicial
+      </button>
       <button class="btn" id="logout">Encerrar Sessão</button>
     </div>
 
     <div class="button-wrapper">
-      <button class="btn" id="choosePhotoBtn">Adicionar Foto (Google)</button>
+      <button class="btn" id="choosePhotoBtn">
+        <!-- Removi o <i> pois não estava no original, mas pode adicionar se quiser -->
+        Adicionar Foto (Google)
+      </button>
     </div>
   </div>
 
   <script type="module">
-    import { initializeApp } from "firebase/app";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import {
       getAuth,
       signInWithPopup,
       GoogleAuthProvider,
       onAuthStateChanged,
       signOut,
-    } from "firebase/auth";
-    import { getAnalytics } from "firebase/analytics";
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
       authDomain: "sdel-b3f65.firebaseapp.com",
       projectId: "sdel-b3f65",
-      storageBucket: "sdel-b3f65.firebasestorage.app",
+      storageBucket: "sdel-b3f65.appspot.com", // CORRIGIDO AQUI
       messagingSenderId: "297725999985",
       appId: "1:297725999985:web:d41da68311c190ef8a54d0",
       measurementId: "G-PT92VECJ2H",
@@ -216,9 +225,7 @@
           const user = result.user;
           userPhoto.src =
             user.photoURL || "https://cdn-icons-png.flaticon.com/512/3736/3736502.png";
-          alert(
-            `Login bem-sucedido! A foto foi atualizada para a sua foto do Google.`
-          );
+          alert("Login bem-sucedido! A foto foi atualizada para a sua foto do Google.");
         })
         .catch((error) => {
           alert("Erro no login com Google: " + error.message);
