@@ -1,142 +1,134 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Escolher Simulado</title>
-<style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f0f4f8;
-    color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-image: linear-gradient(to right, #6a11cb, #2575fc);
-  }
-  .container {
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 12px 24px rgba(0,0,0,0.1);
-    width: 80%;
-    max-width: 800px;
-    padding: 40px;
-    text-align: center;
-  }
-  header h1 {
-    font-size: 3rem;
-    margin-bottom: 30px;
-    color: #333;
-    font-weight: 600;
-  }
-  .simulados {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 30px;
-  }
-  .simulado {
-    background-color: #f9fafb;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.08);
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-  }
-  .simulado:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 16px 32px rgba(0,0,0,0.15);
-  }
-  .simulado h2 {
-    font-size: 1.8rem;
-    margin-bottom: 10px;
-    color: #2575fc;
-    font-weight: 500;
-  }
-  .simulado p {
-    font-size: 1.1rem;
-    color: #555;
-    margin-bottom: 20px;
-  }
-  button {
-    background-color: #2575fc;
-    color: white;
-    border: none;
-    padding: 15px 30px;
-    font-size: 1.2rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    width: 100%;
-    max-width: 200px;
-    margin-top: 15px;
-  }
-  button:hover {
-    background-color: #1c5ab8;
-    transform: translateY(-5px);
-  }
-  button:focus {
-    outline: none;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escolher Simulado</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: linear-gradient(to right, #6a11cb, #2575fc);
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 800px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 30px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .simulados {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .simulado {
+            background-color: #f9fafb;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .simulado:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        .simulado h2 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #2575fc;
+            font-weight: 500;
+        }
+
+        .simulado p {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #2575fc;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            width: 100%;
+            max-width: 200px;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background-color: #1c5ab8;
+            transform: translateY(-5px);
+        }
+
+        button:focus {
+            outline: none;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Escolha sua matéria</h1>
-      <p>Selecione um dos simulados abaixo para testar seus conhecimentos.</p>
-    </header>
+    <div class="container">
+        <header>
+            <h1>Escolha sua matéria</h1>
+            <p>Selecione um dos simulados abaixo para testar seus conhecimentos.</p>
+        </header>
 
-    <div class="simulados">
-      <div class="simulado">
-        <h2>Matemática</h2>
-        <p>Teste seus conhecimentos em Matemática com 45 questões desafiadoras.</p>
-        <button onclick="startSimulado('Matemática')">Iniciar Simulado</button>
-      </div>
-      <div class="simulado">
-        <h2>Português</h2>
-        <p>Avalie seus conhecimentos em Português, com questões focadas na gramática e interpretação.</p>
-        <button onclick="startSimulado('Português')">Iniciar Simulado</button>
-      </div>
-      <div class="simulado">
-        <h2>Ciências da natureza</h2>
-        <p>Desafie-se com questões de Ciências, abordando biologia, física e química.</p>
-        <button onclick="startSimulado('Ciências')">Iniciar Simulado</button>
-      </div>
+        <div class="simulados">
+            <div class="simulado">
+                <h2>Matemática</h2>
+                
+                
+                <p>Teste seus conhecimentos em Matemática com 45 questões desafiadoras.</p>
+                 <a href="questoes.html">
+                <button onclick="startSimulado('Matemática')">Iniciar Simulado</button>
+                 </a>
+            </div>
+            <div class="simulado">
+                <h2>Português</h2>
+                <p>Avalie seus conhecimentos em Português, com questões focadas na gramática e interpretação.</p>
+                <button onclick="startSimulado('Português')">Iniciar Simulado</button>
+            </div>
+            <div class="simulado">
+                <h2>Ciências da natureza</h2>
+                <p>Desafie-se com questões de Ciências, abordando biologia, física e química.</p>
+                <button onclick="startSimulado('Ciências')">Iniciar Simulado</button>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <script type="module">
-    // Importa as funções necessárias do Firebase 10+
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
-
-    // Configuração do seu projeto Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
-      authDomain: "sdel-b3f65.firebaseapp.com",
-      projectId: "sdel-b3f65",
-      storageBucket: "sdel-b3f65.firebasestorage.app",
-      messagingSenderId: "297725999985",
-      appId: "1:297725999985:web:d41da68311c190ef8a54d0",
-      measurementId: "G-PT92VECJ2H"
-    };
-
-    // Inicializa Firebase e Analytics
-    const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-
-    // Função simples para iniciar o simulado
-    window.startSimulado = (materia) => {
-      alert(`Iniciando o Simulado de ${materia}`);
-      // Aqui você pode redirecionar para outra página ou carregar questões do simulado
-      // Exemplo:
-      // window.location.href = `simulado_${materia.toLowerCase()}.html`;
-    };
-  </script>
+    <script>
+        function startSimulado(simulado) {
+            alert(`Iniciando o Simulado de ${simulado}`);
+        }
+    </script>
 </body>
 </html>
