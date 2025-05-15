@@ -1,213 +1,245 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="login.css">
-    <title>Página de Login | SDEL</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil do Usuário</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #c9d6ff; /* Fundo sólido */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .profile-container {
+      background: #ffffff;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .profile-container img {
+      border-radius: 50%;
+      width: 110px;
+      height: 110px;
+      margin-bottom: 1rem;
+      border: 3px solid #0d47a1;
+    }
+
+    .profile-container h2 {
+      margin: 0.5rem 0;
+      color: #0d47a1;
+      font-size: 1.6rem;
+    }
+
+    .profile-container p {
+      color: #333;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .info-box {
+      background: #e3f2fd;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      color: #0d47a1;
+      font-weight: bold;
+    }
+
+    .input-group {
+      margin-top: 1.5rem;
+      display: flex; /* Para alinhamento */
+      justify-content: flex-start; /* Alinha os elementos à esquerda */
+      flex-direction: column;
+      align-items: flex-start; /* Alinha a biografia à esquerda */
+      width: 100%;
+    }
+
+    .input-group label {
+      font-weight: bold;
+      color: #0d47a1;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .input-group textarea {
+      width: 100%;
+      height: 90px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 0.75rem;
+      resize: none;
+      font-size: 0.95rem;
+      box-sizing: border-box; /* Garantir que o padding seja calculado corretamente */
+    }
+
+    .char-count {
+      text-align: right;
+      font-size: 0.85rem;
+      color: #555;
+      margin-top: 0.25rem;
+      width: 100%;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+    }
+
+    .btn {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      flex: 1;
+      margin: 0 0.5rem;
+      background-color: #0d47a1; /* Cor do botão em azul escuro */
+      color: #fff;
+      transition: background-color 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #1c3f7c; /* Cor ao passar o mouse (azul mais escuro) */
+    }
+
+    /* Estilizando o botão de adicionar foto */
+    #choosePhotoBtn {
+      background-color: #0d47a1; /* Cor do botão de foto */
+      color: #fff;
+      padding: 0.8rem 1.5rem; /* Tamanho maior */
+      font-size: 1rem; /* Fonte mais legível */
+      border-radius: 12px; /* Bordas arredondadas */
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px; /* Espaçamento entre o texto e o ícone */
+      margin-top: 1.5rem; /* Margem superior para separar do conteúdo */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+      transition: background-color 0.3s, transform 0.3s;
+    }
+
+    #choosePhotoBtn:hover {
+      background-color: #1c3f7c; /* Cor ao passar o mouse */
+      transform: scale(1.05); /* Efeito de aumento ao passar o mouse */
+    }
+
+    #choosePhotoBtn i {
+      font-size: 1.2rem; /* Tamanho do ícone */
+    }
+
+    /* Alinhamento do botão de foto abaixo da biografia */
+    .profile-container .button-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-top: 1.5rem; /* Ajuste para ficar mais espaçado */
+    }
+  </style>
 </head>
-
 <body>
+  <div class="profile-container" id="profile">
+    <img id="userPhoto" alt="Foto do usuário" src="https://via.placeholder.com/110"> <!-- Foto padrão -->
+    <h2 id="userName">Nome</h2>
+    <p id="userEmail">Email</p>
 
-    <div class="container" id="container">
-        <div class="form-container sign-up">
-            <form class="formLogin">
-                <h1>Criar Conta</h1>
-                <div class="social-icons">
-    
-                <a href= "#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
-                    <a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a>
-                    <a href="#" class="icon"><i class="fa-brands fa-github"></i></a>
-                    <a href="#" class="icon"><i class="fa-brands fa-linkedin-in"></i></a>
-                </div>
-                <span>Usando Email</span>
-                <input type="text" id="nomeCadastro" name="nome" placeholder="Nome completo">
-                <input type="email" id="emailCadastro" name="email" placeholder="Email">
-                 <input type="password" id="senhaCadastro" name="senha" placeholder="Senha">
-                 <button type="button" onclick="fazerCadastro()">Criar</button>
-            </form>
-        </div>
-        <div class="form-container sign-in">
-            <form id="loginForm">
-                <h1>Entrar</h1>
-                <div class="social-icons">
-                    <a href="#" class="icon" id="googleLogin">
-                   <i class="fa-brands fa-google-plus-g"></i></a>
-                </div>
-                <span>Senha Email</span>
-              
-               
-                <!--<button>Entrar</button>-->
-
-                <input type="email" id="emailLogin" placeholder="Email">
-               <input type="password" id="senhaLogin" placeholder="Password">
-               <a href="recuperarsenha.html">Esqueceu sua senha?</a>
-<button type="button" onclick="fazerLogin()">Entrar</button>
-
-            </form>
-        </div>
-        <div class="toggle-container">
-            <div class="toggle">
-                <div class="toggle-panel toggle-left">
-                    <h1>Bem vindo de Volta!</h1>
-                    <p>Entrar com a sua conta</p>
-                    <button class="hidden" id="login">Entrar</button>
-                </div>
-                <div class="toggle-panel toggle-right">
-                    <h1>Olá, Amigo!</h1>
-                    <p>Clique aqui para registrar-se</p>
-                    <button class="hidden" id="register">Inscrever-se</button>
-                </div>
-            </div>
-        </div>
+    <div class="info-box">
+      Plano: Comum
     </div>
-</body>
-     <script src="script.js"></script>
-   <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
-  import {
-    getAuth,
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
-    GoogleAuthProvider,
-    signInWithPopup,
-    sendEmailVerification,
-    deleteUser
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import {
-    getFirestore,
-    doc,
-    setDoc
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyATG5P2NvdecjCPO7gzFNGs6l7plDrxY04",
-    authDomain: "sdel-16c6a.firebaseapp.com",
-    projectId: "sdel-16c6a",
-    storageBucket: "sdel-16c6a.appspot.com",
-    messagingSenderId: "676676370586",
-    appId: "1:676676370586:web:444947d3dda78a80d9df23",
-    measurementId: "G-FZWQ9FYZG5"
-  };
+    <div class="input-group">
+      <label for="biografia">Biografia:</label>
+      <textarea id="biografia" maxlength="300" placeholder="Escreva algo sobre você (máx. 300 caracteres)..."></textarea>
+      <div class="char-count" id="charCount">0/300</div>
+    </div>
 
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-  const provider = new GoogleAuthProvider();
+    <div class="button-container">
+      <button class="btn" onclick="window.location.href='index.html'">Voltar à Página Inicial</button>
+      <button class="btn" id="logout">Encerrar Sessão</button>
+    </div>
 
-  // === CADASTRO COM VERIFICAÇÃO DE EMAIL E REDIRECIONAMENTO PÓS-VERIFICAÇÃO ===
-  window.fazerCadastro = function () {
-    const nome = document.getElementById("nomeCadastro").value;
-    const email = document.getElementById("emailCadastro").value;
-    const senha = document.getElementById("senhaCadastro").value;
+    <div class="button-wrapper">
+      <button class="btn" id="choosePhotoBtn">Adicionar Foto (Google)</button> <!-- Botão para escolher foto -->
+    </div>
+  </div>
 
-    createUserWithEmailAndPassword(auth, email, senha)
-      .then((userCredential) => {
-        const user = userCredential.user;
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 
-        // Salvar no Firestore
-        const userRef = doc(db, "users", user.uid);
-        setDoc(userRef, {
-          nome: nome,
-          email: email,
-          createdAt: new Date()
+ const firebaseConfig = {
+  apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
+  authDomain: "sdel-b3f65.firebaseapp.com",
+  projectId: "sdel-b3f65",
+  storageBucket: "sdel-b3f65.firebasestorage.app",
+  messagingSenderId: "297725999985",
+  appId: "1:297725999985:web:d41da68311c190ef8a54d0",
+  measurementId: "G-PT92VECJ2H"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    const userName = document.getElementById('userName');
+    const userEmail = document.getElementById('userEmail');
+    const userPhoto = document.getElementById('userPhoto');
+    const logoutBtn = document.getElementById('logout');
+    const bioInput = document.getElementById('biografia');
+    const charCount = document.getElementById('charCount');
+    const choosePhotoBtn = document.getElementById('choosePhotoBtn');
+
+    // Verificar se já está logado
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        userName.textContent = user.displayName;
+        userEmail.textContent = user.email;
+        userPhoto.src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/3736/3736502.png"; // Foto padrão se não tiver foto no perfil
+
+        const bio = localStorage.getItem('bio_' + user.email) || '';
+        bioInput.value = bio;
+        charCount.textContent = ${bio.length}/300;
+
+        bioInput.addEventListener('input', () => {
+          const texto = bioInput.value;
+          localStorage.setItem('bio_' + user.email, texto);
+          charCount.textContent = ${texto.length}/300;
         });
 
-        // Envia email de verificação
-        sendEmailVerification(user)
-          .then(() => {
-            alert("Verifique seu e-mail. Redirecionaremos automaticamente quando a verificação for feita.");
-
-            // Verifica se o email foi verificado automaticamente a cada 3 segundos
-            const intervalId = setInterval(async () => {
-              await user.reload();
-              if (user.emailVerified) {
-                clearInterval(intervalId);
-                alert("Email verificado com sucesso!");
-                window.location.href = "perfil.html"; // Redireciona para o perfil após a verificação
-              }
-            }, 3000); // Verifica a cada 3 segundos
-          })
-          .catch((error) => {
-            alert("Erro ao enviar email de verificação: " + error.message);
-          });
-      })
-      .catch((error) => {
-        alert("Erro no cadastro: " + error.message);
-      });
-  };
-
-  // === LOGIN COM VERIFICAÇÃO DE EMAIL ===
-  window.fazerLogin = function () {
-    const email = document.getElementById("emailLogin").value;
-    const senha = document.getElementById("senhaLogin").value;
-
-    signInWithEmailAndPassword(auth, email, senha)
-      .then(async (userCredential) => {
-        const user = userCredential.user;
-        await user.reload();
-
-        if (user.emailVerified) {
-          alert("Login realizado com sucesso!");
-          window.location.href = "perfil.html"; // Redireciona para o perfil
-        } else {
-          alert("Por favor, verifique seu email antes de fazer login.");
-          auth.signOut();
-        }
-      })
-      .catch((error) => {
-        alert("Erro no login: " + error.message);
-      });
-  };
-
-  // === LOGIN COM GOOGLE ===
-  document.getElementById('googleLogin').addEventListener('click', (e) => {
-    e.preventDefault();
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        const user = result.user;
-        alert(`Bem-vindo(a), ${user.displayName}!`);
-        window.location.href = "perfil.html"; // Redireciona para o perfil após o login
-      })
-      .catch((error) => {
-        alert("Erro no login com Google: " + error.message);
-      });
-  });
-
-  // === EXCLUSÃO AUTOMÁTICA DE CONTAS NÃO VERIFICADAS APÓS 2 MINUTOS ===
-  window.verificarEmail = function () {
-    const user = auth.currentUser;
-    if (user) {
-      const createdAt = user.metadata.creationTime;
-      const agora = new Date().getTime();
-      const minutos = (agora - new Date(createdAt).getTime()) / 1000 / 60;
-
-      if (!user.emailVerified && minutos > 2) {
-        deleteUser(user)
-          .then(() => {
-            alert("Conta excluída por falta de verificação.");
-          })
-          .catch((error) => {
-            console.error("Erro ao excluir: ", error);
-          });
+        // O botão "Adicionar Foto" permanece visível, mas o login já foi realizado
+      } else {
+        window.location.href = "login.html";
       }
-    }
-  };
+    });
 
-</script>
+    // Login com Google para adicionar foto
+    choosePhotoBtn.addEventListener('click', () => {
+      signInWithPopup(auth, provider)
+        .then((result) => {
+          const user = result.user;
+          userPhoto.src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/3736/3736502.png";  // Coloca a foto do Google ou uma imagem padrão
+          alert(Login bem-sucedido! A foto foi atualizada para a sua foto do Google.);
+        })
+        .catch((error) => {
+          alert("Erro no login com Google: " + error.message);
+        });
+    });
 
-
-
-
-
-
-
-
-
-
-  
+    logoutBtn.addEventListener('click', () => {
+      signOut(auth).then(() => {
+        window.location.href = "login.html";
+      });
+    });
+  </script>
+</body>
 </html>
