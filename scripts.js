@@ -1,28 +1,33 @@
+// Importações Firebase SDK v10 (modular)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+// Nova configuração Firebase (projeto sdel-b3f65)
 const firebaseConfig = {
-  apiKey: "AIzaSyATG5P2NvdecjCPO7gzFNGs6l7plDrxY04",
-  authDomain: "sdel-16c6a.firebaseapp.com",
-  projectId: "sdel-16c6a",
-  storageBucket: "sdel-16c6a.appspot.com",
-  messagingSenderId: "676676370586",
-  appId: "1:676676370586:web:444947d3dda78a80d9df23",
-  measurementId: "G-FZWQ9FYZG5"
+  apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
+  authDomain: "sdel-b3f65.firebaseapp.com",
+  projectId: "sdel-b3f65",
+  storageBucket: "sdel-b3f65.firebasestorage.app",
+  messagingSenderId: "297725999985",
+  appId: "1:297725999985:web:d41da68311c190ef8a54d0",
+  measurementId: "G-PT92VECJ2H"
 };
 
+// Inicializa Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
 let currentUser = null;
 
+// Referências DOM
 const flashcards = document.querySelector(".flashcards");
 const cardForm = document.querySelector(".card-form");
 const question = document.querySelector("#question");
 const answer = document.querySelector("#answer");
 
+// Monitorar autenticação
 onAuthStateChanged(auth, (user) => {
   if (user) {
     currentUser = user;
@@ -32,25 +37,29 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
+// Mostrar formulário para criar card
 window.create = function () {
   cardForm.style.display = "flex";
 };
 
+// Cancelar criação do card
 window.cancel = function () {
   cardForm.style.display = "none";
 };
 
+// Logout do usuário
 window.logout = function () {
   signOut(auth).then(() => {
     window.location.href = "login.html";
   });
 };
 
+// Salvar novo card no Firestore
 window.save = async function () {
   if (question.value.trim() && answer.value.trim()) {
     const data = {
-      question: question.value,
-      answer: answer.value,
+      question: question.value.trim(),
+      answer: answer.value.trim(),
       uid: currentUser.uid,
       timestamp: new Date()
     };
@@ -62,6 +71,7 @@ window.save = async function () {
   }
 };
 
+// Remover todos os cards do usuário logado
 window.removeAll = async function () {
   if (confirm("Deseja mesmo excluir todos os cards?")) {
     const snapshot = await getDocs(collection(db, "flashcards"));
@@ -75,6 +85,7 @@ window.removeAll = async function () {
   }
 };
 
+// Carregar cards do usuário e mostrar na tela
 async function loadCards() {
   flashcards.innerHTML = "";
   const snapshot = await getDocs(collection(db, "flashcards"));
@@ -87,6 +98,7 @@ async function loadCards() {
   });
 }
 
+// Criar card visual na página
 function addCard(card) {
   const div = document.createElement("div");
   div.className = "flashcard";
@@ -103,8 +115,13 @@ function addCard(card) {
   const btn = document.createElement("button");
   btn.innerText = "mostrar";
   btn.onclick = () => {
-    h2answer.style.display = h2answer.style.display === "none" ? "block" : "none";
-    btn.innerText = btn.innerText === "mostrar" ? "esconder" : "mostrar";
+    if (h2answer.style.display === "none") {
+      h2answer.style.display = "block";
+      btn.innerText = "esconder";
+    } else {
+      h2answer.style.display = "none";
+      btn.innerText = "mostrar";
+    }
   };
 
   const remove = document.createElement("span");
