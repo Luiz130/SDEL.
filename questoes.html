@@ -7,25 +7,28 @@
     <link rel="stylesheet" href="questoes.css" />
   </head>
   <body>
+      <!-- Temporizador -->
+         <br>
+           <br>
+               <div id="timer">02:30:00</div>
   <div class="app">
     <h1>Quiz</h1>
     
-    <!-- Barra de Progresso -->
-   <div class="progress-bar-container">
-  <progress id="progress-bar" value="0" max="100"></progress>
-</div>
-
-    <div class="quiz">
-      <h2 id="question">Questão</h2>
-      <div id="answer-buttons">
-        <button class="btn">Questão 1</button>
-        <button class="btn">Questão 2</button>
-        <button class="btn">Questão 3</button>
-        <button class="btn">Questão 4</button>
-      </div>
-      <button id="next-btn">Próximo</button>
-      
-    </div>
+  <div class="progress-bar-container">
+    <progress id="progress-bar" value="0" max="100"></progress>
   </div>
+
+
+
+  <!-- Quiz -->
+  <div class="quiz">
+    <h2 id="question">Questão</h2>
+    <div id="answer-buttons">
+      <!-- Botões de resposta serão inseridos pelo JS -->
+    </div>
+    <button id="next-btn">Próximo</button>
+  </div>
+
   <script src="questoes.js"></script>
 </body>
+</html>
