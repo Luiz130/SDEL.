@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Perfil do Usuário</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #c9d6ff, #1976d2);
+      background-color: #c9d6ff; /* Fundo sólido */
       display: flex;
       justify-content: center;
       align-items: center;
@@ -56,7 +56,11 @@
 
     .input-group {
       margin-top: 1.5rem;
-      text-align: left;
+      display: flex; /* Para alinhamento */
+      justify-content: flex-start; /* Alinha os elementos à esquerda */
+      flex-direction: column;
+      align-items: flex-start; /* Alinha a biografia à esquerda */
+      width: 100%;
     }
 
     .input-group label {
@@ -74,6 +78,7 @@
       padding: 0.75rem;
       resize: none;
       font-size: 0.95rem;
+      box-sizing: border-box; /* Garantir que o padding seja calculado corretamente */
     }
 
     .char-count {
@@ -81,13 +86,13 @@
       font-size: 0.85rem;
       color: #555;
       margin-top: 0.25rem;
+      width: 100%;
     }
 
     .button-container {
       display: flex;
       justify-content: space-between;
       margin-top: 2rem;
-      flex-wrap: wrap;
     }
 
     .btn {
@@ -96,24 +101,59 @@
       border-radius: 8px;
       font-weight: 600;
       cursor: pointer;
-      margin: 0.5rem;
-      background-color: #0d47a1;
+      flex: 1;
+      margin: 0 0.5rem;
+      background-color: #0d47a1; /* Cor do botão em azul escuro */
       color: #fff;
       transition: background-color 0.3s;
     }
 
     .btn:hover {
-      background-color: #44749D;
+      background-color: #1c3f7c; /* Cor ao passar o mouse (azul mais escuro) */
+    }
+
+    /* Estilizando o botão de adicionar foto */
+    #choosePhotoBtn {
+      background-color: #0d47a1; /* Cor do botão de foto */
+      color: #fff;
+      padding: 0.8rem 1.5rem; /* Tamanho maior */
+      font-size: 1rem; /* Fonte mais legível */
+      border-radius: 12px; /* Bordas arredondadas */
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px; /* Espaçamento entre o texto e o ícone */
+      margin-top: 1.5rem; /* Margem superior para separar do conteúdo */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+      transition: background-color 0.3s, transform 0.3s;
+    }
+
+    #choosePhotoBtn:hover {
+      background-color: #1c3f7c; /* Cor ao passar o mouse */
+      transform: scale(1.05); /* Efeito de aumento ao passar o mouse */
+    }
+
+    #choosePhotoBtn i {
+      font-size: 1.2rem; /* Tamanho do ícone */
+    }
+
+    /* Alinhamento do botão de foto abaixo da biografia */
+    .profile-container .button-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-top: 1.5rem; /* Ajuste para ficar mais espaçado */
     }
   </style>
 </head>
 <body>
-  <div class="profile-container">
-    <img id="userPhoto" src="https://via.placeholder.com/110" alt="Foto do usuário" />
+  <div class="profile-container" id="profile">
+    <img id="userPhoto" alt="Foto do usuário" src="https://via.placeholder.com/110"> <!-- Foto padrão -->
     <h2 id="userName">Nome</h2>
     <p id="userEmail">Email</p>
 
-    <div class="info-box">Plano: Comum</div>
+    <div class="info-box">
+      Plano: Comum
+    </div>
 
     <div class="input-group">
       <label for="biografia">Biografia:</label>
@@ -122,85 +162,84 @@
     </div>
 
     <div class="button-container">
-      <button class="btn" id="choosePhotoBtn">Colocar Foto</button>
-      <button class="btn" onclick="window.location.href='index.html'">Voltar</button>
-      <button class="btn" id="logout">Sair</button>
+      <button class="btn" onclick="window.location.href='index.html'">Voltar à Página Inicial</button>
+      <button class="btn" id="logout">Encerrar Sessão</button>
+    </div>
+
+    <div class="button-wrapper">
+      <button class="btn" id="choosePhotoBtn">Adicionar Foto (Google)</button> <!-- Botão para escolher foto -->
     </div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, signOut, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyATG5P2NvdecjCPO7gzFNGs6l7plDrxY04",
-      authDomain: "sdel-16c6a.firebaseapp.com",
-      projectId: "sdel-16c6a",
-      storageBucket: "sdel-16c6a.appspot.com",
-      messagingSenderId: "676676370586",
-      appId: "1:676676370586:web:444947d3dda78a80d9df23",
-      measurementId: "G-FZWQ9FYZG5"
-    };
+const firebaseConfig = {
+  apiKey: "AIzaSyATG5P2NvdecjCPO7gzFNGs6l7plDrxY04",
+  authDomain: "sdel-16c6a.firebaseapp.com",
+  projectId: "sdel-16c6a",
+  storageBucket: "sdel-16c6a.firebasestorage.app",
+  messagingSenderId: "676676370586",
+  appId: "1:676676370586:web:444947d3dda78a80d9df23",
+  measurementId: "G-FZWQ9FYZG5"
+};
+
 
     const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
     const auth = getAuth(app);
-    const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    const userName = document.getElementById("userName");
-    const userEmail = document.getElementById("userEmail");
-    const userPhoto = document.getElementById("userPhoto");
-    const bioInput = document.getElementById("biografia");
-    const charCount = document.getElementById("charCount");
-    const choosePhotoBtn = document.getElementById("choosePhotoBtn");
+    const userName = document.getElementById('userName');
+    const userEmail = document.getElementById('userEmail');
+    const userPhoto = document.getElementById('userPhoto');
+    const logoutBtn = document.getElementById('logout');
+    const bioInput = document.getElementById('biografia');
+    const charCount = document.getElementById('charCount');
+    const choosePhotoBtn = document.getElementById('choosePhotoBtn');
 
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        window.location.href = "login.html";
-        return;
-      }
+    // Verificar se já está logado
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        userName.textContent = user.displayName;
+        userEmail.textContent = user.email;
+        userPhoto.src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/3736/3736502.png"; // Foto padrão se não tiver foto no perfil
 
-      userName.textContent = user.displayName || "Sem nome";
-      userEmail.textContent = user.email;
-      userPhoto.src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/3736/3736502.png";
-
-      const userDocRef = doc(db, "users", user.uid);
-      const userDocSnap = await getDoc(userDocRef);
-
-      if (userDocSnap.exists()) {
-        const data = userDocSnap.data();
-        bioInput.value = data.bio || "";
-        charCount.textContent = `${bioInput.value.length}/300`;
-      }
-
-      bioInput.addEventListener("input", async () => {
-        const bio = bioInput.value;
+        const bio = localStorage.getItem('bio_' + user.email) || '';
+        bioInput.value = bio;
         charCount.textContent = `${bio.length}/300`;
-        await setDoc(userDocRef, {
-          name: user.displayName || "Usuário",
-          email: user.email,
-          bio: bio
-        }, { merge: true });
-      });
-    });
 
-    document.getElementById("logout").addEventListener("click", () => {
-      signOut(auth).then(() => {
+        bioInput.addEventListener('input', () => {
+          const texto = bioInput.value;
+          localStorage.setItem('bio_' + user.email, texto);
+          charCount.textContent = `${texto.length}/300`;
+        });
+
+        // O botão "Adicionar Foto" permanece visível, mas o login já foi realizado
+      } else {
         window.location.href = "login.html";
-      });
+      }
     });
 
-    choosePhotoBtn.addEventListener("click", () => {
+    // Login com Google para adicionar foto
+    choosePhotoBtn.addEventListener('click', () => {
       signInWithPopup(auth, provider)
         .then((result) => {
           const user = result.user;
-          userPhoto.src = user.photoURL || 'https://via.placeholder.com/110';
-          choosePhotoBtn.style.display = 'none';
+          userPhoto.src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/3736/3736502.png";  // Coloca a foto do Google ou uma imagem padrão
+          alert(`Login bem-sucedido! A foto foi atualizada para a sua foto do Google.`);
         })
         .catch((error) => {
           alert("Erro no login com Google: " + error.message);
         });
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      signOut(auth).then(() => {
+        window.location.href = "login.html";
+      });
     });
   </script>
 </body>
