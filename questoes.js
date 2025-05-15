@@ -453,21 +453,50 @@ const questions = [
     ],
   },
 ];
-
 const questionElement = document.getElementById("question");
 const answerButtons = document.getElementById("answer-buttons");
 const nextButton = document.getElementById("next-btn");
 const progressBar = document.getElementById("progress-bar");
+const timerElement = document.getElementById("timer");
 
 let currentQuestionIndex = 0;
 let score = 0;
 const totalQuestions = questions.length;
 
+// Timer: 2h30min (em segundos)
+let totalTime = 2 * 60 * 60 + 30 * 60;
+let timerInterval;
+
 function startQuiz() {
   currentQuestionIndex = 0;
   score = 0;
   nextButton.innerHTML = "Próxima";
+  startTimer();
   showQuestion();
+}
+
+function startTimer() {
+  clearInterval(timerInterval); // Garante que não existam múltiplos timers
+  updateTimerDisplay(); // Mostra o tempo inicial imediatamente
+  timerInterval = setInterval(() => {
+    totalTime--;
+
+    if (totalTime <= 0) {
+      clearInterval(timerInterval);
+      showScore();
+    } else {
+      updateTimerDisplay();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const hours = Math.floor(totalTime / 3600);
+  const minutes = Math.floor((totalTime % 3600) / 60);
+  const seconds = totalTime % 60;
+
+  timerElement.textContent = 
+    `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
 function showQuestion() {
@@ -480,10 +509,8 @@ function showQuestion() {
     const button = document.createElement("button");
     button.innerHTML = answer.text;
     button.classList.add("btn");
-
     button.dataset.correct = answer.correct;
     button.dataset.id = answer.id;
-
     button.addEventListener("click", selectAnswer);
     answerButtons.appendChild(button);
   });
@@ -525,6 +552,7 @@ function updateProgressBar() {
 }
 
 function showScore() {
+  clearInterval(timerInterval); // Para o cronômetro
   resetState();
   questionElement.innerHTML = `Você acertou ${score} de ${totalQuestions}!`;
   nextButton.innerHTML = "Jogar Novamente";
