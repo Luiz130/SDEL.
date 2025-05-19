@@ -11,13 +11,123 @@ const firebaseConfig = {
   measurementId: "G-PT92VECJ2H"
 };
 
-// Inicializa Firebase e Firestore
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const questions = [
-  // suas perguntas aqui
+  {
+    question: "Qual é o valor da soma dos ângulos internos de um hexágono?",
+    answers: [
+      { id: 1, text: "720°", correct: true },
+      { id: 2, text: "1080°", correct: false },
+      { id: 3, text: "540°", correct: false },
+      { id: 4, text: "360°", correct: false },
+      { id: 5, text: "480°", correct: false },
+    ],
+  },
+  {
+    question: "O valor de x na equação log₁₀(x) = 2 é:",
+    answers: [
+      { id: 1, text: "10", correct: false },
+      { id: 2, text: "100", correct: true },
+      { id: 3, text: "1000", correct: false },
+      { id: 4, text: "1", correct: false },
+      { id: 5, text: "0", correct: false },
+    ],
+  },
+  {
+    question: "Se a área de um círculo é 25π, qual é o seu raio?",
+    answers: [
+      { id: 1, text: "5", correct: true },
+      { id: 2, text: "10", correct: false },
+      { id: 3, text: "2", correct: false },
+      { id: 4, text: "25", correct: false },
+      { id: 5, text: "4", correct: false },
+    ],
+  },
+  {
+    question: "Em uma progressão geométrica de razão 2, o primeiro termo é 3. Qual é o quinto termo?",
+    answers: [
+      { id: 1, text: "48", correct: false },
+      { id: 2, text: "96", correct: true },
+      { id: 3, text: "24", correct: false },
+      { id: 4, text: "72", correct: false },
+      { id: 5, text: "144", correct: false },
+    ],
+  },
+  {
+    question: "Qual é o valor da soma das raízes da equação quadrática x² - 7x + 10 = 0?",
+    answers: [
+      { id: 1, text: "7", correct: true },
+      { id: 2, text: "10", correct: false },
+      { id: 3, text: "5", correct: false },
+      { id: 4, text: "2", correct: false },
+      { id: 5, text: "12", correct: false },
+    ],
+  },
+  {
+    question: "Qual é o valor de x na equação 2x + 5 = 3x - 8?",
+    answers: [
+      { id: 1, text: "-13", correct: false },
+      { id: 2, text: "13", correct: false },
+      { id: 3, text: "-13/3", correct: true },
+      { id: 4, text: "13/3", correct: false },
+      { id: 5, text: "-8", correct: false },
+    ],
+  },
+  {
+    question: "A equação 2x² + 3x - 5 = 0 tem as raízes reais?",
+    answers: [
+      { id: 1, text: "Sim", correct: true },
+      { id: 2, text: "Não", correct: false },
+      { id: 3, text: "Somente uma raiz", correct: false },
+      { id: 4, text: "As raízes são complexas", correct: false },
+      { id: 5, text: "Duas raízes iguais", correct: false },
+    ],
+  },
+  {
+    question: "Se a função f(x) = x² + 4x + 3 tem um ponto de mínimo, qual é o valor de f(-2)?",
+    answers: [
+      { id: 1, text: "0", correct: false },
+      { id: 2, text: "-1", correct: false },
+      { id: 3, text: "1", correct: false },
+      { id: 4, text: "-2", correct: true },
+      { id: 5, text: "2", correct: false },
+    ],
+  },
+  {
+    question: "Se uma circunferência tem raio 4, qual é o comprimento da circunferência?",
+    answers: [
+      { id: 1, text: "16π", correct: true },
+      { id: 2, text: "8π", correct: false },
+      { id: 3, text: "4π", correct: false },
+      { id: 4, text: "2π", correct: false },
+      { id: 5, text: "10π", correct: false },
+    ],
+  },
+  {
+    question: "Em um triângulo equilátero de lado 6, qual é a área?",
+    answers: [
+      { id: 1, text: "9√3", correct: true },
+      { id: 2, text: "12√3", correct: false },
+      { id: 3, text: "36", correct: false },
+      { id: 4, text: "18√3", correct: false },
+      { id: 5, text: "18", correct: false },
+    ],
+  },
+  {
+    question: "A solução da equação logₓ(81) = 4 é:",
+    answers: [
+      { id: 1, text: "9", correct: true },
+      { id: 2, text: "3", correct: false },
+      { id: 3, text: "81", correct: false },
+      { id: 4, text: "4", correct: false },
+      { id: 5, text: "16", correct: false },
+    ],
+  },
 ];
+
+// Aqui começa o resto do código (igual ao seu)
 
 const questionElement = document.getElementById("question");
 const answerButtons = document.getElementById("answer-buttons");
@@ -121,32 +231,4 @@ function updateProgressBar() {
 }
 
 async function showScore() {
-  clearInterval(timerInterval);
-  resetState();
-  questionElement.innerText = `Você acertou ${score} de ${totalQuestions} perguntas!`;
-  nextButton.innerText = "Refazer Quiz";
-  nextButton.style.display = "block";
-
-  try {
-    await addDoc(collection(db, "quizResults"), {
-      timestamp: serverTimestamp(),
-      score: score,
-      totalQuestions: totalQuestions,
-      answers: userAnswers,
-    });
-    console.log("Resultados salvos com sucesso no Firestore!");
-  } catch (error) {
-    console.error("Erro ao salvar resultados:", error);
-  }
-}
-
-nextButton.addEventListener("click", () => {
-  if (currentQuestionIndex < totalQuestions - 1) {
-    currentQuestionIndex++;
-    showQuestion();
-  } else {
-    startQuiz();
-  }
-});
-
-startQuiz();
+  clear
