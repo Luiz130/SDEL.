@@ -4,81 +4,132 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Quiz | SDEL</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      font-family: "Poppins", sans-serif;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
+      background: #44749D;
+    }
+
+    .app {
+      background: #fff;
+      width: 90%;
       max-width: 600px;
-      margin: 2rem auto;
-      padding: 1rem;
+      margin: 100px auto 0;
+      padding: 30px;
+      border-radius: 30px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
+    }
+
+    h1 {
+      color: #001e4d;
+      font-weight: 600;
+      border-bottom: 1px solid #333;
+      padding-bottom: 30px;
       text-align: center;
     }
-    #timer {
-      font-size: 1.5rem;
-      margin-bottom: 20px;
+
+    .quiz {
+      padding: 20px 0;
     }
+
+    .quiz h2 {
+      font-size: 18px;
+      color: #001e4d;
+      font-weight: 600;
+    }
+
+    .btn {
+      background: #fff;
+      color: #222;
+      font-weight: 500;
+      width: 100%;
+      border: 1px solid #222;
+      padding: 10px;
+      margin: 10px 0;
+      text-align: left;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn:hover:not([disabled]) {
+      background: #222;
+      color: #fff;
+    }
+
+    .btn:disabled {
+      cursor: no-drop;
+    }
+
+    #next-btn {
+      background: #001e4d;
+      color: #fff;
+      font-weight: 500;
+      width: 150px;
+      border: 0;
+      padding: 10px;
+      margin: 20px auto 0;
+      border-radius: 4px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .correct {
+      background: #9aeabc;
+    }
+
+    .incorrect {
+      background: #ff9393;
+    }
+
+    /* Barra de progresso */
     .progress-bar-container {
+      width: 100%;
       margin-bottom: 20px;
     }
+
     progress {
       width: 100%;
       height: 20px;
     }
-    h1 {
+
+    #timer {
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-align: center;
+      color: #d32f2f;
       margin-bottom: 20px;
-    }
-    #question {
-      margin-bottom: 15px;
-    }
-    #answer-buttons button {
-      display: block;
-      width: 100%;
-      margin: 8px 0;
+      background-color: #fff3f3;
       padding: 10px;
-      font-size: 1rem;
-      cursor: pointer;
-      border-radius: 5px;
-      border: 1px solid #333;
-      background-color: #fff;
-    }
-    #answer-buttons button.correct {
-      background-color: #4CAF50;
-      color: white;
-      border-color: #4CAF50;
-    }
-    #answer-buttons button.incorrect {
-      background-color: #f44336;
-      color: white;
-      border-color: #f44336;
-    }
-    #next-btn {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 1rem;
-      cursor: pointer;
-      border-radius: 5px;
-      border: none;
-      background-color: #007bff;
-      color: white;
-      display: none;
-    }
-    #next-btn:hover {
-      background-color: #0056b3;
+      border: 2px solid #d32f2f;
+      border-radius: 8px;
+      width: 120px;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 0 10px rgba(211, 47, 47, 0.2);
     }
   </style>
 </head>
 <body>
-
-  <div id="timer">02:30:00</div>
-
-  <h1>Quiz</h1>
-
-  <div class="progress-bar-container">
-    <progress id="progress-bar" value="0" max="100"></progress>
+  <div class="app">
+    <div id="timer">02:30:00</div>
+    <h1>Quiz</h1>
+    <div class="progress-bar-container">
+      <progress id="progress-bar" value="0" max="100"></progress>
+    </div>
+    <div class="quiz">
+      <h2 id="question">Questão</h2>
+      <div id="answer-buttons"></div>
+      <button id="next-btn">Próximo</button>
+    </div>
   </div>
-
-  <h2 id="question">Questão</h2>
-  <div id="answer-buttons"></div>
-  <button id="next-btn">Próximo</button>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
@@ -162,19 +213,18 @@
     let score = 0;
     const totalQuestions = questions.length;
 
-    let totalTime = 2 * 60 * 60 + 30 * 60; // 2h30min in seconds
+    let totalTime = 2 * 60 * 60 + 30 * 60; // 2h30min em segundos
     let timerInterval;
 
     let currentUser = null;
 
-    // Aguarda usuário logado antes de iniciar
     onAuthStateChanged(auth, user => {
       if (user) {
         currentUser = user;
         startQuiz();
       } else {
         alert("Você precisa estar logado para fazer o quiz.");
-        window.location.href = "login.html"; // ou sua página de login
+        window.location.href = "login.html";
       }
     });
 
@@ -264,7 +314,6 @@
       clearInterval(timerInterval);
       resetState();
 
-      // Salvar resultado no Firestore
       if (currentUser) {
         const resultado = {
           score: score,
@@ -276,7 +325,7 @@
         try {
           await setDoc(doc(db, "quizResults", currentUser.uid), resultado);
           alert(`Quiz finalizado! Sua pontuação: ${score} de ${totalQuestions}`);
-          window.location.href = "resultado.html"; // página da análise de resultados
+          window.location.href = "resultado.html";
         } catch (error) {
           alert("Erro ao salvar resultado: " + error.message);
         }
