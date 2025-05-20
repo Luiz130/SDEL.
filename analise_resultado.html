@@ -1,51 +1,68 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Resultado do Quiz</title>
-    <link rel="stylesheet" href="questoes.css" />
-  </head>
-  <body>
-    <div class="app">
-      <h1>Análise de Resultados</h1>
-      <div id="result-summary">
-        <!-- Conteúdo será preenchido via JS -->
-      </div>
-      <button onclick="window.location.href='index.html'">Refazer Quiz</button>
-    </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Análise de Resultados</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 1rem;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    .result {
+      font-size: 1.3rem;
+      margin: 1.5rem 0;
+    }
+    .no-result {
+      color: #888;
+      font-style: italic;
+      margin-top: 2rem;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Análise de Resultados</h1>
+  <div id="result-container"></div>
+  <button id="retry-btn">Refazer Quiz</button>
 
-    <script>
-      const resultData = JSON.parse(localStorage.getItem("quizResult"));
+  <script>
+    const resultContainer = document.getElementById('result-container');
+    const retryBtn = document.getElementById('retry-btn');
 
-      if (resultData) {
-        const { score, totalQuestions, tempoRestante } = resultData;
-        const erros = totalQuestions - score;
-        const percentual = Math.round((score / totalQuestions) * 100);
-        let mensagem = "";
+    const quizResult = localStorage.getItem('quizResult');
 
-        if (percentual === 100) {
-          mensagem = "Excelente! Você acertou tudo!";
-        } else if (percentual >= 80) {
-          mensagem = "Muito bem! Ótimo desempenho.";
-        } else if (percentual >= 60) {
-          mensagem = "Bom trabalho, mas pode melhorar.";
-        } else {
-          mensagem = "Você precisa estudar um pouco mais.";
-        }
+    if (quizResult) {
+      const result = JSON.parse(quizResult);
+      resultContainer.innerHTML = `
+        <p class="result">Você acertou <strong>${result.score}</strong> de <strong>${result.totalQuestions}</strong> perguntas.</p>
+        <p class="result">Tempo restante: <strong>${result.tempoRestante}</strong></p>
+      `;
+    } else {
+      resultContainer.innerHTML = `<p class="no-result">Nenhum resultado disponível.</p>`;
+    }
 
-        document.getElementById("result-summary").innerHTML = `
-          <p>✅ Acertos: <strong>${score}</strong></p>
-          <p>❌ Erros: <strong>${erros}</strong></p>
-          <p>📊 Porcentagem: <strong>${percentual}%</strong></p>
-          <p>⏰ Tempo restante: <strong>${tempoRestante}</strong></p>
-          <p>💬 <em>${mensagem}</em></p>
-        `;
-      } else {
-        document.getElementById("result-summary").innerHTML = `
-          <p>Nenhum resultado disponível.</p>
-        `;
-      }
-    </script>
-  </body>
+    retryBtn.addEventListener('click', () => {
+      localStorage.removeItem('quizResult');
+      window.location.href = 'questoes.html';
+    });
+  </script>
+</body>
 </html>
