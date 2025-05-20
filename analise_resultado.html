@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Análise Final</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #44749D;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --bg: #f0f4f8;
+      --white: #ffffff;
+      --text: #1e293b;
+      --card-glass: rgba(255, 255, 255, 0.8);
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #44749D);
+      color: var(--text);
+      padding: 30px;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: var(--card-glass);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 40px;
+      font-size: 2.4rem;
+    }
+    .score-overview {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+    .score-box {
+      flex: 1;
+      min-width: 200px;
+      background: var(--white);
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+    .score-box:hover {
+      transform: scale(1.03);
+    }
+    .score-box h2 {
+      font-size: 1.2rem;
+      color: #64748b;
+      margin-bottom: 8px;
+    }
+    .score-box p {
+      font-size: 2rem;
+      font-weight: bold;
+    }
+    .progress-container {
+      margin-bottom: 40px;
+    }
+    .progress-label {
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .progress-bar {
+      height: 25px;
+      width: 100%;
+      background-color: #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(to right, #6366f1, #22d3ee);
+      text-align: center;
+      color: #fff;
+      font-weight: bold;
+      line-height: 25px;
+      transition: width 0.5s ease;
+    }
+    .question-list {
+      margin-top: 30px;
+    }
+    .question-item {
+      background: var(--white);
+      border-left: 6px solid #ccc;
+      padding: 20px;
+      margin-bottom: 16px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: transform 0.3s ease;
+    }
+    .question-item:hover {
+      transform: scale(1.02);
+    }
+    .correct {
+      border-color: var(--success);
+    }
+    .incorrect {
+      border-color: var(--danger);
+    }
+    .question-item p {
+      margin-bottom: 8px;
+    }
+    .emoji {
+      font-size: 1.3rem;
+      margin-right: 6px;
+    }
+    @media (max-width: 700px) {
+      .score-overview {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Análise Final</h1>
+
+    <div class="score-overview" id="score-overview">
+      <!-- Acertos, Erros, Pontuação vão aqui -->
+    </div>
+
+    <div class="progress-container">
+      <div class="progress-label">Aproveitamento</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width: 0%;">0%</div>
+      </div>
+    </div>
+
+    <div class="question-list" id="question-list">
+      <!-- Lista de perguntas com acertos/erros -->
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+    // Config do seu Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
+      authDomain: "sdel-b3f65.firebaseapp.com",
+      projectId: "sdel-b3f65",
+      storageBucket: "sdel-b3f65.firebasestorage.app",
+      messagingSenderId: "297725999985",
+      appId: "1:297725999985:web:d41da68311c190ef8a54d0",
+      measurementId: "G-PT92VECJ2H"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const scoreOverview = document.getElementById("score-overview");
+    const progressFill = document.getElementById("progress-fill");
+    const questionList = document.getElementById("question-list");
+
+    function createScoreBox(title, value) {
+      const box = document.createElement("div");
+      box.classList.add("score-box");
+      box.innerHTML = `<h2>${title}</h2><p>${value}</p>`;
+      return box;
+    }
+
+    function createQuestionItem(index, questionText, correct, userAnswer, correctAnswer) {
+      const div = document.createElement("div");
+      div.classList.add("question-item");
+      div.classList.add(correct ? "correct" : "incorrect");
+
+      const emoji = correct ? "✅" : "❌";
+      let html = `<p><span class="emoji">${emoji}</span><strong>Pergunta ${index + 1}:</strong> ${questionText}</p>`;
+
+      if (correct) {
+        html += `<p>Você acertou!</p>`;
+      } else {
+        html += `<p>Sua resposta: ${userAnswer}<br>Correta: ${correctAnswer}</p>`;
+      }
+      div.innerHTML = html;
+      return div;
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Usuário logado, busca resultados
+        const docRef = doc(db, "quizResults", user.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+
+          const score = data.score || 0;
+          const totalQuestions = data.totalQuestions || 1;
+          const answers = data.answers || [];
+
+          // Calcular erros e porcentagem
+          const errors = totalQuestions - score;
+          const percentage = Math.round((score / totalQuestions) * 100);
+
+          // Mostrar resumo
+          scoreOverview.appendChild(createScoreBox("✅ Acertos", score));
+          scoreOverview.appendChild(createScoreBox("❌ Erros", errors));
+          scoreOverview.appendChild(createScoreBox("🎯 Pontuação", percentage + "%"));
+
+          // Barra de progresso
+          progressFill.style.width = percentage + "%";
+          progressFill.textContent = percentage + "%";
+
+          // Mostrar perguntas
+          answers.forEach((ans, i) => {
+            questionList.appendChild(createQuestionItem(
+              i,
+              ans.question,
+              ans.correct,
+              ans.userAnswer,
+              ans.correctAnswer
+            ));
+          });
+
+        } else {
+          scoreOverview.textContent = "Nenhum resultado encontrado para este usuário.";
+        }
+      } else {
+        scoreOverview.textContent = "Você precisa estar logado para ver os resultados.";
+      }
+    });
+  </script>
+</body>
+</html>
