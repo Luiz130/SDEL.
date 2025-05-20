@@ -2,56 +2,23 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Quiz | SDEL</title>
+  <title>Resultado do Quiz</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       max-width: 600px;
       margin: 2rem auto;
-      padding: 1rem;
       text-align: center;
-    }
-    #timer {
-      font-size: 1.5rem;
-      margin-bottom: 20px;
-    }
-    .progress-bar-container {
-      margin-bottom: 20px;
-    }
-    progress {
-      width: 100%;
-      height: 20px;
     }
     h1 {
       margin-bottom: 20px;
     }
-    #question {
-      margin-bottom: 15px;
+    #resultado {
+      font-size: 1.2rem;
+      margin: 20px 0;
     }
-    #answer-buttons button {
-      display: block;
-      width: 100%;
-      margin: 8px 0;
-      padding: 10px;
-      font-size: 1rem;
-      cursor: pointer;
-      border-radius: 5px;
-      border: 1px solid #333;
-      background-color: #fff;
-    }
-    #answer-buttons button.correct {
-      background-color: #4CAF50;
-      color: white;
-      border-color: #4CAF50;
-    }
-    #answer-buttons button.incorrect {
-      background-color: #f44336;
-      color: white;
-      border-color: #f44336;
-    }
-    #next-btn {
-      margin-top: 20px;
+    button {
+      margin-top: 30px;
       padding: 10px 20px;
       font-size: 1rem;
       cursor: pointer;
@@ -59,257 +26,81 @@
       border: none;
       background-color: #007bff;
       color: white;
-      display: none;
     }
-    #next-btn:hover {
+    button:hover {
       background-color: #0056b3;
     }
   </style>
 </head>
 <body>
 
-  <div id="timer">02:30:00</div>
+  <h1>Seus Resultados do Quiz</h1>
 
-  <h1>Quiz</h1>
-
-  <div class="progress-bar-container">
-    <progress id="progress-bar" value="0" max="100"></progress>
+  <div id="resultado">
+    <p>Carregando seus resultados...</p>
   </div>
 
-  <h2 id="question">Questão</h2>
-  <div id="answer-buttons"></div>
-  <button id="next-btn">Próximo</button>
+  <button id="btn-refazer">Refazer Quiz</button>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-  <script>
-    // Configuração do Firebase (troque pelos seus dados)
-const firebaseConfig = {
-  apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
-  authDomain: "sdel-b3f65.firebaseapp.com",
-  projectId: "sdel-b3f65",
-  storageBucket: "sdel-b3f65.firebasestorage.app",
-  messagingSenderId: "297725999985",
-  appId: "1:297725999985:web:d41da68311c190ef8a54d0",
-  measurementId: "G-PT92VECJ2H"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
+      authDomain: "sdel-b3f65.firebaseapp.com",
+      projectId: "sdel-b3f65",
+      storageBucket: "sdel-b3f65.firebasestorage.app",
+      messagingSenderId: "297725999985",
+      appId: "1:297725999985:web:d41da68311c190ef8a54d0",
+      measurementId: "G-PT92VECJ2H"
+    };
 
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    // Inicializa Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    const resultadoDiv = document.getElementById('resultado');
+    const btnRefazer = document.getElementById('btn-refazer');
 
-    // Suas perguntas do quiz
-    const questions = [
-      { 
-        question: "A equação 2x² + 3x - 5 = 0 tem as raízes reais?",
-        answers: [
-          { id: 1, text: "Sim", correct: true },
-          { id: 2, text: "Não", correct: false },
-          { id: 3, text: "Somente uma raiz", correct: false },
-          { id: 4, text: "As raízes são complexas", correct: false },
-          { id: 5, text: "Duas raízes iguais", correct: false },
-        ],
-      },
-      {
-        question: "Se a função f(x) = x² + 4x + 3 tem um ponto de mínimo, qual é o valor de f(-2)?",
-        answers: [
-          { id: 1, text: "0", correct: false },
-          { id: 2, text: "-1", correct: false },
-          { id: 3, text: "1", correct: false },
-          { id: 4, text: "-2", correct: true },
-          { id: 5, text: "2", correct: false },
-        ],
-      },
-      {
-        question: "Se uma circunferência tem raio 4, qual é o comprimento da circunferência?",
-        answers: [
-          { id: 1, text: "16π", correct: true },
-          { id: 2, text: "8π", correct: false },
-          { id: 3, text: "4π", correct: false },
-          { id: 4, text: "2π", correct: false },
-          { id: 5, text: "10π", correct: false },
-        ],
-      },
-      {
-        question: "Em um triângulo equilátero de lado 6, qual é a área?",
-        answers: [
-          { id: 1, text: "9√3", correct: true },
-          { id: 2, text: "12√3", correct: false },
-          { id: 3, text: "36", correct: false },
-          { id: 4, text: "18√3", correct: false },
-          { id: 5, text: "18", correct: false },
-        ],
-      },
-      {
-        question: "A solução da equação logₓ(81) = 4 é:",
-        answers: [
-          { id: 1, text: "9", correct: true },
-          { id: 2, text: "3", correct: false },
-          { id: 3, text: "81", correct: false },
-          { id: 4, text: "4", correct: false },
-          { id: 5, text: "16", correct: false },
-        ],
-      },
-    ];
-
-    // Elementos DOM
-    const questionElement = document.getElementById("question");
-    const answerButtons = document.getElementById("answer-buttons");
-    const nextButton = document.getElementById("next-btn");
-    const progressBar = document.getElementById("progress-bar");
-    const timerElement = document.getElementById("timer");
-
-    // Variáveis do quiz
-    let currentQuestionIndex = 0;
-    let score = 0;
-    const totalQuestions = questions.length;
-
-    // Timer 2h30min em segundos
-    let totalTime = 2 * 60 * 60 + 30 * 60;
-    let timerInterval;
-
-    function startTimer() {
-      clearInterval(timerInterval);
-      updateTimerDisplay();
-      timerInterval = setInterval(() => {
-        totalTime--;
-        if (totalTime <= 0) {
-          clearInterval(timerInterval);
-          showScore();
-        } else {
-          updateTimerDisplay();
-        }
-      }, 1000);
+    function formatTimestamp(timestamp) {
+      if (!timestamp) return '';
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+      return date.toLocaleString('pt-BR');
     }
 
-    function updateTimerDisplay() {
-      const hours = Math.floor(totalTime / 3600);
-      const minutes = Math.floor((totalTime % 3600) / 60);
-      const seconds = totalTime % 60;
-
-      timerElement.textContent =
-        `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    function mostrarResultados(data) {
+      resultadoDiv.innerHTML = `
+        <p><strong>Pontuação:</strong> ${data.score} / ${data.totalQuestions}</p>
+        <p><strong>Tempo restante:</strong> ${data.tempoRestante}</p>
+        <p><strong>Data da tentativa:</strong> ${formatTimestamp(data.timestamp)}</p>
+      `;
     }
 
-    function startQuiz() {
-      currentQuestionIndex = 0;
-      score = 0;
-      nextButton.innerHTML = "Próximo";
-      nextButton.style.display = "none";
-      startTimer();
-      showQuestion();
-    }
-
-    function showQuestion() {
-      resetState();
-      let currentQuestion = questions[currentQuestionIndex];
-      questionElement.innerHTML = `${currentQuestionIndex + 1}. ${currentQuestion.question}`;
-
-      currentQuestion.answers.forEach(answer => {
-        const button = document.createElement("button");
-        button.innerHTML = answer.text;
-        button.classList.add("btn");
-        button.dataset.correct = answer.correct;
-        button.dataset.id = answer.id;
-        button.addEventListener("click", selectAnswer);
-        answerButtons.appendChild(button);
-      });
-
-      updateProgressBar();
-    }
-
-    function resetState() {
-      nextButton.style.display = "none";
-      while (answerButtons.firstChild) {
-        answerButtons.removeChild(answerButtons.firstChild);
-      }
-    }
-
-    function selectAnswer(e) {
-      const selectedBtn = e.target;
-      const isCorrect = selectedBtn.dataset.correct === "true";
-
-      if (isCorrect) {
-        selectedBtn.classList.add("correct");
-        score++;
-      } else {
-        selectedBtn.classList.add("incorrect");
-      }
-
-      Array.from(answerButtons.children).forEach(button => {
-        if (button.dataset.correct === "true") {
-          button.classList.add("correct");
-        }
-        button.disabled = true;
-      });
-
-      nextButton.style.display = "block";
-    }
-
-    function updateProgressBar() {
-      const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
-      progressBar.value = progress;
-    }
-
-    async function showScore() {
-      clearInterval(timerInterval);
-      resetState();
-
-      const tempoRestanteFormatado = timerElement.textContent;
-      const resultado = {
-        score: score,
-        totalQuestions: totalQuestions,
-        tempoRestante: tempoRestanteFormatado,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      };
-
-      // Pega o usuário logado
-      const user = auth.currentUser;
+    onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        alert("Usuário não autenticado. Faça login para salvar seu resultado.");
+        alert("Você precisa estar logado para ver os resultados.");
+        window.location.href = 'login.html';
         return;
       }
 
       try {
-        // Salva o resultado no Firestore com o UID do usuário
-        await db.collection('quizResults').doc(user.uid).set(resultado);
-        console.log('Resultado salvo com sucesso!');
+        const docRef = doc(db, "quizResults", user.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          mostrarResultados(docSnap.data());
+        } else {
+          resultadoDiv.innerHTML = "<p>Nenhum resultado encontrado. Faça o quiz primeiro!</p>";
+        }
       } catch (error) {
-        console.error('Erro ao salvar resultado:', error);
+        resultadoDiv.innerHTML = `<p>Erro ao carregar resultados: ${error.message}</p>`;
       }
-
-      // Redireciona para a página de resultados (você pode criar ela)
-      window.location.href = 'resultado.html';
-    }
-
-    function handleNextButton() {
-      currentQuestionIndex++;
-      if (currentQuestionIndex < questions.length) {
-        showQuestion();
-      } else {
-        showScore();
-      }
-      updateProgressBar();
-    }
-
-    nextButton.addEventListener('click', () => {
-      handleNextButton();
     });
 
-    // Espera o usuário estar autenticado para iniciar
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        startQuiz();
-      } else {
-        // Aqui pode redirecionar para login, por exemplo:
-        alert("Você precisa estar logado para fazer o quiz.");
-        // window.location.href = 'login.html';
-      }
+    btnRefazer.addEventListener('click', () => {
+      window.location.href = 'questoes.html'; // aqui mudou para questoes.html
     });
   </script>
 </body>
