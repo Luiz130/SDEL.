@@ -579,29 +579,3 @@ nextButton.addEventListener("click", () => {
 });
 
 startQuiz();
-
-import { getAuth } from "firebase/auth";
-import { getFirestore, doc, setDoc } from "firebase/firestore";
-
-const auth = getAuth();
-const db = getFirestore();
-
-async function saveResult(score, totalQuestions, answers) {
-  const user = auth.currentUser;
-  if (!user) {
-    console.log("Usuário não está logado.");
-    return;
-  }
-  
-  try {
-    await setDoc(doc(db, "quizResults", user.uid), {
-      score,
-      totalQuestions,
-      answers,
-      timestamp: Date.now(),
-    });
-    console.log("Resultado salvo com sucesso!");
-  } catch (error) {
-    console.error("Erro ao salvar resultado:", error);
-  }
-}
