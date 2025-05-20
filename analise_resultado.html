@@ -2,52 +2,165 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Resultado do Quiz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Análise Final</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <style>
+    /* -- Seu CSS que você já passou -- */
+    :root {
+      --primary: #44749D;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --bg: #f0f4f8;
+      --white: #ffffff;
+      --text: #1e293b;
+      --card-glass: rgba(255, 255, 255, 0.8);
+    }
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
     body {
-      font-family: Arial, sans-serif;
-      max-width: 600px;
-      margin: 2rem auto;
-      text-align: center;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #44749D);
+      color: var(--text);
+      padding: 30px;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: var(--card-glass);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.1);
     }
     h1 {
-      margin-bottom: 20px;
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 40px;
+      font-size: 2.4rem;
     }
-    #resultado {
+    .score-overview {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+    .score-box {
+      flex: 1;
+      min-width: 200px;
+      background: var(--white);
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+    .score-box:hover {
+      transform: scale(1.03);
+    }
+    .score-box h2 {
       font-size: 1.2rem;
-      margin: 20px 0;
+      color: #64748b;
+      margin-bottom: 8px;
     }
-    button {
+    .score-box p {
+      font-size: 2rem;
+      font-weight: bold;
+    }
+    .progress-container {
+      margin-bottom: 40px;
+    }
+    .progress-label {
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .progress-bar {
+      height: 25px;
+      width: 100%;
+      background-color: #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 70%;
+      background: linear-gradient(to right, #6366f1, #22d3ee);
+      text-align: center;
+      color: #fff;
+      font-weight: bold;
+      line-height: 25px;
+      transition: width 0.5s ease;
+    }
+    .question-list {
       margin-top: 30px;
-      padding: 10px 20px;
-      font-size: 1rem;
-      cursor: pointer;
-      border-radius: 5px;
-      border: none;
-      background-color: #007bff;
-      color: white;
     }
-    button:hover {
-      background-color: #0056b3;
+    .question-item {
+      background: var(--white);
+      border-left: 6px solid #ccc;
+      padding: 20px;
+      margin-bottom: 16px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: transform 0.3s ease;
+    }
+    .question-item:hover {
+      transform: scale(1.02);
+    }
+    .correct {
+      border-color: var(--success);
+    }
+    .incorrect {
+      border-color: var(--danger);
+    }
+    .question-item p {
+      margin-bottom: 8px;
+    }
+    .emoji {
+      font-size: 1.3rem;
+      margin-right: 6px;
+    }
+    @media (max-width: 700px) {
+      .score-overview {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
-
-  <h1>Seus Resultados do Quiz</h1>
-
-  <div id="resultado">
-    <p>Carregando seus resultados...</p>
+  <div class="container">
+    <h1>Análise Final</h1>
+    <div class="score-overview">
+      <div class="score-box">
+        <h2>✅ Acertos</h2>
+        <p id="acertos">0</p>
+      </div>
+      <div class="score-box">
+        <h2>❌ Erros</h2>
+        <p id="erros">0</p>
+      </div>
+      <div class="score-box">
+        <h2>🎯 Pontuação</h2>
+        <p id="pontuacao">0%</p>
+      </div>
+    </div>
+    <div class="progress-container">
+      <div class="progress-label">Aproveitamento</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width: 0%;">0%</div>
+      </div>
+    </div>
+    <div class="question-list" id="question-list">
+      <!-- Perguntas e respostas vão aparecer aqui -->
+    </div>
   </div>
-
-  <button id="btn-refazer">Refazer Quiz</button>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-    // Configuração Firebase (sua config)
     const firebaseConfig = {
       apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
       authDomain: "sdel-b3f65.firebaseapp.com",
@@ -62,49 +175,70 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const resultadoDiv = document.getElementById('resultado');
-    const btnRefazer = document.getElementById('btn-refazer');
+    const acertosElem = document.getElementById('acertos');
+    const errosElem = document.getElementById('erros');
+    const pontuacaoElem = document.getElementById('pontuacao');
+    const progressFillElem = document.getElementById('progress-fill');
+    const questionListElem = document.getElementById('question-list');
 
-    // Formata Timestamp Firestore para string legível
-    function formatTimestamp(timestamp) {
-      if (!timestamp) return '';
-      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-      return date.toLocaleString('pt-BR');
-    }
-
-    // Exibe resultado na tela
-    function mostrarResultados(data) {
-      resultadoDiv.innerHTML = `
-        <p><strong>Pontuação:</strong> ${data.score} / ${data.totalQuestions}</p>
-        <p><strong>Tempo restante:</strong> ${data.tempoRestante}</p>
-        <p><strong>Data da tentativa:</strong> ${formatTimestamp(data.timestamp)}</p>
-      `;
-    }
-
-    onAuthStateChanged(auth, async (user) => {
+    onAuthStateChanged(auth, async user => {
       if (!user) {
-        alert("Você precisa estar logado para ver os resultados.");
-        window.location.href = 'login.html'; // ajuste conforme sua página de login
+        alert("Você precisa estar logado para ver o resultado.");
+        window.location.href = "login.html";
         return;
       }
 
       try {
-        // Pega documento do usuário (id = user.uid)
         const docRef = doc(db, "quizResults", user.uid);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          mostrarResultados(docSnap.data());
+          const data = docSnap.data();
+
+          // Exemplo esperado dos dados:
+          // data.score = número de acertos
+          // data.totalQuestions = total de perguntas
+          // data.answers = array [{ question: "...", userAnswer: "...", correctAnswer: "...", isCorrect: true/false }, ...]
+
+          const score = data.score ?? 0;
+          const totalQuestions = data.totalQuestions ?? 0;
+          const answers = data.answers ?? [];
+
+          const erros = totalQuestions - score;
+          const porcentagem = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
+
+          acertosElem.textContent = score;
+          errosElem.textContent = erros;
+          pontuacaoElem.textContent = porcentagem + '%';
+          progressFillElem.style.width = porcentagem + '%';
+          progressFillElem.textContent = porcentagem + '%';
+
+          // Preencher a lista de perguntas com status correto/incorreto
+          questionListElem.innerHTML = ''; // limpa antes
+
+          answers.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.classList.add('question-item');
+            div.classList.add(item.isCorrect ? 'correct' : 'incorrect');
+
+            div.innerHTML = `
+              <p><span class="emoji">${item.isCorrect ? '✅' : '❌'}</span><strong>Pergunta ${index + 1}:</strong> ${item.question}</p>
+              ${item.isCorrect ? 
+                '<p>Você acertou!</p>' :
+                `<p>Sua resposta: ${item.userAnswer}<br>Correta: ${item.correctAnswer}</p>`
+              }
+            `;
+
+            questionListElem.appendChild(div);
+          });
+
         } else {
-          resultadoDiv.innerHTML = "<p>Nenhum resultado encontrado. Faça o quiz primeiro!</p>";
+          alert("Nenhum resultado encontrado para este usuário.");
+          window.location.href = "quiz.html"; // redireciona para o quiz
         }
       } catch (error) {
-        resultadoDiv.innerHTML = `<p>Erro ao carregar resultados: ${error.message}</p>`;
+        alert("Erro ao buscar resultado: " + error.message);
       }
-    });
-
-    btnRefazer.addEventListener('click', () => {
-      window.location.href = 'quiz.html'; // ajuste para sua página de quiz
     });
   </script>
 </body>
