@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Quiz 45 Questões</title>
+  <title>Quiz de Matemática</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -14,69 +14,81 @@
       height: 100vh;
       margin: 0;
     }
-    #quiz-container {
+    .quiz-container {
       background: white;
+      padding: 20px 30px;
       border-radius: 8px;
-      padding: 20px;
-      width: 450px; /* pode ajustar */
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 400px;
+      max-width: 90vw;
+      text-align: center;
     }
-    #question {
+    .question {
       font-size: 20px;
       margin-bottom: 15px;
     }
-    .answer {
-      background: #eee;
-      border: none;
-      border-radius: 5px;
-      padding: 10px 15px;
-      margin-bottom: 10px;
+    .answers {
+      list-style: none;
+      padding: 0;
+    }
+    .answers li {
+      margin: 10px 0;
+    }
+    button.answer-btn {
       width: 100%;
-      text-align: left;
-      cursor: pointer;
+      padding: 10px;
       font-size: 16px;
-      transition: background 0.3s;
+      cursor: pointer;
+      border: 2px solid #3498db;
+      background: white;
+      border-radius: 5px;
+      transition: background 0.3s, color 0.3s;
     }
-    .answer:hover {
-      background: #ddd;
-    }
-    .answer.correct {
-      background-color: #4CAF50;
+    button.answer-btn:hover {
+      background: #3498db;
       color: white;
     }
-    .answer.wrong {
-      background-color: #f44336;
+    button.answer-btn.correct {
+      background: #2ecc71;
+      border-color: #27ae60;
       color: white;
     }
-    #submit-btn {
-      background: #2196F3;
+    button.answer-btn.wrong {
+      background: #e74c3c;
+      border-color: #c0392b;
       color: white;
-      border: none;
+    }
+    button#next-btn {
+      margin-top: 20px;
       padding: 10px 20px;
       font-size: 16px;
+      background: #3498db;
+      color: white;
+      border: none;
       border-radius: 5px;
       cursor: pointer;
     }
-    #submit-btn:hover {
-      background: #0b7dda;
+    button#next-btn:disabled {
+      background: #ccc;
+      cursor: default;
     }
-    #result {
+    .score-container {
+      font-size: 24px;
       margin-top: 20px;
-      font-size: 18px;
     }
   </style>
 </head>
 <body>
-  <div id="quiz-container">
-    <div id="question"></div>
-    <div id="answers"></div>
-    <button id="submit-btn">Próxima</button>
-    <div id="result"></div>
+
+  <div class="quiz-container">
+    <div id="question" class="question">Pergunta</div>
+    <ul id="answers" class="answers"></ul>
+    <button id="next-btn" disabled>Próxima</button>
+    <div id="score-container" class="score-container" style="display:none;"></div>
   </div>
 
   <script>
-    const quizData = [
-      // Cole aqui as suas 45 questões, no formato abaixo:
+    const questions = [
       {
     question: "Se log₂(x) = 5, então o valor de x é:",
     answers: [
@@ -519,73 +531,84 @@
       { id: 5, text: "18", correct: false },
     ],
   },
-  {
-
-    const questionEl = document.getElementById("question");
-    const answersEl = document.getElementById("answers");
-    const submitBtn = document.getElementById("submit-btn");
-    const resultEl = document.getElementById("result");
+    ];
 
     let currentQuestionIndex = 0;
     let score = 0;
-    let selectedAnswer = null;
 
-    function loadQuestion() {
-      selectedAnswer = null;
-      const currentQuestion = quizData[currentQuestionIndex];
-      questionEl.textContent = `${currentQuestionIndex + 1}. ${currentQuestion.question}`;
-      answersEl.innerHTML = "";
+    const questionEl = document.getElementById("question");
+    const answersEl = document.getElementById("answers");
+    const nextBtn = document.getElementById("next-btn");
+    const scoreContainer = document.getElementById("score-container");
+
+    function showQuestion() {
+      resetState();
+      let currentQuestion = questions[currentQuestionIndex];
+      questionEl.textContent = currentQuestion.question;
 
       currentQuestion.answers.forEach(answer => {
         const button = document.createElement("button");
-        button.classList.add("answer");
         button.textContent = answer.text;
+        button.classList.add("answer-btn");
         button.dataset.correct = answer.correct;
-        button.addEventListener("click", () => {
-          clearSelection();
-          button.classList.add("selected");
-          selectedAnswer = button;
-        });
-        answersEl.appendChild(button);
+        button.addEventListener("click", selectAnswer);
+        const li = document.createElement("li");
+        li.appendChild(button);
+        answersEl.appendChild(li);
+      });
+    }
+
+    function resetState() {
+      nextBtn.disabled = true;
+      while (answersEl.firstChild) {
+        answersEl.removeChild(answersEl.firstChild);
+      }
+      scoreContainer.style.display = "none";
+    }
+
+    function selectAnswer(e) {
+      const selectedBtn = e.target;
+      const correct = selectedBtn.dataset.correct === "true";
+
+      if (correct) {
+        selectedBtn.classList.add("correct");
+        score++;
+      } else {
+        selectedBtn.classList.add("wrong");
+      }
+
+      Array.from(answersEl.children).forEach(li => {
+        const button = li.firstChild;
+        button.disabled = true;
+        if (button.dataset.correct === "true") {
+          button.classList.add("correct");
+        }
       });
 
-      submitBtn.textContent = currentQuestionIndex === quizData.length - 1 ? "Finalizar" : "Próxima";
-      resultEl.textContent = "";
+      nextBtn.disabled = false;
     }
 
-    function clearSelection() {
-      const buttons = answersEl.querySelectorAll("button");
-      buttons.forEach(btn => btn.classList.remove("selected"));
-    }
-
-    submitBtn.addEventListener("click", () => {
-      if (!selectedAnswer) {
-        alert("Por favor, selecione uma resposta!");
-        return;
-      }
-
-      // Verifica se resposta correta
-      if (selectedAnswer.dataset.correct === "true") {
-        score++;
-      }
-
+    nextBtn.addEventListener("click", () => {
       currentQuestionIndex++;
-
-      if (currentQuestionIndex < quizData.length) {
-        loadQuestion();
+      if (currentQuestionIndex < questions.length) {
+        showQuestion();
       } else {
-        showResult();
+        showScore();
       }
     });
 
-    function showResult() {
+    function showScore() {
+      resetState();
       questionEl.textContent = "Quiz finalizado!";
-      answersEl.innerHTML = "";
-      submitBtn.style.display = "none";
-      resultEl.textContent = `Sua pontuação: ${score} / ${quizData.length}`;
+      scoreContainer.style.display = "block";
+      scoreContainer.textContent = `Você acertou ${score} de ${questions.length} perguntas.`;
+      nextBtn.style.display = "none";
     }
 
-    loadQuestion();
+    // Iniciar quiz
+    showQuestion();
+
   </script>
+
 </body>
 </html>
