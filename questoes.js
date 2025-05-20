@@ -1,5 +1,24 @@
 
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+// Config Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
+  authDomain: "sdel-b3f65.firebaseapp.com",
+  projectId: "sdel-b3f65",
+  storageBucket: "sdel-b3f65.appspot.com",
+  messagingSenderId: "297725999985",
+  appId: "1:297725999985:web:d41da68311c190ef8a54d0"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
 const questions = [
+
   {
     question: "Se log₂(x) = 5, então o valor de x é:",
     answers: [
@@ -452,7 +471,8 @@ const questions = [
       { id: 5, text: "16", correct: false },
     ],
   },
-];
+]; /* ... Mesma lista de questões que você já tem ... */ ;
+
 const questionElement = document.getElementById("question");
 const answerButtons = document.getElementById("answer-buttons");
 const nextButton = document.getElementById("next-btn");
@@ -462,25 +482,23 @@ const timerElement = document.getElementById("timer");
 let currentQuestionIndex = 0;
 let score = 0;
 const totalQuestions = questions.length;
-
-// Timer: 2h30min (em segundos)
+let answersLog = [];
 let totalTime = 2 * 60 * 60 + 30 * 60;
 let timerInterval;
 
 function startQuiz() {
   currentQuestionIndex = 0;
   score = 0;
+  answersLog = [];
   nextButton.innerHTML = "Próxima";
   startTimer();
   showQuestion();
 }
 
 function startTimer() {
-  clearInterval(timerInterval); // Garante que não existam múltiplos timers
-  updateTimerDisplay(); // Mostra o tempo inicial imediatamente
+  updateTimerDisplay();
   timerInterval = setInterval(() => {
     totalTime--;
-
     if (totalTime <= 0) {
       clearInterval(timerInterval);
       showScore();
@@ -494,16 +512,13 @@ function updateTimerDisplay() {
   const hours = Math.floor(totalTime / 3600);
   const minutes = Math.floor((totalTime % 3600) / 60);
   const seconds = totalTime % 60;
-
-  timerElement.textContent = 
-    `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  timerElement.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
 function showQuestion() {
   resetState();
-  let currentQuestion = questions[currentQuestionIndex];
-  let questionNo = currentQuestionIndex + 1;
-  questionElement.innerHTML = questionNo + ". " + currentQuestion.question;
+  const currentQuestion = questions[currentQuestionIndex];
+  questionElement.innerHTML = `${currentQuestionIndex + 1}. ${currentQuestion.question}`;
 
   currentQuestion.answers.forEach((answer) => {
     const button = document.createElement("button");
@@ -528,13 +543,16 @@ function resetState() {
 function selectAnswer(e) {
   const selectedBtn = e.target;
   const isCorrect = selectedBtn.dataset.correct === "true";
+  const currentQuestion = questions[currentQuestionIndex];
 
-  if (isCorrect) {
-    selectedBtn.classList.add("correct");
-    score++;
-  } else {
-    selectedBtn.classList.add("incorrect");
-  }
+  if (isCorrect) score++;
+
+  answersLog.push({
+    question: currentQuestion.question,
+    userAnswer: selectedBtn.innerText,
+    correctAnswer: currentQuestion.answers.find(a => a.correct).text,
+    correct: isCorrect
+  });
 
   Array.from(answerButtons.children).forEach((button) => {
     if (button.dataset.correct === "true") {
@@ -542,6 +560,8 @@ function selectAnswer(e) {
     }
     button.disabled = true;
   });
+
+  if (!isCorrect) selectedBtn.classList.add("incorrect");
 
   nextButton.style.display = "block";
 }
@@ -552,11 +572,22 @@ function updateProgressBar() {
 }
 
 function showScore() {
-  clearInterval(timerInterval); // Para o cronômetro
+  clearInterval(timerInterval);
   resetState();
   questionElement.innerHTML = `Você acertou ${score} de ${totalQuestions}!`;
   nextButton.innerHTML = "Jogar Novamente";
   nextButton.style.display = "block";
+
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      await setDoc(doc(db, "quizResults", user.uid), {
+        score,
+        totalQuestions,
+        answers: answersLog,
+        timestamp: new Date()
+      });
+    }
+  });
 }
 
 function handleNextButton() {
