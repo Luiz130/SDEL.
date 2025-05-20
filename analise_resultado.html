@@ -6,9 +6,8 @@
   <title>Análise Final</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <style>
-    /* -- Seu CSS que você já passou -- */
     :root {
-      --primary: #44749D;
+      --primary: #44749d;
       --success: #22c55e;
       --danger: #ef4444;
       --bg: #f0f4f8;
@@ -16,15 +15,20 @@
       --text: #1e293b;
       --card-glass: rgba(255, 255, 255, 0.8);
     }
+
     * {
-      margin: 0; padding: 0; box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
+
     body {
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(to right, #44749D);
+      background: linear-gradient(to right, #44749d, #5c93b8);
       color: var(--text);
       padding: 30px;
     }
+
     .container {
       max-width: 900px;
       margin: auto;
@@ -32,212 +36,110 @@
       backdrop-filter: blur(12px);
       border-radius: 20px;
       padding: 40px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
     }
+
     h1 {
       text-align: center;
       color: var(--primary);
       margin-bottom: 40px;
       font-size: 2.4rem;
     }
-    .score-overview {
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
-      margin-bottom: 40px;
-      flex-wrap: wrap;
-    }
-    .score-box {
-      flex: 1;
-      min-width: 200px;
-      background: var(--white);
-      border-radius: 16px;
-      padding: 25px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      text-align: center;
-      transition: transform 0.3s ease;
-    }
-    .score-box:hover {
-      transform: scale(1.03);
-    }
-    .score-box h2 {
-      font-size: 1.2rem;
-      color: #64748b;
-      margin-bottom: 8px;
-    }
-    .score-box p {
-      font-size: 2rem;
-      font-weight: bold;
-    }
-    .progress-container {
-      margin-bottom: 40px;
-    }
-    .progress-label {
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
-    .progress-bar {
-      height: 25px;
-      width: 100%;
-      background-color: #e2e8f0;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      width: 70%;
-      background: linear-gradient(to right, #6366f1, #22d3ee);
-      text-align: center;
-      color: #fff;
-      font-weight: bold;
-      line-height: 25px;
-      transition: width 0.5s ease;
-    }
+
     .question-list {
       margin-top: 30px;
     }
+
     .question-item {
       background: var(--white);
       border-left: 6px solid #ccc;
       padding: 20px;
       margin-bottom: 16px;
       border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
       transition: transform 0.3s ease;
     }
+
     .question-item:hover {
       transform: scale(1.02);
     }
+
     .correct {
       border-color: var(--success);
     }
+
     .incorrect {
       border-color: var(--danger);
     }
+
     .question-item p {
       margin-bottom: 8px;
     }
+
     .emoji {
       font-size: 1.3rem;
       margin-right: 6px;
-    }
-    @media (max-width: 700px) {
-      .score-overview {
-        flex-direction: column;
-      }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Análise Final</h1>
-    <div class="score-overview">
-      <div class="score-box">
-        <h2>✅ Acertos</h2>
-        <p id="acertos">0</p>
-      </div>
-      <div class="score-box">
-        <h2>❌ Erros</h2>
-        <p id="erros">0</p>
-      </div>
-      <div class="score-box">
-        <h2>🎯 Pontuação</h2>
-        <p id="pontuacao">0%</p>
-      </div>
-    </div>
-    <div class="progress-container">
-      <div class="progress-label">Aproveitamento</div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progress-fill" style="width: 0%;">0%</div>
-      </div>
-    </div>
-    <div class="question-list" id="question-list">
-      <!-- Perguntas e respostas vão aparecer aqui -->
-    </div>
+    <div class="question-list"></div>
   </div>
 
+  <!-- Firebase + análise de resultados -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
       authDomain: "sdel-b3f65.firebaseapp.com",
       projectId: "sdel-b3f65",
-      storageBucket: "sdel-b3f65.firebasestorage.app",
+      storageBucket: "sdel-b3f65.appspot.com",
       messagingSenderId: "297725999985",
       appId: "1:297725999985:web:d41da68311c190ef8a54d0",
       measurementId: "G-PT92VECJ2H"
     };
 
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
     const db = getFirestore(app);
+    const auth = getAuth();
+    const questionList = document.querySelector(".question-list");
 
-    const acertosElem = document.getElementById('acertos');
-    const errosElem = document.getElementById('erros');
-    const pontuacaoElem = document.getElementById('pontuacao');
-    const progressFillElem = document.getElementById('progress-fill');
-    const questionListElem = document.getElementById('question-list');
-
-    onAuthStateChanged(auth, async user => {
+    onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        alert("Você precisa estar logado para ver o resultado.");
-        window.location.href = "login.html";
+        questionList.innerHTML = "<p style='color:red;'>Você precisa estar logado para ver os resultados.</p>";
         return;
       }
 
-      try {
-        const docRef = doc(db, "quizResults", user.uid);
-        const docSnap = await getDoc(docRef);
+      const respostasRef = collection(db, "respostas");
+      const q = query(respostasRef, where("uid", "==", user.uid));
 
-        if (docSnap.exists()) {
-          const data = docSnap.data();
+      const querySnapshot = await getDocs(q);
 
-          // Exemplo esperado dos dados:
-          // data.score = número de acertos
-          // data.totalQuestions = total de perguntas
-          // data.answers = array [{ question: "...", userAnswer: "...", correctAnswer: "...", isCorrect: true/false }, ...]
+      let encontrouErro = false;
 
-          const score = data.score ?? 0;
-          const totalQuestions = data.totalQuestions ?? 0;
-          const answers = data.answers ?? [];
+      querySnapshot.forEach((doc) => {
+        const dados = doc.data();
 
-          const erros = totalQuestions - score;
-          const porcentagem = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
-
-          acertosElem.textContent = score;
-          errosElem.textContent = erros;
-          pontuacaoElem.textContent = porcentagem + '%';
-          progressFillElem.style.width = porcentagem + '%';
-          progressFillElem.textContent = porcentagem + '%';
-
-          // Preencher a lista de perguntas com status correto/incorreto
-          questionListElem.innerHTML = ''; // limpa antes
-
-          answers.forEach((item, index) => {
-            const div = document.createElement('div');
-            div.classList.add('question-item');
-            div.classList.add(item.isCorrect ? 'correct' : 'incorrect');
-
-            div.innerHTML = `
-              <p><span class="emoji">${item.isCorrect ? '✅' : '❌'}</span><strong>Pergunta ${index + 1}:</strong> ${item.question}</p>
-              ${item.isCorrect ? 
-                '<p>Você acertou!</p>' :
-                `<p>Sua resposta: ${item.userAnswer}<br>Correta: ${item.correctAnswer}</p>`
-              }
-            `;
-
-            questionListElem.appendChild(div);
-          });
-
-        } else {
-          alert("Nenhum resultado encontrado para este usuário.");
-          window.location.href = "quiz.html"; // redireciona para o quiz
+        if (dados.respostaSelecionada !== dados.respostaCorreta) {
+          encontrouErro = true;
+          const perguntaHTML = `
+            <div class="question-item incorrect">
+              <p><span class="emoji">❌</span><strong>${dados.pergunta}</strong></p>
+              <p>Sua resposta: <strong>${dados.respostaSelecionada}</strong><br>
+              Resposta correta: <strong>${dados.respostaCorreta}</strong></p>
+            </div>
+          `;
+          questionList.innerHTML += perguntaHTML;
         }
-      } catch (error) {
-        alert("Erro ao buscar resultado: " + error.message);
+      });
+
+      if (!encontrouErro) {
+        questionList.innerHTML = "<p style='color:green;'>Parabéns! Você acertou todas as perguntas.</p>";
       }
     });
   </script>
