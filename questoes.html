@@ -1,236 +1,353 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Quiz de Matemática</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    max-width: 600px;
-    margin: 40px auto;
-    padding: 0 20px;
-    background: #f7f7f7;
-  }
-  h1 {
-    text-align: center;
-  }
-  .question {
-    font-size: 1.2em;
-    margin-bottom: 15px;
-  }
-  .answers button {
-    display: block;
-    width: 100%;
-    margin: 8px 0;
-    padding: 10px;
-    font-size: 1em;
-    cursor: pointer;
-    border: 1px solid #ddd;
-    background: #fff;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-  }
-  .answers button:hover {
-    background-color: #eee;
-  }
-  .answers button.correct {
-    background-color: #4caf50;
-    color: white;
-  }
-  .answers button.wrong {
-    background-color: #f44336;
-    color: white;
-  }
-  .next-btn {
-    margin-top: 20px;
-    padding: 10px 15px;
-    font-size: 1em;
-    cursor: pointer;
-    background-color: #2196f3;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    display: none;
-  }
-  .score {
-    font-size: 1.3em;
-    text-align: center;
-    margin-top: 30px;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quiz | SDEL</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      font-family: "Poppins", sans-serif;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #44749D;
+    }
+
+    .app {
+      background: #fff;
+      width: 90%;
+      max-width: 600px;
+      margin: 100px auto 0;
+      padding: 30px;
+      border-radius: 30px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
+    }
+
+    h1 {
+      color: #001e4d;
+      font-weight: 600;
+      border-bottom: 1px solid #333;
+      padding-bottom: 30px;
+      text-align: center;
+    }
+
+    .quiz {
+      padding: 20px 0;
+    }
+
+    .quiz h2 {
+      font-size: 18px;
+      color: #001e4d;
+      font-weight: 600;
+    }
+
+    .btn {
+      background: #fff;
+      color: #222;
+      font-weight: 500;
+      width: 100%;
+      border: 1px solid #222;
+      padding: 10px;
+      margin: 10px 0;
+      text-align: left;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn:hover:not([disabled]) {
+      background: #222;
+      color: #fff;
+    }
+
+    .btn:disabled {
+      cursor: no-drop;
+    }
+
+    #next-btn {
+      background: #001e4d;
+      color: #fff;
+      font-weight: 500;
+      width: 150px;
+      border: 0;
+      padding: 10px;
+      margin: 20px auto 0;
+      border-radius: 4px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .correct {
+      background: #9aeabc;
+    }
+
+    .incorrect {
+      background: #ff9393;
+    }
+
+    /* Barra de progresso */
+    .progress-bar-container {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    progress {
+      width: 100%;
+      height: 20px;
+    }
+
+    #timer {
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-align: center;
+      color: #d32f2f;
+      margin-bottom: 20px;
+      background-color: #fff3f3;
+      padding: 10px;
+      border: 2px solid #d32f2f;
+      border-radius: 8px;
+      width: 120px;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 0 10px rgba(211, 47, 47, 0.2);
+    }
+  </style>
 </head>
 <body>
+  <div class="app">
+    <div id="timer">02:30:00</div>
+    <h1>Quiz</h1>
+    <div class="progress-bar-container">
+      <progress id="progress-bar" value="0" max="100"></progress>
+    </div>
+    <div class="quiz">
+      <h2 id="question">Questão</h2>
+      <div id="answer-buttons"></div>
+      <button id="next-btn">Próximo</button>
+    </div>
+  </div>
 
-<h1>Quiz de Matemática</h1>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-<div id="quiz-container">
-  <div id="question" class="question"></div>
-  <div id="answers" class="answers"></div>
-  <button id="next-btn" class="next-btn">Próxima</button>
-</div>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
+      authDomain: "sdel-b3f65.firebaseapp.com",
+      projectId: "sdel-b3f65",
+      storageBucket: "sdel-b3f65.firebasestorage.app",
+      messagingSenderId: "297725999985",
+      appId: "1:297725999985:web:d41da68311c190ef8a54d0",
+      measurementId: "G-PT92VECJ2H"
+    };
 
-<div id="result" class="score" style="display:none;"></div>
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-<script>
-  const quizData = [
-    {
-      question: "Se log₂(x) = 5, então o valor de x é:",
-      answers: [
-        { id: 1, text: "10", correct: false },
-        { id: 2, text: "16", correct: false },
-        { id: 3, text: "25", correct: false },
-        { id: 4, text: "32", correct: true },
-        { id: 5, text: "64", correct: false },
-      ],
-    },
-    {
-      question: "A distância entre os pontos A(2, -3) e B(6, 1) no plano cartesiano é:",
-      answers: [
-        { id: 1, text: "4", correct: false },
-        { id: 2, text: "5", correct: false },
-        { id: 3, text: "6", correct: true },
-        { id: 4, text: "√32", correct: false },
-        { id: 5, text: "8", correct: false },
-      ],
-    },
-    {
-      question: "Em uma PA de 10 termos, o primeiro é 3 e o último é 30. Qual é a soma dos termos dessa PA?",
-      answers: [
-        { id: 1, text: "150", correct: false },
-        { id: 2, text: "155", correct: false },
-        { id: 3, text: "160", correct: true },
-        { id: 4, text: "165", correct: false },
-        { id: 5, text: "170", correct: false },
-      ],
-    },
-    {
-      question: "Um sólido geométrico tem base quadrada de 4 cm de lado e altura de 9 cm. Qual é o volume desse sólido, sabendo que se trata de uma pirâmide?",
-      answers: [
-        { id: 1, text: "36 cm³", correct: false },
-        { id: 2, text: "48 cm³", correct: false },
-        { id: 3, text: "60 cm³", correct: false },
-        { id: 4, text: "72 cm³", correct: true },
-        { id: 5, text: "80 cm³", correct: false },
-      ],
-    },
-    {
-      question: "Em uma urna há 5 bolas vermelhas, 3 verdes e 2 azuis. Qual é a probabilidade de se retirar uma bola verde ao acaso?",
-      answers: [
-        { id: 1, text: "1/2", correct: false },
-        { id: 2, text: "1/3", correct: false },
-        { id: 3, text: "3/10", correct: true },
-        { id: 4, text: "2/5", correct: false },
-        { id: 5, text: "3/5", correct: false },
-      ],
-    },
-    {
-      question: "Um capital de R$ 10.000,00 foi aplicado à taxa de juros compostos de 2% ao mês durante 12 meses. Qual será o montante ao final do período?",
-      answers: [
-        { id: 1, text: "R$ 12.000,00", correct: false },
-        { id: 2, text: "R$ 12.682,50", correct: true },
-        { id: 3, text: "R$ 11.440,00", correct: false },
-        { id: 4, text: "R$ 12.000,80", correct: false },
-        { id: 5, text: "R$ 12.260,40", correct: false },
-      ],
-    },
-    {
-      question: "A função f(x) = x³ - 6x² + 9x representa o lucro de uma empresa. Qual é o valor de x que proporciona o lucro máximo?",
-      answers: [
-        { id: 1, text: "1", correct: false },
-        { id: 2, text: "2", correct: false },
-        { id: 3, text: "3", correct: true },
-        { id: 4, text: "4", correct: false },
-        { id: 5, text: "5", correct: false },
-      ],
-    },
-    {
-      question: "Se f(x) = logₐ(x) e f(81) = 4, então o valor de a é:",
-      answers: [
-        { id: 1, text: "2", correct: false },
-        { id: 2, text: "3", correct: false },
-        { id: 3, text: "9", correct: false },
-        { id: 4, text: "81", correct: false },
-        { id: 5, text: "3√3", correct: true },
-      ],
-    },
-    {
-      question: "Uma escada de 10 m de comprimento está apoiada em uma parede, formando um ângulo de 60° com o chão. Qual a altura que a escada alcança na parede?",
-      answers: [
-        { id: 1, text: "5 m", correct: false },
-        { id: 2, text: "6 m", correct: false },
-        { id: 3, text: "8.66 m", correct: true },
-        { id: 4, text: "7.50 m", correct: false },
-        { id: 5, text: "9.00 m", correct: false },
-      ],
-    },
-  ];
+    const questions = [
+      { 
+        question: "A equação 2x² + 3x - 5 = 0 tem as raízes reais?",
+        answers: [
+          { id: 1, text: "Sim", correct: true },
+          { id: 2, text: "Não", correct: false },
+          { id: 3, text: "Somente uma raiz", correct: false },
+          { id: 4, text: "As raízes são complexas", correct: false },
+          { id: 5, text: "Duas raízes iguais", correct: false },
+        ],
+      },
+      {
+        question: "Se a função f(x) = x² + 4x + 3 tem um ponto de mínimo, qual é o valor de f(-2)?",
+        answers: [
+          { id: 1, text: "0", correct: false },
+          { id: 2, text: "-1", correct: false },
+          { id: 3, text: "1", correct: false },
+          { id: 4, text: "-2", correct: true },
+          { id: 5, text: "2", correct: false },
+        ],
+      },
+      {
+        question: "Se uma circunferência tem raio 4, qual é o comprimento da circunferência?",
+        answers: [
+          { id: 1, text: "16π", correct: true },
+          { id: 2, text: "8π", correct: false },
+          { id: 3, text: "4π", correct: false },
+          { id: 4, text: "2π", correct: false },
+          { id: 5, text: "10π", correct: false },
+        ],
+      },
+      {
+        question: "Em um triângulo equilátero de lado 6, qual é a área?",
+        answers: [
+          { id: 1, text: "9√3", correct: true },
+          { id: 2, text: "12√3", correct: false },
+          { id: 3, text: "36", correct: false },
+          { id: 4, text: "18√3", correct: false },
+          { id: 5, text: "18", correct: false },
+        ],
+      },
+      {
+        question: "A solução da equação logₓ(81) = 4 é:",
+        answers: [
+          { id: 1, text: "9", correct: true },
+          { id: 2, text: "3", correct: false },
+          { id: 3, text: "81", correct: false },
+          { id: 4, text: "4", correct: false },
+          { id: 5, text: "16", correct: false },
+        ],
+      },
+    ];
 
-  const questionEl = document.getElementById('question');
-  const answersEl = document.getElementById('answers');
-  const nextBtn = document.getElementById('next-btn');
-  const resultEl = document.getElementById('result');
+    const questionElement = document.getElementById("question");
+    const answerButtons = document.getElementById("answer-buttons");
+    const nextButton = document.getElementById("next-btn");
+    const progressBar = document.getElementById("progress-bar");
+    const timerElement = document.getElementById("timer");
 
-  let currentQuestionIndex = 0;
-  let score = 0;
-  let answered = false;
+    let currentQuestionIndex = 0;
+    let score = 0;
+    const totalQuestions = questions.length;
 
-  function loadQuestion() {
-    answered = false;
-    nextBtn.style.display = 'none';
-    const currentQuestion = quizData[currentQuestionIndex];
-    questionEl.textContent = currentQuestion.question;
-    answersEl.innerHTML = '';
+    let totalTime = 2 * 60 * 60 + 30 * 60; // 2h30min em segundos
+    let timerInterval;
 
-    currentQuestion.answers.forEach(answer => {
-      const button = document.createElement('button');
-      button.textContent = answer.text;
-      button.dataset.correct = answer.correct;
-      button.addEventListener('click', selectAnswer);
-      answersEl.appendChild(button);
+    let currentUser = null;
+
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        currentUser = user;
+        startQuiz();
+      } else {
+        alert("Você precisa estar logado para fazer o quiz.");
+        window.location.href = "login.html";
+      }
     });
-  }
 
-  function selectAnswer(e) {
-    if (answered) return; // só uma resposta por pergunta
+    function startQuiz() {
+      currentQuestionIndex = 0;
+      score = 0;
+      nextButton.innerHTML = "Próximo";
+      startTimer();
+      showQuestion();
+    }
 
-    answered = true;
-    const selectedBtn = e.target;
-    const correct = selectedBtn.dataset.correct === 'true';
-
-    if (correct) {
-      selectedBtn.classList.add('correct');
-      score++;
-    } else {
-      selectedBtn.classList.add('wrong');
-      // mostra qual era a certa:
-      Array.from(answersEl.children).forEach(btn => {
-        if (btn.dataset.correct === 'true') {
-          btn.classList.add('correct');
+    function startTimer() {
+      clearInterval(timerInterval);
+      updateTimerDisplay();
+      timerInterval = setInterval(() => {
+        totalTime--;
+        if (totalTime <= 0) {
+          clearInterval(timerInterval);
+          showScore();
+        } else {
+          updateTimerDisplay();
         }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const hours = Math.floor(totalTime / 3600);
+      const minutes = Math.floor((totalTime % 3600) / 60);
+      const seconds = totalTime % 60;
+
+      timerElement.textContent =
+        `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    function showQuestion() {
+      resetState();
+      let currentQuestion = questions[currentQuestionIndex];
+      questionElement.innerHTML = `${currentQuestionIndex + 1}. ${currentQuestion.question}`;
+
+      currentQuestion.answers.forEach(answer => {
+        const button = document.createElement("button");
+        button.innerHTML = answer.text;
+        button.classList.add("btn");
+        button.dataset.correct = answer.correct;
+        button.dataset.id = answer.id;
+        button.addEventListener("click", selectAnswer);
+        answerButtons.appendChild(button);
       });
+
+      updateProgressBar();
     }
-    nextBtn.style.display = 'inline-block';
-  }
 
-  nextBtn.addEventListener('click', () => {
-    currentQuestionIndex++;
-    if (currentQuestionIndex < quizData.length) {
-      loadQuestion();
-    } else {
-      showResult();
+    function resetState() {
+      nextButton.style.display = "none";
+      while (answerButtons.firstChild) {
+        answerButtons.removeChild(answerButtons.firstChild);
+      }
     }
-  });
 
-  function showResult() {
-    quizContainer = document.getElementById('quiz-container');
-    quizContainer.style.display = 'none';
-    resultEl.style.display = 'block';
-    resultEl.textContent = `Você acertou ${score} de ${quizData.length} perguntas!`;
-  }
+    function selectAnswer(e) {
+      const selectedBtn = e.target;
+      const isCorrect = selectedBtn.dataset.correct === "true";
 
-  loadQuestion();
-</script>
+      if (isCorrect) {
+        selectedBtn.classList.add("correct");
+        score++;
+      } else {
+        selectedBtn.classList.add("incorrect");
+      }
 
+      Array.from(answerButtons.children).forEach(button => {
+        if (button.dataset.correct === "true") {
+          button.classList.add("correct");
+        }
+        button.disabled = true;
+      });
+
+      nextButton.style.display = "block";
+    }
+
+    function updateProgressBar() {
+      const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+      progressBar.value = progress;
+    }
+
+    async function showScore() {
+      clearInterval(timerInterval);
+      resetState();
+
+      if (currentUser) {
+        const resultado = {
+          score: score,
+          totalQuestions: totalQuestions,
+          tempoRestante: timerElement.textContent,
+          timestamp: serverTimestamp()
+        };
+
+        try {
+          await setDoc(doc(db, "quizResults", currentUser.uid), resultado);
+          alert(`Quiz finalizado! Sua pontuação: ${score} de ${totalQuestions}`);
+          window.location.href = "resultado.html";
+        } catch (error) {
+          alert("Erro ao salvar resultado: " + error.message);
+        }
+      } else {
+        alert("Usuário não autenticado, resultado não salvo.");
+        window.location.href = "login.html";
+      }
+    }
+
+    function handleNextButton() {
+      currentQuestionIndex++;
+      if (currentQuestionIndex < questions.length) {
+        showQuestion();
+      } else {
+        showScore();
+      }
+      updateProgressBar();
+    }
+
+    nextButton.addEventListener('click', () => {
+      handleNextButton();
+    });
+  </script>
 </body>
 </html>
