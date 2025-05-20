@@ -1,52 +1,34 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Quiz | SDEL</title>
     <link rel="stylesheet" href="questoes.css" />
-    <script type="module">
-      // Importações do Firebase
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-      import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-      const firebaseConfig = {
-        apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
-        authDomain: "sdel-b3f65.firebaseapp.com",
-        projectId: "sdel-b3f65",
-        storageBucket: "sdel-b3f65.appspot.com",
-        messagingSenderId: "297725999985",
-        appId: "1:297725999985:web:d41da68311c190ef8a54d0",
-        measurementId: "G-PT92VECJ2H"
-      };
-
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-
-      // Verifica se está logado
-      onAuthStateChanged(auth, user => {
-        if (!user) {
-          alert("Você precisa estar logado para acessar o quiz.");
-          window.location.href = "login.html"; // Redireciona para login
-        }
-      });
-    </script>
   </head>
   <body>
-    <div id="timer">02:30:00</div>
-    <div class="app">
-      <h1>Quiz</h1>
-      <div class="progress-bar-container">
-        <progress id="progress-bar" value="0" max="100"></progress>
-      </div>
+      <!-- Temporizador -->
+         <br>
+           <br>
+               <div id="timer">02:30:00</div>
+  <div class="app">
+    <h1>Quiz</h1>
+    
+  <div class="progress-bar-container">
+    <progress id="progress-bar" value="0" max="100"></progress>
+  </div>
 
-      <div class="quiz">
-        <h2 id="question">Questão</h2>
-        <div id="answer-buttons"></div>
-        <button id="next-btn">Próximo</button>
-      </div>
+
+
+  <!-- Quiz -->
+  <div class="quiz">
+    <h2 id="question">Questão</h2>
+    <div id="answer-buttons">
+      <!-- Botões de resposta serão inseridos pelo JS -->
     </div>
+    <button id="next-btn">Próximo</button>
+  </div>
 
-    <script src="questoes.js"></script>
-  </body>
+  <script src="questoes.js"></script>
+</body>
 </html>
