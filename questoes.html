@@ -80,7 +80,28 @@
   <div id="answer-buttons"></div>
   <button id="next-btn">Próximo</button>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
   <script>
+    // Configuração do Firebase (troque pelos seus dados)
+    const firebaseConfig = {
+      apiKey: "SUA_API_KEY",
+      authDomain: "SEU_AUTH_DOMAIN",
+      projectId: "SEU_PROJECT_ID",
+      storageBucket: "SEU_STORAGE_BUCKET",
+      messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+      appId: "SEU_APP_ID"
+    };
+
+    // Inicializa Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Suas perguntas do quiz
     const questions = [
       { 
         question: "A equação 2x² + 3x - 5 = 0 tem as raízes reais?",
@@ -134,27 +155,21 @@
       },
     ];
 
+    // Elementos DOM
     const questionElement = document.getElementById("question");
     const answerButtons = document.getElementById("answer-buttons");
     const nextButton = document.getElementById("next-btn");
     const progressBar = document.getElementById("progress-bar");
     const timerElement = document.getElementById("timer");
 
+    // Variáveis do quiz
     let currentQuestionIndex = 0;
     let score = 0;
     const totalQuestions = questions.length;
 
-    // Timer: 2h30min in seconds
+    // Timer 2h30min em segundos
     let totalTime = 2 * 60 * 60 + 30 * 60;
     let timerInterval;
-
-    function startQuiz() {
-      currentQuestionIndex = 0;
-      score = 0;
-      nextButton.innerHTML = "Próximo";
-      startTimer();
-      showQuestion();
-    }
 
     function startTimer() {
       clearInterval(timerInterval);
@@ -177,6 +192,15 @@
 
       timerElement.textContent =
         `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    function startQuiz() {
+      currentQuestionIndex = 0;
+      score = 0;
+      nextButton.innerHTML = "Próximo";
+      nextButton.style.display = "none";
+      startTimer();
+      showQuestion();
     }
 
     function showQuestion() {
@@ -230,20 +254,34 @@
       progressBar.value = progress;
     }
 
-    function showScore() {
+    async function showScore() {
       clearInterval(timerInterval);
       resetState();
 
-      // Salvar resultado no localStorage
       const tempoRestanteFormatado = timerElement.textContent;
       const resultado = {
         score: score,
         totalQuestions: totalQuestions,
-        tempoRestante: tempoRestanteFormatado
+        tempoRestante: tempoRestanteFormatado,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
       };
-      localStorage.setItem('quizResult', JSON.stringify(resultado));
 
-      // Redirecionar para análise de resultados
+      // Pega o usuário logado
+      const user = auth.currentUser;
+      if (!user) {
+        alert("Usuário não autenticado. Faça login para salvar seu resultado.");
+        return;
+      }
+
+      try {
+        // Salva o resultado no Firestore com o UID do usuário
+        await db.collection('quizResults').doc(user.uid).set(resultado);
+        console.log('Resultado salvo com sucesso!');
+      } catch (error) {
+        console.error('Erro ao salvar resultado:', error);
+      }
+
+      // Redireciona para a página de resultados (você pode criar ela)
       window.location.href = 'resultado.html';
     }
 
@@ -261,7 +299,16 @@
       handleNextButton();
     });
 
-    startQuiz();
+    // Espera o usuário estar autenticado para iniciar
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        startQuiz();
+      } else {
+        // Aqui pode redirecionar para login, por exemplo:
+        alert("Você precisa estar logado para fazer o quiz.");
+        // window.location.href = 'login.html';
+      }
+    });
   </script>
 </body>
 </html>
