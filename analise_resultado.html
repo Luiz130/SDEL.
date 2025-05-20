@@ -2,36 +2,30 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Análise de Resultados</title>
+  <title>Resultado do Quiz</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       max-width: 600px;
       margin: 2rem auto;
-      padding: 1rem;
       text-align: center;
     }
     h1 {
       margin-bottom: 20px;
     }
-    .result {
-      font-size: 1.3rem;
-      margin: 1.5rem 0;
-    }
-    .no-result {
-      color: #888;
-      font-style: italic;
-      margin-top: 2rem;
+    #resultado {
+      font-size: 1.2rem;
+      margin: 20px 0;
     }
     button {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 0.7rem 1.5rem;
+      margin-top: 30px;
+      padding: 10px 20px;
       font-size: 1rem;
       cursor: pointer;
-      border-radius: 4px;
+      border-radius: 5px;
+      border: none;
+      background-color: #007bff;
+      color: white;
     }
     button:hover {
       background-color: #0056b3;
@@ -39,29 +33,78 @@
   </style>
 </head>
 <body>
-  <h1>Análise de Resultados</h1>
-  <div id="result-container"></div>
-  <button id="retry-btn">Refazer Quiz</button>
 
-  <script>
-    const resultContainer = document.getElementById('result-container');
-    const retryBtn = document.getElementById('retry-btn');
+  <h1>Seus Resultados do Quiz</h1>
 
-    const quizResult = localStorage.getItem('quizResult');
+  <div id="resultado">
+    <p>Carregando seus resultados...</p>
+  </div>
 
-    if (quizResult) {
-      const result = JSON.parse(quizResult);
-      resultContainer.innerHTML = `
-        <p class="result">Você acertou <strong>${result.score}</strong> de <strong>${result.totalQuestions}</strong> perguntas.</p>
-        <p class="result">Tempo restante: <strong>${result.tempoRestante}</strong></p>
-      `;
-    } else {
-      resultContainer.innerHTML = `<p class="no-result">Nenhum resultado disponível.</p>`;
+  <button id="btn-refazer">Refazer Quiz</button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+    // Configuração Firebase (sua config)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
+      authDomain: "sdel-b3f65.firebaseapp.com",
+      projectId: "sdel-b3f65",
+      storageBucket: "sdel-b3f65.firebasestorage.app",
+      messagingSenderId: "297725999985",
+      appId: "1:297725999985:web:d41da68311c190ef8a54d0",
+      measurementId: "G-PT92VECJ2H"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const resultadoDiv = document.getElementById('resultado');
+    const btnRefazer = document.getElementById('btn-refazer');
+
+    // Formata Timestamp Firestore para string legível
+    function formatTimestamp(timestamp) {
+      if (!timestamp) return '';
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+      return date.toLocaleString('pt-BR');
     }
 
-    retryBtn.addEventListener('click', () => {
-      localStorage.removeItem('quizResult');
-      window.location.href = 'questoes.html';
+    // Exibe resultado na tela
+    function mostrarResultados(data) {
+      resultadoDiv.innerHTML = `
+        <p><strong>Pontuação:</strong> ${data.score} / ${data.totalQuestions}</p>
+        <p><strong>Tempo restante:</strong> ${data.tempoRestante}</p>
+        <p><strong>Data da tentativa:</strong> ${formatTimestamp(data.timestamp)}</p>
+      `;
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        alert("Você precisa estar logado para ver os resultados.");
+        window.location.href = 'login.html'; // ajuste conforme sua página de login
+        return;
+      }
+
+      try {
+        // Pega documento do usuário (id = user.uid)
+        const docRef = doc(db, "quizResults", user.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          mostrarResultados(docSnap.data());
+        } else {
+          resultadoDiv.innerHTML = "<p>Nenhum resultado encontrado. Faça o quiz primeiro!</p>";
+        }
+      } catch (error) {
+        resultadoDiv.innerHTML = `<p>Erro ao carregar resultados: ${error.message}</p>`;
+      }
+    });
+
+    btnRefazer.addEventListener('click', () => {
+      window.location.href = 'quiz.html'; // ajuste para sua página de quiz
     });
   </script>
 </body>
