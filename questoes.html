@@ -1,5 +1,42 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR"><script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-analytics.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
+    authDomain: "sdel-b3f65.firebaseapp.com",
+    projectId: "sdel-b3f65",
+    storageBucket: "sdel-b3f65.firebasestorage.app",
+    messagingSenderId: "297725999985",
+    appId: "1:297725999985:web:d41da68311c190ef8a54d0",
+    measurementId: "G-PT92VECJ2H"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+  const analytics = getAnalytics(app);
+
+  // Armazenar no escopo global se necessário
+  window.firebaseApp = app;
+  window.db = db;
+  window.auth = auth;
+
+  // Verifica autenticação ao carregar
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      console.log("Usuário autenticado:", user.email);
+      // Usuário está logado, nada a fazer
+    } else {
+      console.warn("Usuário não autenticado, redirecionando...");
+      window.location.href = "login.html";
+    }
+  });
+</script>
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
