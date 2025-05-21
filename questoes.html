@@ -15,13 +15,27 @@
 
     body {
       background: #44749D;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #timer {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #d32f2f;
+      margin: 30px 0 10px;
+      background-color: #fff3f3;
+      padding: 10px 20px;
+      border: 2px solid #d32f2f;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(211, 47, 47, 0.2);
     }
 
     .app {
       background: #fff;
       width: 90%;
       max-width: 600px;
-      margin: 100px auto 0;
       padding: 30px;
       border-radius: 30px;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
@@ -89,7 +103,6 @@
       background: #ff9393;
     }
 
-    /* Barra de progresso */
     .progress-bar-container {
       width: 100%;
       margin-bottom: 20px;
@@ -99,27 +112,11 @@
       width: 100%;
       height: 20px;
     }
-
-    #timer {
-      font-size: 1.5rem;
-      font-weight: bold;
-      text-align: center;
-      color: #d32f2f;
-      margin-bottom: 20px;
-      background-color: #fff3f3;
-      padding: 10px;
-      border: 2px solid #d32f2f;
-      border-radius: 8px;
-      width: 120px;
-      margin-left: auto;
-      margin-right: auto;
-      box-shadow: 0 0 10px rgba(211, 47, 47, 0.2);
-    }
   </style>
 </head>
 <body>
+  <div id="timer">02:30:00</div>
   <div class="app">
-    <div id="timer">02:30:00</div>
     <h1>Quiz</h1>
     <div class="progress-bar-container">
       <progress id="progress-bar" value="0" max="100"></progress>
@@ -140,7 +137,7 @@
       apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
       authDomain: "sdel-b3f65.firebaseapp.com",
       projectId: "sdel-b3f65",
-      storageBucket: "sdel-b3f65.firebasestorage.app",
+      storageBucket: "sdel-b3f65.appspot.com",
       messagingSenderId: "297725999985",
       appId: "1:297725999985:web:d41da68311c190ef8a54d0",
       measurementId: "G-PT92VECJ2H"
@@ -150,7 +147,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const questions = [
+    const baseQuestions = [
       { 
         question: "A equação 2x² + 3x - 5 = 0 tem as raízes reais?",
         answers: [
@@ -203,6 +200,9 @@
       },
     ];
 
+    // Duplicar para chegar em 45 questões (apenas para exemplo)
+    const questions = Array(9).fill(baseQuestions).flat().slice(0, 45);
+
     const questionElement = document.getElementById("question");
     const answerButtons = document.getElementById("answer-buttons");
     const nextButton = document.getElementById("next-btn");
@@ -211,11 +211,9 @@
 
     let currentQuestionIndex = 0;
     let score = 0;
-    const totalQuestions = questions.length;
-
-    let totalTime = 2 * 60 * 60 + 30 * 60; // 2h30min em segundos
+    const totalQuestions = 45;
+    let totalTime = 2 * 60 * 60 + 30 * 60;
     let timerInterval;
-
     let currentUser = null;
 
     onAuthStateChanged(auth, user => {
@@ -254,7 +252,6 @@
       const hours = Math.floor(totalTime / 3600);
       const minutes = Math.floor((totalTime % 3600) / 60);
       const seconds = totalTime % 60;
-
       timerElement.textContent =
         `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     }
@@ -263,7 +260,6 @@
       resetState();
       let currentQuestion = questions[currentQuestionIndex];
       questionElement.innerHTML = `${currentQuestionIndex + 1}. ${currentQuestion.question}`;
-
       currentQuestion.answers.forEach(answer => {
         const button = document.createElement("button");
         button.innerHTML = answer.text;
@@ -273,7 +269,6 @@
         button.addEventListener("click", selectAnswer);
         answerButtons.appendChild(button);
       });
-
       updateProgressBar();
     }
 
@@ -287,21 +282,18 @@
     function selectAnswer(e) {
       const selectedBtn = e.target;
       const isCorrect = selectedBtn.dataset.correct === "true";
-
       if (isCorrect) {
         selectedBtn.classList.add("correct");
         score++;
       } else {
         selectedBtn.classList.add("incorrect");
       }
-
       Array.from(answerButtons.children).forEach(button => {
         if (button.dataset.correct === "true") {
           button.classList.add("correct");
         }
         button.disabled = true;
       });
-
       nextButton.style.display = "block";
     }
 
@@ -313,7 +305,6 @@
     async function showScore() {
       clearInterval(timerInterval);
       resetState();
-
       if (currentUser) {
         const resultado = {
           score: score,
@@ -321,7 +312,6 @@
           tempoRestante: timerElement.textContent,
           timestamp: serverTimestamp()
         };
-
         try {
           await setDoc(doc(db, "quizResults", currentUser.uid), resultado);
           alert(`Quiz finalizado! Sua pontuação: ${score} de ${totalQuestions}`);
