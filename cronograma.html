@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Cronograma de Estudos</title>
+  <link rel="stylesheet" href="cronograma.css">
+</head>
+<body>
+  <h1>Cronograma Semanal de Estudos</h1>
+  <div class="schedule-container">
+    <div class="header">
+      <div class="time-slot">Horário</div>
+      <div class="day">Seg</div>
+      <div class="day">Ter</div>
+      <div class="day">Qua</div>
+      <div class="day">Qui</div>
+      <div class="day">Sex</div>
+      <div class="day">Sáb</div>
+      <div class="day">Dom</div>
+    </div>
+    <div id="schedule-grid" class="grid"></div>
+  </div>
+
+<!-- Modal -->
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <span id="close-modal" class="close">&times;</span>
+    <h2>Editar Bloco de Estudo</h2>
+    <label for="subject">Disciplina:</label>
+    <select id="subject">
+      <option value="matematica">Matemática</option>
+      <option value="portugues">Português</option>
+      <option value="historia">História</option>
+      <option value="biologia">Biologia</option>
+      <option value="quimica">Química</option>
+    </select>
+
+    <label for="study-time">Tempo de Estudo (min):</label>
+    <input type="number" id="study-time" min="0" placeholder="Ex: 60">
+
+    <button id="save">Salvar</button>
+
+    <button id="clear-cell" style="margin-top: 10px; background-color: #f87171;">Limpar Bloco</button>
+    <button id="clear-all" style="margin-top: 10px; background-color: #ef4444;">Limpar Tudo</button>
+
+  </div>
+</div>
+
+
+  <script src="cronograma.js"></script>
+</body>
+</html>
