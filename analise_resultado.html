@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Análise Final</title>
+  <title>Análise Final com Histórico</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <style>
-    /* -- Seu CSS que você já passou -- */
     :root {
       --primary: #44749D;
       --success: #22c55e;
@@ -34,11 +33,11 @@
       padding: 40px;
       box-shadow: 0 8px 30px rgba(0,0,0,0.1);
     }
-    h1 {
+    h1, h2 {
       text-align: center;
       color: var(--primary);
       margin-bottom: 40px;
-      font-size: 2.4rem;
+      font-weight: 600;
     }
     .score-overview {
       display: flex;
@@ -75,6 +74,7 @@
     .progress-label {
       font-weight: 600;
       margin-bottom: 10px;
+      text-align: center;
     }
     .progress-bar {
       height: 25px;
@@ -85,7 +85,7 @@
     }
     .progress-fill {
       height: 100%;
-      width: 70%;
+      width: 0%;
       background: linear-gradient(to right, #6366f1, #22d3ee);
       text-align: center;
       color: #fff;
@@ -121,6 +121,13 @@
       font-size: 1.3rem;
       margin-right: 6px;
     }
+    #history-list {
+      margin-top: 20px;
+    }
+    #history-list .score-box {
+      cursor: default;
+      transition: none;
+    }
     @media (max-width: 700px) {
       .score-overview {
         flex-direction: column;
@@ -145,21 +152,28 @@
         <p id="pontuacao">0%</p>
       </div>
     </div>
+
     <div class="progress-container">
       <div class="progress-label">Aproveitamento</div>
       <div class="progress-bar">
-        <div class="progress-fill" id="progress-fill" style="width: 0%;">0%</div>
+        <div class="progress-fill" id="progress-fill">0%</div>
       </div>
     </div>
+
     <div class="question-list" id="question-list">
-      <!-- Perguntas e respostas vão aparecer aqui -->
+      <!-- Perguntas e respostas do quiz atual -->
+    </div>
+
+    <h2>Históricos Anteriores</h2>
+    <div id="history-list">
+      <p>Carregando históricos anteriores...</p>
     </div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
@@ -180,6 +194,7 @@
     const pontuacaoElem = document.getElementById('pontuacao');
     const progressFillElem = document.getElementById('progress-fill');
     const questionListElem = document.getElementById('question-list');
+    const historyListElem = document.getElementById('history-list');
 
     onAuthStateChanged(auth, async user => {
       if (!user) {
@@ -189,16 +204,12 @@
       }
 
       try {
+        // 1) Busca resultado atual no quizResults/{uid}
         const docRef = doc(db, "quizResults", user.uid);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
           const data = docSnap.data();
-
-          // Exemplo esperado dos dados:
-          // data.score = número de acertos
-          // data.totalQuestions = total de perguntas
-          // data.answers = array [{ question: "...", userAnswer: "...", correctAnswer: "...", isCorrect: true/false }, ...]
 
           const score = data.score ?? 0;
           const totalQuestions = data.totalQuestions ?? 0;
@@ -213,8 +224,7 @@
           progressFillElem.style.width = porcentagem + '%';
           progressFillElem.textContent = porcentagem + '%';
 
-          // Preencher a lista de perguntas com status correto/incorreto
-          questionListElem.innerHTML = ''; // limpa antes
+          questionListElem.innerHTML = '';
 
           answers.forEach((item, index) => {
             const div = document.createElement('div');
@@ -223,7 +233,7 @@
 
             div.innerHTML = `
               <p><span class="emoji">${item.isCorrect ? '✅' : '❌'}</span><strong>Pergunta ${index + 1}:</strong> ${item.question}</p>
-              ${item.isCorrect ? 
+              ${item.isCorrect ?
                 '<p>Você acertou!</p>' :
                 `<p>Sua resposta: ${item.userAnswer}<br>Correta: ${item.correctAnswer}</p>`
               }
@@ -231,10 +241,46 @@
 
             questionListElem.appendChild(div);
           });
-
         } else {
           alert("Nenhum resultado encontrado para este usuário.");
-          window.location.href = "quiz.html"; // redireciona para o quiz
+          window.location.href = "quiz.html";
+          return;
+        }
+
+        // 2) Buscar históricos anteriores na coleção quizHistory onde userId == user.uid
+        const historyQuery = query(
+          collection(db, "quizHistory"),
+          where("userId", "==", user.uid),
+          orderBy("date", "desc")
+        );
+
+        const querySnapshot = await getDocs(historyQuery);
+
+        if (querySnapshot.empty) {
+          historyListElem.innerHTML = '<p>Nenhum histórico anterior encontrado.</p>';
+        } else {
+          historyListElem.innerHTML = '';
+
+          querySnapshot.forEach(doc => {
+            const hData = doc.data();
+
+            const date = hData.date ? hData.date.toDate().toLocaleString('pt-BR') : "Data desconhecida";
+            const scoreHist = hData.score ?? 0;
+            const totalQHist = hData.totalQuestions ?? 0;
+            const pct = totalQHist > 0 ? Math.round((scoreHist / totalQHist) * 100) : 0;
+
+            const divHist = document.createElement('div');
+            divHist.classList.add('score-box');
+            divHist.style.marginBottom = '10px';
+
+            divHist.innerHTML = `
+              <h3>Data: ${date}</h3>
+              <p><strong>Acertos:</strong> ${scoreHist} / ${totalQHist}</p>
+              <p><strong>Aproveitamento:</strong> ${pct}%</p>
+            `;
+
+            historyListElem.appendChild(divHist);
+          });
         }
       } catch (error) {
         alert("Erro ao buscar resultado: " + error.message);
