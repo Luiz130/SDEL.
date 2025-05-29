@@ -26,11 +26,7 @@
         <a href="login.html">
         <button class="login-btn">LOGIN</button>
         </a>
-        <div class="search-container">
-            <input type="text" class="search-box" id="searchInput" placeholder="Buscar aqui..." onblur="hideSearch()">
-            <img src="https://icones.pro/wp-content/uploads/2021/02/loupe-et-icone-de-recherche-couleur-noire.png"
-                 alt="Lupa" class="search-icon" onclick="toggleSearch()">
-        </div>
+        
         
         <div class="menu-container">
           <img src="https://cdn-icons-png.flaticon.com/512/3736/3736502.png" 
@@ -52,9 +48,9 @@
 
 
 
-     
+    
     <div class="subheader-right">
-        
+      <!--   
         <select class="Matérias-slc" onchange="location.href=this.value">
             <option value="#">Selecione</option>
             <option value= "geografia.html">Geografia</option>
@@ -62,11 +58,11 @@
             <option value="http://www.fluminense.com.br">Matemática</option>
             <option value="http://www.vasco.com.br">Português</option>
            </select>
-           
+            -->
    <!--<button class="Redação-btn">Redação</button>-->
    <!--<button class="Exercícios-btn">Exercícios</button> -->
-   </div>
-
+  </div>
+   
 
    
 
@@ -202,23 +198,193 @@
 
 
 
+
+
+
+
+
+<br>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vestibular & Enem</title>
+  <style>
+    .pagina-enem {
+      font-family: Arial, sans-serif;
+      background-color: #fafafa;
+      padding: 40px;
+      margin: 0;
+    }
+
+    .pagina-enem h2 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: #111;
+    }
+
+.secao-enem {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centraliza horizontalmente */
+  margin-left:0px;
+  gap: 40px;
+}
+
+    .cartao-enem {
+      display: flex;
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 20px;
+       width: 1250px;
+      height: 200px;
+      align-items: flex-start;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: box-shadow 0.2s ease;
+
+    }
+
+    .cartao-enem:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .imagem-enem {
+      width: 400px;
+      height: 200px;
+      margin-right: 20px;
+      border-radius: 6px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .imagem-enem img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .info-enem {
+      max-width: 400px;
+    }
+
+    .info-enem h3 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: bold;
+      color: #111;
+    }
+
+    .info-enem p {
+      margin: 10px 0 0;
+      font-size: 16px;
+      color: #444;
+    }
+
+    .Vestibular-enem{
+    text-align:center;
+     margin-right:1020px;
+
+    }
+
+    
+  </style>
+</head>
+<body>
+  <div class="pagina-enem">
+
+    <div class="Vestibular-enem">
+    <h1>Vestibular & Enem</h1>
+    </div>
+    <br>
+    <div class="secao-enem">
+
+      <div class="cartao-enem" onclick="abrirVideo('https://www.youtube.com/watch?v=7PrRzxNwEC4')">
+        <div class="imagem-enem">
+          <img src="https://img.youtube.com/vi/7PrRzxNwEC4/hqdefault.jpg" alt="Thumbnail do vídeo">
+        </div>
+        <div class="info-enem">
+          <h3>Enem+</h3>
+          <p>Colocamos em pauta os assuntos mais abordados em matemática no Enem e além disso damos dicas e macetes.</p>
+        </div>
+      </div>
+
+      <div class="cartao-enem" onclick="abrirVideo('https://www.todamateria.com.br/temas-de-redacao/')">
+        <div class="imagem-enem">
+          <img src="https://www.bernoulli.com.br/app/uploads/2024/10/AnyConv.com__shutterstock_1203448918-1080x720.webp" alt="Thumbnail">
+        </div>
+        <div class="info-enem">
+          <h3>Redação Enem</h3>
+          <p>Temas em alta que podem cair na redação do Enem. Contém explicação detalhada.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function abrirVideo(url) {
+      window.open(url, '_blank');
+    }
+  </script>
+</body>
+</html>
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<!--Rodapé-->
+  <footer>
+    <div class="footer-wrapper">
+      <!-- Sobre -->
+      <div class="footer-column">
+        <h4>Sobre o site</h4>
+        <p>
+          Portal com conteúdos educativos gratuitos para estudantes do ensino médio, ENEM e vestibulares. Nosso objetivo é democratizar o conhecimento com qualidade e confiança.
+        </p>
+      </div>
+
+      <!-- Links -->
+      <div class="footer-column">
+        <h4>Links importantes</h4>
+        <a href="#">Início</a>
+        <a href="#">Contato</a>
+      </div>
+
+      <!-- Redes Sociais -->
+      <div class="footer-column">
+        <h4>Redes Sociais</h4>
+        <div class="social-icons">
+          <a href="https://instagram.com" target="_blank" aria-label="Instagram">
+            <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram" />
+          </a>
+          <a href="https://youtube.com" target="_blank" aria-label="YouTube">
+            <img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" alt="YouTube" />
+          </a>
+          <a href="https://facebook.com" target="_blank" aria-label="Facebook">
+            <img src="https://cdn-icons-png.flaticon.com/512/1384/1384053.png" alt="Facebook" />
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      &copy; SDEL. Todos os direitos reservados.
+    </div>
+  </footer>
+
+
+
+
+
+
 </div>
 
 <!--java-script-->
-<script>
-    function toggleSearch() {
-        let searchBox = document.getElementById("searchInput");
-        searchBox.classList.add("active");
-        searchBox.focus();
-    }
-
-    function hideSearch() {
-        let searchBox = document.getElementById("searchInput");
-        if (searchBox.value === "") { 
-            searchBox.classList.remove("active");
-        }
-    }
-</script>
    
 <script>
     const image = document.getElementById('profileImage');
