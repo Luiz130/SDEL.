@@ -385,8 +385,12 @@
   </footer>
 
 
-
-  <title>Painel Flutuante Moderno e Movível</title>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Painel Flutuante com Firebase</title>
   <style>
     body {
       margin: 0;
@@ -394,13 +398,12 @@
       background: #f0f2f5;
     }
 
-    /* Botão flutuante lateral */
     #botaoPainel {
       position: fixed;
       top: 50%;
       right: 0;
       transform: translateY(-50%);
-      background-color: #44749D;
+      background-color: #2563eb;
       color: white;
       padding: 14px 18px;
       border-radius: 12px 0 0 12px;
@@ -408,17 +411,15 @@
       font-size: 24px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
       z-index: 10000;
-      transition: background 0.3s;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
     #botaoPainel:hover {
-      background-color: #44749D;
+      background-color: #1e40af;
     }
 
-    /* Painel lateral movível */
     #painel {
       position: fixed;
       top: 50%;
@@ -426,17 +427,15 @@
       transform: translateY(-50%);
       width: 340px;
       background: white;
-      border-left: 4px solid #44749D;
+      border-left: 4px solid #2563eb;
       border-radius: 16px 0 0 16px;
       padding: 16px 24px 24px 24px;
       box-shadow: -4px 0 16px rgba(0,0,0,0.1);
       display: none;
       z-index: 9999;
-      cursor: default;
       user-select: none;
     }
 
-    /* Cabeçalho do painel (área para arrastar) */
     #cabecalhoPainel {
       cursor: grab;
       padding-bottom: 12px;
@@ -445,7 +444,6 @@
       font-weight: 700;
       font-size: 20px;
       color: #111827;
-      user-select: none;
     }
 
     #cabecalhoPainel:active {
@@ -456,7 +454,7 @@
       width: 100%;
       padding: 12px;
       margin-bottom: 14px;
-      background-color: #44749D;
+      background-color: #2563eb;
       color: white;
       border: none;
       border-radius: 10px;
@@ -467,7 +465,7 @@
     }
 
     .botaoSecao:hover {
-      background-color: #44749D;
+      background-color: #1e3a8a;
       transform: scale(1.02);
     }
 
@@ -476,7 +474,6 @@
       margin-bottom: 24px;
     }
 
-    /* Estilo do bloco de notas */
     #blocoNotas label {
       display: block;
       margin-bottom: 8px;
@@ -505,7 +502,6 @@
       box-shadow: 0 0 6px rgba(37, 99, 235, 0.5);
     }
 
-    /* Estilo do cronômetro */
     #cronometro {
       font-size: 28px;
       font-weight: bold;
@@ -537,21 +533,17 @@
 </head>
 <body>
 
-<!-- Botão lateral com ícone de ferramenta para abrir/fechar o painel -->
 <div id="botaoPainel" title="Abrir Painel">🛠️</div>
 
-<!-- Painel flutuante movível -->
 <div id="painel">
   <div id="cabecalhoPainel">Painel Rápido</div>
 
-  <!-- Botão para mostrar/esconder bloco de notas -->
   <button class="botaoSecao" onclick="alternarSecao('blocoNotas')">📘 Bloco de Notas</button>
   <div id="blocoNotas" class="secaoPainel">
     <label for="textareaNotas">Suas Anotações:</label>
     <textarea id="textareaNotas" placeholder="Digite suas anotações..."></textarea>
   </div>
 
-  <!-- Botão para mostrar/esconder cronômetro -->
   <button class="botaoSecao" onclick="alternarSecao('containerCronometro')">⏱️ Cronômetro</button>
   <div id="containerCronometro" class="secaoPainel">
     <div id="cronometro">00:00:00</div>
@@ -563,138 +555,110 @@
   </div>
 </div>
 
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
 <script>
-  // Referências aos elementos do DOM
+  // Configuração do Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
+    authDomain: "sdel-b3f65.firebaseapp.com",
+    projectId: "sdel-b3f65",
+    storageBucket: "sdel-b3f65.appspot.com",
+    messagingSenderId: "297725999985",
+    appId: "1:297725999985:web:d41da68311c190ef8a54d0",
+    measurementId: "G-PT92VECJ2H"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const auth = firebase.auth();
+
+  let userId = null;
+  const textareaNotas = document.getElementById('textareaNotas');
+
+  // Login anônimo + carregar anotações
+  auth.signInAnonymously().then(userCredential => {
+    userId = userCredential.user.uid;
+    db.collection('notas').doc(userId).get().then(doc => {
+      if (doc.exists) {
+        textareaNotas.value = doc.data().texto || '';
+      }
+    });
+  });
+
+  // Salvar notas automaticamente
+  textareaNotas.addEventListener('input', () => {
+    if (!userId) return;
+    db.collection('notas').doc(userId).set({
+      texto: textareaNotas.value,
+      atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  });
+
   const botaoPainel = document.getElementById('botaoPainel');
   const painel = document.getElementById('painel');
 
-  // Função para abrir/fechar o painel lateral
   botaoPainel.onclick = () => {
-    if (painel.style.display === 'block') {
-      painel.style.display = 'none';
-    } else {
-      painel.style.display = 'block';
-    }
+    painel.style.display = painel.style.display === 'block' ? 'none' : 'block';
   };
 
-  /**
-   * Alterna a visibilidade das seções dentro do painel.
-   * Cada seção pode ser aberta ou fechada independentemente.
-   * @param {string} id - ID da seção para alternar
-   */
   function alternarSecao(id) {
     const secao = document.getElementById(id);
-    if (secao.style.display === 'block') {
-      secao.style.display = 'none';
-    } else {
-      secao.style.display = 'block';
-    }
+    secao.style.display = secao.style.display === 'block' ? 'none' : 'block';
   }
 
-  // Bloco de notas: persistência no localStorage para salvar texto automaticamente
-  const textareaNotas = document.getElementById('textareaNotas');
-  textareaNotas.value = localStorage.getItem('textoNotasSalvo') || '';
+  let segundos = 0, minutos = 0, horas = 0, intervaloCronometro = null;
 
-  textareaNotas.addEventListener('input', () => {
-    localStorage.setItem('textoNotasSalvo', textareaNotas.value);
-  });
-
-  // Variáveis do cronômetro
-  let segundos = 0;
-  let minutos = 0;
-  let horas = 0;
-  let intervaloCronometro = null;
-
-  /**
-   * Atualiza o visor do cronômetro a cada segundo
-   */
   function atualizarCronometro() {
     segundos++;
-    if (segundos >= 60) {
-      segundos = 0;
-      minutos++;
-    }
-    if (minutos >= 60) {
-      minutos = 0;
-      horas++;
-    }
-    // Formata os números com 2 dígitos
-    const formatarNumero = (numero) => numero.toString().padStart(2, '0');
-    document.getElementById('cronometro').innerText =
-      `${formatarNumero(horas)}:${formatarNumero(minutos)}:${formatarNumero(segundos)}`;
+    if (segundos >= 60) { segundos = 0; minutos++; }
+    if (minutos >= 60) { minutos = 0; horas++; }
+    const f = n => n.toString().padStart(2, '0');
+    document.getElementById('cronometro').innerText = `${f(horas)}:${f(minutos)}:${f(segundos)}`;
   }
 
-  /**
-   * Inicia o cronômetro
-   */
   function iniciarCronometro() {
-    if (!intervaloCronometro) {
-      intervaloCronometro = setInterval(atualizarCronometro, 1000);
-    }
+    if (!intervaloCronometro) intervaloCronometro = setInterval(atualizarCronometro, 1000);
   }
 
-  /**
-   * Para o cronômetro (pausa)
-   */
   function pararCronometro() {
     clearInterval(intervaloCronometro);
     intervaloCronometro = null;
   }
 
-  /**
-   * Reseta o cronômetro para zero
-   */
   function resetarCronometro() {
     pararCronometro();
-    segundos = 0;
-    minutos = 0;
-    horas = 0;
+    segundos = minutos = horas = 0;
     document.getElementById('cronometro').innerText = '00:00:00';
   }
 
-  // Função para permitir que o painel seja movido arrastando o cabeçalho
-
   const cabecalhoPainel = document.getElementById('cabecalhoPainel');
-  let arrastando = false;
-  let diferencaX = 0;
-  let diferencaY = 0;
+  let arrastando = false, diferencaX = 0, diferencaY = 0;
 
-  // Inicia o arrasto quando o mouse é pressionado no cabeçalho
-  cabecalhoPainel.addEventListener('mousedown', (evento) => {
+  cabecalhoPainel.addEventListener('mousedown', e => {
     arrastando = true;
     const rect = painel.getBoundingClientRect();
-    diferencaX = evento.clientX - rect.left;
-    diferencaY = evento.clientY - rect.top;
+    diferencaX = e.clientX - rect.left;
+    diferencaY = e.clientY - rect.top;
     cabecalhoPainel.style.cursor = 'grabbing';
   });
 
-  // Para o arrasto quando o mouse é solto
   window.addEventListener('mouseup', () => {
     arrastando = false;
     cabecalhoPainel.style.cursor = 'grab';
   });
 
-  // Move o painel enquanto o mouse se move e o arrasto está ativo
-  window.addEventListener('mousemove', (evento) => {
+  window.addEventListener('mousemove', e => {
     if (!arrastando) return;
-
-    let novaEsquerda = evento.clientX - diferencaX;
-    let novaTop = evento.clientY - diferencaY;
-
-    // Impede que o painel ultrapasse as bordas da janela
-    const maxEsquerda = window.innerWidth - painel.offsetWidth;
-    const maxTopo = window.innerHeight - painel.offsetHeight;
-
-    if (novaEsquerda < 0) novaEsquerda = 0;
-    else if (novaEsquerda > maxEsquerda) novaEsquerda = maxEsquerda;
-
-    if (novaTop < 0) novaTop = 0;
-    else if (novaTop > maxTopo) novaTop = maxTopo;
-
-    painel.style.left = novaEsquerda + 'px';
-    painel.style.top = novaTop + 'px';
-
-    // Remove o posicionamento à direita e a transformação para evitar conflito
+    let x = e.clientX - diferencaX;
+    let y = e.clientY - diferencaY;
+    x = Math.max(0, Math.min(x, window.innerWidth - painel.offsetWidth));
+    y = Math.max(0, Math.min(y, window.innerHeight - painel.offsetHeight));
+    painel.style.left = x + 'px';
+    painel.style.top = y + 'px';
     painel.style.right = 'auto';
     painel.style.transform = 'none';
   });
@@ -702,6 +666,8 @@
 
 </body>
 </html>
+
+
 
 
 
@@ -766,53 +732,5 @@ const firebaseConfig = {
     const larguraItem = 130; // largura + espaço
     carrossel.scrollLeft += direcao * larguraItem;
   }
-
-    // Bloco de notas: persistência no localStorage para salvar texto automaticamente
-const textareaNotas = document.getElementById('textareaNotas');
-textareaNotas.value = localStorage.getItem('textoNotasSalvo') || '';
-
-textareaNotas.addEventListener('input', () => {
-  localStorage.setItem('textoNotasSalvo', textareaNotas.value);
-});
-
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-
-const db = getFirestore();
-const auth = getAuth();
-
-const textareaNotas = document.getElementById('textareaNotas');
-let usuarioAtual = null;
-
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    usuarioAtual = user;
-    // Carrega as anotações do Firestore
-    const docRef = doc(db, "notas", user.uid);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      textareaNotas.value = docSnap.data().texto || "";
-    } else {
-      textareaNotas.value = "";
-    }
-  } else {
-    usuarioAtual = null;
-    textareaNotas.value = "";
-  }
-});
-
-// Salva as anotações no Firestore a cada alteração no textarea
-textareaNotas.addEventListener('input', async () => {
-  if (!usuarioAtual) return;
-
-  try {
-    const docRef = doc(db, "notas", usuarioAtual.uid);
-    await setDoc(docRef, { texto: textareaNotas.value });
-  } catch (error) {
-    console.error("Erro ao salvar anotações:", error);
-  }
-});
 </script>
-
 </body>
