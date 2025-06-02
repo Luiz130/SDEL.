@@ -392,66 +392,151 @@
 </div>
 
   <title>Painel Flutuante Moderno e Movível</title>
-    <style>
+  <style>
     body {
-      font-family: Arial, sans-serif;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
     }
 
+    /* Botão flutuante lateral */
     #botaoPainel {
-      padding: 10px 20px;
-      cursor: pointer;
-      background-color: #007bff;
+      position: fixed;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+      background-color: #2563eb;
       color: white;
-      border: none;
-      border-radius: 5px;
-      margin: 20px;
+      padding: 14px 18px;
+      border-radius: 12px 0 0 12px;
+      cursor: pointer;
+      font-size: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 10000;
+      transition: background 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
+    #botaoPainel:hover {
+      background-color: #1e40af;
+    }
+
+    /* Painel lateral movível */
     #painel {
       position: fixed;
-      top: 100px;
-      left: 100px;
-      width: 300px;
-      background: #f0f0f0;
-      border: 1px solid #ccc;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+      width: 340px;
+      background: white;
+      border-left: 4px solid #2563eb;
+      border-radius: 16px 0 0 16px;
+      padding: 16px 24px 24px 24px;
+      box-shadow: -4px 0 16px rgba(0,0,0,0.1);
       display: none;
-      z-index: 1000;
+      z-index: 9999;
+      cursor: default;
       user-select: none;
     }
 
+    /* Cabeçalho do painel (área para arrastar) */
     #cabecalhoPainel {
-      background: #007bff;
-      color: white;
-      padding: 10px;
-      cursor: move;
-      font-weight: bold;
+      cursor: grab;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e5e7eb;
+      margin-bottom: 16px;
+      font-weight: 700;
+      font-size: 20px;
+      color: #111827;
       user-select: none;
     }
 
-    #conteudoPainel {
-      padding: 10px;
+    #cabecalhoPainel:active {
+      cursor: grabbing;
+    }
+
+    .botaoSecao {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 14px;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 15px;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .botaoSecao:hover {
+      background-color: #1e3a8a;
+      transform: scale(1.02);
+    }
+
+    .secaoPainel {
+      display: none;
+      margin-bottom: 24px;
+    }
+
+    /* Estilo do bloco de notas */
+    #blocoNotas label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #374151;
     }
 
     textarea {
       width: 100%;
-      height: 150px;
-      resize: none;
-      font-size: 14px;
-      padding: 5px;
+      min-height: 120px;
+      resize: vertical;
+      padding: 14px 16px;
+      font-size: 15px;
+      border-radius: 10px;
+      border: 1.5px solid #cbd5e1;
+      box-shadow: inset 0 1px 4px rgba(0,0,0,0.08);
+      outline-offset: 2px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #111827;
+      box-sizing: border-box;
+      transition: border-color 0.3s ease;
     }
 
+    textarea:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 6px rgba(37, 99, 235, 0.5);
+    }
+
+    /* Estilo do cronômetro */
     #cronometro {
-      font-size: 18px;
+      font-size: 28px;
       font-weight: bold;
-      margin-top: 10px;
+      margin-bottom: 16px;
       text-align: center;
+      color: #111827;
     }
 
-    button {
-      margin-top: 10px;
-      padding: 5px 10px;
+    #botoesCronometro {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    #botoesCronometro button {
+      background: #4b5563;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      font-size: 14px;
+      border-radius: 8px;
       cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    #botoesCronometro button:hover {
+      background: #374151;
     }
   </style>
 
@@ -490,7 +575,7 @@
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
   import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
 
-  // Configuração do Firebase (substitua pela sua config)
+  // Configuração do Firebase (sua config)
   const firebaseConfig = {
     apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
     authDomain: "sdel-b3f65.firebaseapp.com",
@@ -521,10 +606,20 @@
     }
   };
 
-  // Variável para usuário atual logado
+  // Alternar visibilidade das seções
+  window.alternarSecao = function(id) {
+    const secao = document.getElementById(id);
+    if (secao.style.display === 'block') {
+      secao.style.display = 'none';
+    } else {
+      secao.style.display = 'block';
+    }
+  };
+
+  // Variáveis para usuário logado e controle do salvamento
   let usuarioAtual = null;
 
-  // Ao mudar estado de autenticação, carrega notas
+  // Quando usuário autenticar, carrega as notas
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       usuarioAtual = user;
@@ -535,7 +630,7 @@
     }
   });
 
-  // Carregar notas do Firestore
+  // Carrega as notas do Firestore para o textarea
   async function carregarNotas(uid) {
     const docRef = doc(db, "notasUsuario", uid);
     const docSnap = await getDoc(docRef);
@@ -546,19 +641,19 @@
     }
   }
 
-  // Salvar notas enquanto digita (se usuário logado)
+  // Salva as notas no Firestore ao digitar, se usuário logado
   textareaNotas.addEventListener("input", () => {
     if (!usuarioAtual) return;
     salvarNotas(usuarioAtual.uid, textareaNotas.value);
   });
 
-  // Função para salvar notas
+  // Função para salvar as notas no Firestore
   async function salvarNotas(uid, texto) {
     const docRef = doc(db, "notasUsuario", uid);
     await setDoc(docRef, { texto });
   }
 
-  // --- Cronômetro ---
+  // -- Cronômetro --
   let segundos = 0;
   let minutos = 0;
   let horas = 0;
@@ -598,8 +693,7 @@
     document.getElementById('cronometro').innerText = '00:00:00';
   };
 
-  // --- Drag & Drop do painel ---
-
+  // -- Arrastar painel pelo cabeçalho --
   const cabecalhoPainel = document.getElementById('cabecalhoPainel');
 
   let posX = 0, posY = 0, posInicialX = 0, posInicialY = 0;
@@ -616,26 +710,25 @@
 
   function moverPainel(e) {
     e.preventDefault();
-
-    posX = e.clientX - posInicialX;
-    posY = e.clientY - posInicialY;
-
+    posX = posInicialX - e.clientX;
+    posY = posInicialY - e.clientY;
     posInicialX = e.clientX;
     posInicialY = e.clientY;
 
     const rect = painel.getBoundingClientRect();
 
-    let novaTop = rect.top + posY;
-    let novaLeft = rect.left + posX;
+    // Calcula nova posição respeitando a viewport para não sumir
+    let novaTop = rect.top - posY;
+    let novaRight = window.innerWidth - (rect.right - posX);
 
-    // Limites para não sair da tela (opcional)
+    // Limites
     if (novaTop < 0) novaTop = 0;
     if (novaTop + rect.height > window.innerHeight) novaTop = window.innerHeight - rect.height;
-    if (novaLeft < 0) novaLeft = 0;
-    if (novaLeft + rect.width > window.innerWidth) novaLeft = window.innerWidth - rect.width;
+    if (novaRight < 0) novaRight = 0;
+    if (novaRight > window.innerWidth - rect.width) novaRight = window.innerWidth - rect.width;
 
     painel.style.top = novaTop + "px";
-    painel.style.left = novaLeft + "px";
+    painel.style.right = novaRight + "px";
   }
 
   function fecharDrag() {
@@ -644,7 +737,7 @@
   }
 </script>
 
-
+</body>
 </html>
 
 <!--java-script-->
