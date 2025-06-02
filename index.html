@@ -766,5 +766,14 @@ const firebaseConfig = {
     const larguraItem = 130; // largura + espaço
     carrossel.scrollLeft += direcao * larguraItem;
   }
+
+    // Bloco de notas: persistência no localStorage para salvar texto automaticamente
+const textareaNotas = document.getElementById('textareaNotas');
+textareaNotas.value = localStorage.getItem('textoNotasSalvo') || '';
+
+textareaNotas.addEventListener('input', () => {
+  localStorage.setItem('textoNotasSalvo', textareaNotas.value);
+});
 </script>
+
 </body>
