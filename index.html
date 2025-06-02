@@ -764,11 +764,22 @@
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
   // Configuração do seu Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
+  authDomain: "sdel-b3f65.firebaseapp.com",
+  projectId: "sdel-b3f65",
+  storageBucket: "sdel-b3f65.firebasestorage.app",
+  messagingSenderId: "297725999985",
+  appId: "1:297725999985:web:d41da68311c190ef8a54d0",
+  measurementId: "G-PT92VECJ2H"
+};
 
 //
 
   // Inicializa o Firebase
-
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const auth = getAuth(app);
 
   // Quando o usuário estiver logado, atualiza a imagem de perfil
   onAuthStateChanged(auth, (user) => {
