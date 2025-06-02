@@ -774,6 +774,45 @@ textareaNotas.value = localStorage.getItem('textoNotasSalvo') || '';
 textareaNotas.addEventListener('input', () => {
   localStorage.setItem('textoNotasSalvo', textareaNotas.value);
 });
+
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+const db = getFirestore();
+const auth = getAuth();
+
+const textareaNotas = document.getElementById('textareaNotas');
+let usuarioAtual = null;
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    usuarioAtual = user;
+    // Carrega as anotações do Firestore
+    const docRef = doc(db, "notas", user.uid);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      textareaNotas.value = docSnap.data().texto || "";
+    } else {
+      textareaNotas.value = "";
+    }
+  } else {
+    usuarioAtual = null;
+    textareaNotas.value = "";
+  }
+});
+
+// Salva as anotações no Firestore a cada alteração no textarea
+textareaNotas.addEventListener('input', async () => {
+  if (!usuarioAtual) return;
+
+  try {
+    const docRef = doc(db, "notas", usuarioAtual.uid);
+    await setDoc(docRef, { texto: textareaNotas.value });
+  } catch (error) {
+    console.error("Erro ao salvar anotações:", error);
+  }
+});
 </script>
 
 </body>
