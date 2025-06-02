@@ -1,0 +1,387 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flashcards</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;500;600;700&display=swap");
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Nunito", sans-serif;
+      outline: none;
+      border: none;
+      text-decoration: none;
+    }
+
+    body {
+      font-size: 1rem;
+      background-color: #eee;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px;
+    }
+
+    button {
+      padding: 8px;
+      cursor: pointer;
+      background-color: #3e63dd;
+      color: #fff;
+      border-radius: 4px;
+    }
+
+    button:hover {
+      background-color: #577cf6;
+    }
+
+    .card-form {
+      width: 100%;
+      height: 100%;
+      background-color: #2828294d;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: absolute;
+      top: 0;
+      z-index: 999999;
+      backdrop-filter: blur(3px);
+    }
+
+    .card-form-box {
+      background-color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      width: 330px;
+      padding: 20px 10px;
+      border-radius: 5px;
+      box-shadow: 1px 1px 6px 0 #0000004a;
+    }
+
+    input {
+      width: 100%;
+      border-radius: 5px;
+      padding: 10px;
+      background-color: #eee;
+    }
+
+    input::placeholder {
+      font-size: 0.9rem;
+    }
+
+    .obs {
+      padding: 8px;
+      font-size: 0.8rem;
+      color: #404040;
+      text-align: center;
+    }
+
+    .flashcards {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+      margin: auto;
+      margin-top: 10px;
+      padding: 0 10px;
+    }
+
+    .flashcard {
+      width: 370px;
+      min-height: 200px;
+      word-wrap: break-word;
+      margin: 10px;
+      background-color: #fff;
+      box-shadow: 0 2px 5px 0 #00000021;
+      border-radius: 5px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      padding: 20px 15px;
+    }
+
+    .flashcard h2 {
+      font-size: 1rem;
+    }
+
+    .remove {
+      color: #bb0101;
+      font-size: 18px;
+      position: absolute;
+      top: 0;
+      right: 0;
+      margin-right: 7px;
+      cursor: pointer;
+    }
+
+    .remove:hover {
+      color: #404040;
+    }
+
+    .number {
+      color: #577cf6;
+      font-size: 12px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      margin: 7px;
+    }
+
+    footer {
+      font-size: 0.85rem;
+      padding: 8px;
+    }
+
+    footer a {
+      color: #3e63dd;
+    }
+
+    body.dark {
+      background-color: #1e1e1e;
+      color: #eee;
+    }
+
+    body.dark .flashcard {
+      background-color: #2e2e2e;
+      color: #eee;
+    }
+
+    body.dark .card-form-box {
+      background-color: #333;
+    }
+
+    body.dark input {
+      background-color: #444;
+      color: #fff;
+    }
+
+    body.dark .remove {
+      color: #ff5a5a;
+    }
+
+    body.dark .number {
+      color: #9aa7ff;
+    }
+
+    @media (max-width: 768px) {
+      .flashcard {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .nav {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .flashcard,
+      .card-form {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="nav">
+    <h1>Flashcards</h1>
+    <div>
+      <button onclick="toggleTheme()">🌗 Tema</button>
+      <button onclick="create()">Novo card</button>
+      <button onclick="removeAll()">Excluir todos</button>
+    </div>
+  </div>
+
+  <div class="card-form">
+    <div class="card-form-box">
+      <h2>Criar card</h2>
+      <input type="text" id="question" placeholder="Insira a questão" />
+      <input type="text" id="answer" placeholder="Insira a resposta" />
+      <input type="text" id="subject" placeholder="Disciplina (ex: Matemática)" />
+      <span class="obs">Certifique-se de preencher pergunta, resposta e disciplina</span>
+      <div class="btns">
+        <button onclick="save()">Salvar</button>
+        <button onclick="cancel()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="flashcards"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
+      authDomain: "sdel-b3f65.firebaseapp.com",
+      projectId: "sdel-b3f65",
+      storageBucket: "sdel-b3f65.firebasestorage.app",
+      messagingSenderId: "297725999985",
+      appId: "1:297725999985:web:d41da68311c190ef8a54d0",
+      measurementId: "G-PT92VECJ2H"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    let currentUser = null;
+    const flashcards = document.querySelector(".flashcards");
+    const cardForm = document.querySelector(".card-form");
+    const question = document.querySelector("#question");
+    const answer = document.querySelector("#answer");
+    const subject = document.querySelector("#subject");
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUser = user;
+        loadCards();
+      } else {
+        window.location.href = "login.html";
+      }
+    });
+
+    window.create = function () {
+      cardForm.style.display = "flex";
+    };
+
+    window.cancel = function () {
+      cardForm.style.display = "none";
+    };
+
+    window.logout = function () {
+      signOut(auth).then(() => {
+        window.location.href = "login.html";
+      });
+    };
+
+    window.save = async function () {
+      if (question.value.trim() && answer.value.trim() && subject.value.trim()) {
+        const data = {
+          question: question.value.trim(),
+          answer: answer.value.trim(),
+          subject: subject.value.trim().toLowerCase(),
+          uid: currentUser.uid,
+          timestamp: new Date()
+        };
+        await addDoc(collection(db, "flashcards"), data);
+        question.value = "";
+        answer.value = "";
+        subject.value = "";
+        cardForm.style.display = "none";
+        await loadCards();
+      }
+    };
+
+    window.removeAll = async function () {
+      if (confirm("Deseja mesmo excluir todos os cards?")) {
+        const snapshot = await getDocs(collection(db, "flashcards"));
+        const promises = snapshot.docs
+          .filter(docSnap => docSnap.data().uid === currentUser.uid)
+          .map(docSnap => deleteDoc(doc(db, "flashcards", docSnap.id)));
+        await Promise.all(promises);
+        loadCards();
+      }
+    };
+
+    function getColorBySubject(subject) {
+      const colors = {
+        matemática: "#ff6b6b",
+        português: "#6b5b95",
+        história: "#f9a825",
+        geografia: "#29b6f6",
+        biologia: "#66bb6a",
+        química: "#ef5350",
+        física: "#ab47bc",
+        inglês: "#ff7043",
+        default: "#90a4ae"
+      };
+      return colors[subject] || colors.default;
+    }
+
+    function addCard(card) {
+      const div = document.createElement("div");
+      div.className = "flashcard";
+      div.setAttribute("data-id", card.id);
+      div.style.backgroundColor = getColorBySubject(card.subject);
+
+      const h2question = document.createElement("h2");
+      h2question.style.textAlign = "justify";
+      h2question.innerText = card.question;
+
+      const h2answer = document.createElement("h2");
+      h2answer.style = "text-align: center; display: none; color: green";
+      h2answer.innerText = card.answer;
+
+      const btn = document.createElement("button");
+      btn.innerText = "mostrar";
+      btn.onclick = () => {
+        if (h2answer.style.display === "none") {
+          h2answer.style.display = "block";
+          btn.innerText = "esconder";
+        } else {
+          h2answer.style.display = "none";
+          btn.innerText = "mostrar";
+        }
+      };
+
+      const remove = document.createElement("span");
+      remove.className = "remove";
+      remove.innerText = "x";
+      remove.onclick = async () => {
+        if (confirm("Deseja excluir este card?")) {
+          await deleteDoc(doc(db, "flashcards", card.id));
+          loadCards();
+        }
+      };
+
+      const number = document.createElement("span");
+      number.className = "number";
+      number.innerText = card.number;
+
+      div.appendChild(h2question);
+      div.appendChild(h2answer);
+      div.appendChild(btn);
+      div.appendChild(remove);
+      div.appendChild(number);
+
+      flashcards.appendChild(div);
+    }
+
+    async function loadCards() {
+      flashcards.innerHTML = "";
+      const snapshot = await getDocs(collection(db, "flashcards"));
+      let count = 1;
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        if (data.uid === currentUser.uid) {
+          addCard({ ...data, id: docSnap.id, number: count++ });
+        }
+      });
+    }
+
+    window.toggleTheme = function () {
+      document.body.classList.toggle("dark");
+    };
+  </script>
+</body>
+</html>
