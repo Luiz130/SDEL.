@@ -423,7 +423,7 @@ h1 {
     
     display: flex;
     justify-content: center; /* Centraliza horizontalmente */
-    margin-left:-350px;
+    margin-left:-100px;
   }
   .bloco-questoes {
     width: 200px;
@@ -507,7 +507,27 @@ h1 {
     margin-top: 15px;
   }
 
-
+/*--------------------------------------------------------*/
+  .redacao {
+    width: 200px;
+    background-color: #C6D4E1;
+    border-radius: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 10px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+  }
+  
+  .redacao h2 {
+    margin: 0;
+    font-size: 24px;
+    color: #333;
+  }
+  
+  .redacao img {
+    width: 100px;
+    margin-top: 15px;
+}
   /*rodape*/
 
   main {
