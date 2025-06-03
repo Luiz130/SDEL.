@@ -792,3 +792,112 @@ h1 {
     #botoesCronometro button:hover {
       background: #374151;
     }
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 15px;
+  }
+
+  .header-right {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .centralizador {
+    padding: 20px 0;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .retangulo {
+    flex-direction: column;
+    height: auto;
+    width: 95%;
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .conteudo {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin: 0;
+  }
+
+  .texto h1 {
+    font-size: 20px;
+  }
+
+  .texto p {
+    font-size: 16px;
+  }
+
+  .imagem {
+    width: 100px;
+    margin-left: 0;
+  }
+
+  .subheader-right {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .Matérias-slc,
+  .Redação-btn,
+  .Exercícios-btn {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .image-box img.principal {
+    width: 95%;
+    height: auto;
+  }
+
+  .carrossel-wrapper {
+    max-width: 100%;
+  }
+
+  .ferramentas {
+    flex-direction: column;
+    margin-left: 0;
+    align-items: center;
+  }
+
+  .bloco-questoes,
+  .bloco-flashcards,
+  .bloco-cronograma,
+  .bloco-analise-resultado,
+  .redacao {
+    width: 90%;
+  }
+
+  .footer-wrapper {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .footer-column {
+    min-width: 100%;
+  }
+
+  .titulo, .titulo2 {
+    font-size: 14px;
+    margin-right: 0;
+    text-align: center;
+  }
+
+  .menu-image {
+    width: 25px;
+    height: 25px;
+  }
+
+  .perfil-options {
+    width: 120px;
+    height: auto;
+  }
+}
