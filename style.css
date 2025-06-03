@@ -1042,19 +1042,3 @@ h1 {
 
 
 
-/*===========================================*/
-    @media (max-width: 480px) {
-  #painel {
-    width: 90vw; /* usa 90% da largura da viewport */
-    right: 5vw;  /* deixa uma margem da borda direita */
-    border-radius: 12px 0 0 12px;
-    padding: 16px 12px 24px 12px;
-  }
-
-  #botaoPainel {
-    padding: 12px 14px;
-    font-size: 20px;
-    border-radius: 10px 0 0 10px;
-    right: 5vw; /* mesmo alinhamento do painel */
-  }
-}
