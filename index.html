@@ -520,5 +520,17 @@
   };
 
 </script>
+<script>
+    window.onload = () => {
+  const larguraTela = window.innerWidth;
+  const elementos = document.querySelectorAll('body *');
 
+  elementos.forEach(el => {
+    const larguraEl = el.getBoundingClientRect().width;
+    if(larguraEl > larguraTela) {
+      console.log('Elemento largo demais:', el, larguraEl);
+    }
+  });
+};
+</script>
 </body>
