@@ -377,7 +377,197 @@
       </form>
     </div>
   </div>
+  <style>
+    
+  </style>
+<script type="module">
+  // Importações Firebase SDK (modular)
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-analytics.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
 
+  // Configuração do Firebase (sua config)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
+    authDomain: "sdel-b3f65.firebaseapp.com",
+    projectId: "sdel-b3f65",
+    storageBucket: "sdel-b3f65.firebasestorage.app",
+    messagingSenderId: "297725999985",
+    appId: "1:297725999985:web:d41da68311c190ef8a54d0",
+    measurementId: "G-PT92VECJ2H"
+  };
+
+  // Inicializa Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Elementos do DOM
+  const botaoPainel = document.getElementById('botaoPainel');
+  const painel = document.getElementById('painel');
+  const textareaNotas = document.getElementById('textareaNotas');
+
+  // Controle painel abrir/fechar
+  botaoPainel.onclick = () => {
+    if (painel.style.display === 'block') {
+      painel.style.display = 'none';
+    } else {
+      painel.style.display = 'block';
+    }
+  };
+
+  // Alternar visibilidade das seções
+  window.alternarSecao = function(id) {
+    const secao = document.getElementById(id);
+    if (secao.style.display === 'block') {
+      secao.style.display = 'none';
+    } else {
+      secao.style.display = 'block';
+    }
+  };
+
+  // Variáveis para usuário logado e controle do salvamento
+  let usuarioAtual = null;
+
+  // Quando usuário autenticar, carrega as notas
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      usuarioAtual = user;
+      await carregarNotas(user.uid);
+    } else {
+      usuarioAtual = null;
+      textareaNotas.value = "";
+    }
+  });
+
+  // Carrega as notas do Firestore para o textarea
+  async function carregarNotas(uid) {
+    const docRef = doc(db, "notasUsuario", uid);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      textareaNotas.value = docSnap.data().texto || "";
+    } else {
+      textareaNotas.value = "";
+    }
+  }
+
+  // Salva as notas no Firestore ao digitar, se usuário logado
+  textareaNotas.addEventListener("input", () => {
+    if (!usuarioAtual) return;
+    salvarNotas(usuarioAtual.uid, textareaNotas.value);
+  });
+
+  // Função para salvar as notas no Firestore
+  async function salvarNotas(uid, texto) {
+    const docRef = doc(db, "notasUsuario", uid);
+    await setDoc(docRef, { texto });
+  }
+
+  // -- Cronômetro --
+  let segundos = 0;
+  let minutos = 0;
+  let horas = 0;
+  let intervaloCronometro = null;
+
+  function atualizarCronometro() {
+    segundos++;
+    if (segundos >= 60) {
+      segundos = 0;
+      minutos++;
+    }
+    if (minutos >= 60) {
+      minutos = 0;
+      horas++;
+    }
+    const formatarNumero = (numero) => numero.toString().padStart(2, '0');
+    document.getElementById('cronometro').innerText =
+      ${formatarNumero(horas)}:${formatarNumero(minutos)}:${formatarNumero(segundos)};
+  }
+
+  window.iniciarCronometro = function() {
+    if (!intervaloCronometro) {
+      intervaloCronometro = setInterval(atualizarCronometro, 1000);
+    }
+  };
+
+  window.pararCronometro = function() {
+    clearInterval(intervaloCronometro);
+    intervaloCronometro = null;
+  };
+
+  window.resetarCronometro = function() {
+    window.pararCronometro();
+    segundos = 0;
+    minutos = 0;
+    horas = 0;
+    document.getElementById('cronometro').innerText = '00:00:00';
+  };
+
+  // -- Arrastar painel pelo cabeçalho --
+  const cabecalhoPainel = document.getElementById('cabecalhoPainel');
+
+  let posX = 0, posY = 0, posInicialX = 0, posInicialY = 0;
+
+  cabecalhoPainel.onmousedown = dragMouseDown;
+
+  function dragMouseDown(e) {
+    e.preventDefault();
+    posInicialX = e.clientX;
+    posInicialY = e.clientY;
+    document.onmouseup = fecharDrag;
+    document.onmousemove = moverPainel;
+  }
+
+  function moverPainel(e) {
+    e.preventDefault();
+    posX = posInicialX - e.clientX;
+    posY = posInicialY - e.clientY;
+    posInicialX = e.clientX;
+    posInicialY = e.clientY;
+
+    const rect = painel.getBoundingClientRect();
+
+    // Calcula nova posição respeitando a viewport para não sumir
+    let novaTop = rect.top - posY;
+    let novaRight = window.innerWidth - (rect.right - posX);
+
+    // Limites
+    if (novaTop < 0) novaTop = 0;
+    if (novaTop + rect.height > window.innerHeight) novaTop = window.innerHeight - rect.height;
+    if (novaRight < 0) novaRight = 0;
+    if (novaRight > window.innerWidth - rect.width) novaRight = window.innerWidth - rect.width;
+
+    painel.style.top = novaTop + "px";
+    painel.style.right = novaRight + "px";
+  }
+
+  function fecharDrag() {
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+</script>
+
+</body>
+</html>
+
+<!--java-script-->
+   
+<script>
+    const image = document.getElementById('profileImage');
+    const menu = document.getElementById('perfilOptions');
+  
+    image.addEventListener('click', () => {
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    });
+  
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.perfil-container')) {
+        perfil.style.display = 'none';
+      }
+    });
+  </script>
   <script>
     // Elementos DOM
     const flashcardContainer = document.getElementById('flashcardContainer');
