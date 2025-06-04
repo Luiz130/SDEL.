@@ -512,7 +512,31 @@
       </form>
     </div>
   </div>
- 
+ <!-- Botão lateral com ícone de ferramenta para abrir/fechar o painel -->
+<div id="botaoPainel" title="Abrir Painel">🛠️</div>
+
+<!-- Painel flutuante movível -->
+<div id="painel">
+  <div id="cabecalhoPainel">Painel Rápido</div>
+
+  <!-- Botão para mostrar/esconder bloco de notas -->
+  <button class="botaoSecao" onclick="alternarSecao('blocoNotas')">📘 Bloco de Notas</button>
+  <div id="blocoNotas" class="secaoPainel">
+    <label for="textareaNotas">Suas Anotações:</label>
+    <textarea id="textareaNotas" placeholder="Digite suas anotações..."></textarea>
+  </div>
+
+  <!-- Botão para mostrar/esconder cronômetro -->
+  <button class="botaoSecao" onclick="alternarSecao('containerCronometro')">⏱️ Cronômetro</button>
+  <div id="containerCronometro" class="secaoPainel">
+    <div id="cronometro">00:00:00</div>
+    <div id="botoesCronometro">
+      <button onclick="iniciarCronometro()">Iniciar</button>
+      <button onclick="pararCronometro()">Parar</button>
+      <button onclick="resetarCronometro()">Resetar</button>
+    </div>
+  </div>
+</div>
 
 
 </body>
