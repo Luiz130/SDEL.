@@ -324,442 +324,329 @@
   <h1>Flashcards de Estudo</h1>
 
   <div class="controls">
-    <button id="addBtn" aria-label="Adicionar novo flashcard">Adicionar Flashcard</button>
-    <button id="themeBtn" aria-label="Alternar modo claro e escuro">Modo Escuro</button>
-    <button id="clearBtn" aria-label="Excluir todos os flashcards">Excluir Todos</button>
-    <button id="quizToggleBtn" aria-label="Alternar modo quiz">Modo Quiz</button>
-    <div id="scoreDisplay" style="display:none;" aria-live="polite">Pontuação: 0 / 0</div>
+    <button id="addFlashcardBtn" title="Adicionar novo flashcard">➕ Adicionar Flashcard</button>
+    <button id="themeToggleBtn" title="Alternar modo claro/escuro">Modo Escuro</button>
+    <button id="quizToggleBtn" title="Ativar/Desativar modo quiz">Modo Quiz</button>
+    <span id="scoreDisplay" style="display:none;">Pontuação: 0 / 0</span>
   </div>
 
-  <div class="flashcards" id="flashcardContainer" aria-live="polite" aria-atomic="true"></div>
+  <div class="flashcards" id="flashcardsContainer"></div>
 
-  <!-- Modal Criar / Editar -->
-  <div class="modal-bg" id="modalBg" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
-    <div class="modal">
-      <button class="close-btn" id="closeModalBtn" aria-label="Fechar">&times;</button>
+  <!-- Modal para adicionar/editar -->
+  <div class="modal-bg" id="modalBg">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="close-btn" id="closeModalBtn" aria-label="Fechar modal">×</button>
       <h2 id="modalTitle">Adicionar Flashcard</h2>
       <form id="flashcardForm">
-        <input type="text" id="contentInput" placeholder="Conteúdo do flashcard" required maxlength="150" autocomplete="off" />
-        <input type="text" id="answerInput" placeholder="Resposta do flashcard" required maxlength="150" autocomplete="off" />
-        <select id="subjectInput" required aria-label="Selecione a disciplina">
+        <input type="text" id="frontInput" placeholder="Frente (pergunta/conteúdo)" required maxlength="200" />
+        <input type="text" id="backInput" placeholder="Verso (resposta/explicação)" required maxlength="400" />
+        <select id="categorySelect" required>
           <option value="" disabled selected>Selecione a disciplina</option>
           <option value="math">Matemática</option>
           <option value="history">História</option>
           <option value="science">Ciências</option>
-          <option value="language">Língua</option>
+          <option value="language">Língua Portuguesa</option>
         </select>
         <button type="submit">Salvar</button>
       </form>
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    // Config Firebase - substitua pela sua config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
+      authDomain: "sdel-b3f65.firebaseapp.com",
+      projectId: "sdel-b3f65",
+      storageBucket: "sdel-b3f65.appspot.com",
+      messagingSenderId: "297725999985",
+      appId: "1:297725999985:web:d41da68311c190ef8a54d0",
+      measurementId: "G-PT92VECJ2H"
+    };
 
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
-  authDomain: "sdel-b3f65.firebaseapp.com",
-  projectId: "sdel-b3f65",
-  storageBucket: "sdel-b3f65.firebasestorage.app",
-  messagingSenderId: "297725999985",
-  appId: "1:297725999985:web:d41da68311c190ef8a54d0",
-  measurementId: "G-PT92VECJ2H"
-};
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-    // Estado global
+    // Inicializa Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // DOM elements
+    const flashcardsContainer = document.getElementById('flashcardsContainer');
+    const addFlashcardBtn = document.getElementById('addFlashcardBtn');
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const quizToggleBtn = document.getElementById('quizToggleBtn');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const modalBg = document.getElementById('modalBg');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const flashcardForm = document.getElementById('flashcardForm');
+    const frontInput = document.getElementById('frontInput');
+    const backInput = document.getElementById('backInput');
+    const categorySelect = document.getElementById('categorySelect');
+    const modalTitle = document.getElementById('modalTitle');
+
+    // Variáveis globais
     let flashcards = [];
-    let editingIndex = null;
     let quizMode = false;
     let score = 0;
     let totalAnswered = 0;
+    let editIndex = -1;  // índice para editar flashcard
 
-    const flashcardContainer = document.getElementById('flashcardContainer');
-    const modalBg = document.getElementById('modalBg');
-    const addBtn = document.getElementById('addBtn');
-    const themeBtn = document.getElementById('themeBtn');
-    const clearBtn = document.getElementById('clearBtn');
-    const quizToggleBtn = document.getElementById('quizToggleBtn');
-    const scoreDisplay = document.getElementById('scoreDisplay');
+    // Controla o usuário logado
+    let currentUser = null;
 
-    const contentInput = document.getElementById('contentInput');
-    const answerInput = document.getElementById('answerInput');
-    const subjectInput = document.getElementById('subjectInput');
-    const flashcardForm = document.getElementById('flashcardForm');
-    const closeModalBtn = document.getElementById('closeModalBtn');
+    // --- Funções Firebase para salvar e carregar ---
 
-   // Salvar flashcards no Firestore
-async function saveFlashcards() {
-  const user = auth.currentUser;
-  if (!user) return;
-  try {
-    await setDoc(doc(db, "flashcards", user.uid), {
-      cards: flashcards
-    });
-    console.log("Flashcards salvos com sucesso no Firestore!");
-  } catch (error) {
-    console.error("Erro ao salvar flashcards:", error);
-  }
-}
-// Carregar flashcards do Firestore
-async function loadFlashcards() {
-  const user = auth.currentUser;
-  if (!user) return;
-  try {
-    const docSnap = await getDoc(doc(db, "flashcards", user.uid));
-    if (docSnap.exists()) {
-      flashcards = docSnap.data().cards || [];
-    } else {
-      flashcards = [];
-    }
-    renderFlashcards();
-  } catch (error) {
-    console.error("Erro ao carregar flashcards:", error);
-  }
-}
-
-    // Criar card HTML
-    function createFlashcardElement(card, index) {
-      const cardDiv = document.createElement('div');
-      cardDiv.className = `flashcard ${card.subject}`;
-      cardDiv.setAttribute('data-index', index);
-      cardDiv.setAttribute('tabindex', 0);
-      cardDiv.setAttribute('role', 'button');
-      cardDiv.setAttribute('aria-pressed', 'false');
-
-      const innerDiv = document.createElement('div');
-      innerDiv.className = 'card-inner';
-
-      // Buttons container (edit, delete)
-      const buttonsDiv = document.createElement('div');
-      buttonsDiv.className = 'buttons';
-
-      const editBtn = document.createElement('button');
-      editBtn.className = 'edit';
-      editBtn.textContent = 'Editar';
-      editBtn.setAttribute('aria-label', `Editar flashcard ${index + 1}`);
-      buttonsDiv.appendChild(editBtn);
-
-      const deleteBtn = document.createElement('button');
-      deleteBtn.className = 'delete';
-      deleteBtn.textContent = 'Excluir';
-      deleteBtn.setAttribute('aria-label', `Excluir flashcard ${index + 1}`);
-      buttonsDiv.appendChild(deleteBtn);
-
-      innerDiv.appendChild(buttonsDiv);
-
-      // Frente do cartão (conteúdo)
-      const frontDiv = document.createElement('div');
-      frontDiv.className = 'card-front';
-      frontDiv.textContent = card.content;
-
-      // Verso do cartão (resposta)
-      const backDiv = document.createElement('div');
-      backDiv.className = 'card-back';
-      backDiv.textContent = card.answer;
-
-      innerDiv.appendChild(frontDiv);
-      innerDiv.appendChild(backDiv);
-
-      cardDiv.appendChild(innerDiv);
-
-      // Eventos
-      if(!quizMode) {
-        cardDiv.addEventListener('click', () => {
-          cardDiv.classList.toggle('flipped');
-          cardDiv.setAttribute('aria-pressed', cardDiv.classList.contains('flipped') ? 'true' : 'false');
-        });
-
-        cardDiv.addEventListener('keydown', e => {
-          if(e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            cardDiv.classList.toggle('flipped');
-            cardDiv.setAttribute('aria-pressed', cardDiv.classList.contains('flipped') ? 'true' : 'false');
-          }
-        });
+    async function saveFlashcards() {
+      if (!currentUser) return;
+      try {
+        await setDoc(doc(db, "flashcards", currentUser.uid), { cards: flashcards });
+        console.log("Flashcards salvos no Firestore.");
+      } catch (e) {
+        console.error("Erro ao salvar flashcards:", e);
       }
+    }
 
-      editBtn.addEventListener('click', e => {
-        e.stopPropagation();
-        openEditModal(index);
-      });
-
-      deleteBtn.addEventListener('click', e => {
-        e.stopPropagation();
-        if(confirm('Tem certeza que deseja excluir este flashcard?')) {
-          flashcards.splice(index,1);
-          saveFlashcards();
-          renderFlashcards();
-          resetQuizScore();
+    async function loadFlashcards() {
+      if (!currentUser) return;
+      try {
+        const docSnap = await getDoc(doc(db, "flashcards", currentUser.uid));
+        if (docSnap.exists()) {
+          flashcards = docSnap.data().cards || [];
+        } else {
+          flashcards = [];
         }
-      });
-
-      return cardDiv;
+        resetQuizScore();
+        renderFlashcards();
+      } catch (e) {
+        console.error("Erro ao carregar flashcards:", e);
+      }
     }
 
-    // Renderiza os flashcards na tela
+    // --- Renderização dos flashcards ---
+
     function renderFlashcards() {
-      flashcardContainer.innerHTML = '';
+      flashcardsContainer.innerHTML = "";
+
+      if (flashcards.length === 0) {
+        flashcardsContainer.innerHTML = "<p style='color:gray; user-select:none;'>Nenhum flashcard disponível. Clique em 'Adicionar Flashcard' para criar.</p>";
+        return;
+      }
+
       flashcards.forEach((card, index) => {
-        const cardEl = createFlashcardElement(card, index);
-        flashcardContainer.appendChild(cardEl);
+        const cardEl = document.createElement("div");
+        cardEl.className = `flashcard ${card.category}`;
+        if (card.flipped) cardEl.classList.add("flipped");
+
+        const cardInner = document.createElement("div");
+        cardInner.className = "card-inner";
+
+        // Conteúdo frente e verso
+        const cardFront = document.createElement("div");
+        cardFront.className = "card-front";
+        cardFront.textContent = card.front;
+
+        const cardBack = document.createElement("div");
+        cardBack.className = "card-back";
+        cardBack.textContent = card.back;
+
+        // Botões editar e excluir (só visíveis fora do quiz)
+        const buttonsDiv = document.createElement("div");
+        buttonsDiv.className = "buttons";
+
+        if (!quizMode) {
+          const editBtn = document.createElement("button");
+          editBtn.textContent = "Editar";
+          editBtn.className = "edit";
+          editBtn.title = "Editar flashcard";
+          editBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            openEditModal(index);
+          });
+
+          const deleteBtn = document.createElement("button");
+          deleteBtn.textContent = "Excluir";
+          deleteBtn.className = "delete";
+          deleteBtn.title = "Excluir flashcard";
+          deleteBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (confirm("Tem certeza que deseja excluir este flashcard?")) {
+              flashcards.splice(index, 1);
+              saveFlashcards();
+              renderFlashcards();
+              resetQuizScore();
+            }
+          });
+
+          buttonsDiv.appendChild(editBtn);
+          buttonsDiv.appendChild(deleteBtn);
+          cardInner.appendChild(buttonsDiv);
+        }
+
+        // No modo quiz, adiciona input para resposta no verso
+        if (quizMode) {
+          cardEl.classList.remove("flipped"); // Garante que não fica virado inicialmente
+
+          const answerInput = document.createElement("input");
+          answerInput.type = "text";
+          answerInput.className = "quiz-input";
+          answerInput.placeholder = "Digite sua resposta aqui";
+          answerInput.autocomplete = "off";
+
+          const checkBtn = document.createElement("button");
+          checkBtn.textContent = "Verificar";
+          checkBtn.className = "quiz-button";
+
+          const resultSpan = document.createElement("div");
+          resultSpan.className = "quiz-result";
+
+          checkBtn.addEventListener("click", () => {
+            const userAnswer = answerInput.value.trim().toLowerCase();
+            const correctAnswer = card.back.trim().toLowerCase();
+            totalAnswered++;
+            if (userAnswer === correctAnswer) {
+              resultSpan.textContent = "✔️ Correto!";
+              score++;
+            } else {
+              resultSpan.textContent = `❌ Incorreto! Resposta correta: ${card.back}`;
+            }
+            answerInput.disabled = true;
+            checkBtn.disabled = true;
+            updateScoreDisplay();
+          });
+
+          cardBack.innerHTML = "";
+          cardBack.appendChild(answerInput);
+          cardBack.appendChild(checkBtn);
+          cardBack.appendChild(resultSpan);
+        }
+
+        cardInner.appendChild(cardFront);
+        cardInner.appendChild(cardBack);
+
+        // Clique para virar flashcard no modo normal
+        if (!quizMode) {
+          cardEl.addEventListener("click", () => {
+            card.flipped = !card.flipped;
+            renderFlashcards();
+          });
+        }
+
+        cardEl.appendChild(cardInner);
+        flashcardsContainer.appendChild(cardEl);
       });
-      if(flashcards.length === 0){
-        flashcardContainer.innerHTML = '<p style="color:gray; user-select:none;">Nenhum flashcard disponível. Clique em "Adicionar Flashcard" para criar um.</p>';
-      }
     }
 
-    // Abre modal para adicionar ou editar flashcard
-    function openEditModal(index = null) {
-      editingIndex = index;
-      if(index !== null) {
-        modalTitle.textContent = 'Editar Flashcard';
-        const card = flashcards[index];
-        contentInput.value = card.content;
-        answerInput.value = card.answer;
-        subjectInput.value = card.subject;
-      } else {
-        modalTitle.textContent = 'Adicionar Flashcard';
-        contentInput.value = '';
-        answerInput.value = '';
-        subjectInput.value = '';
-      }
-      modalBg.classList.add('show');
-      modalBg.setAttribute('aria-hidden', 'false');
-      contentInput.focus();
+    // --- Modal: abrir para adicionar ou editar ---
+
+    function openAddModal() {
+      modalTitle.textContent = "Adicionar Flashcard";
+      frontInput.value = "";
+      backInput.value = "";
+      categorySelect.value = "";
+      editIndex = -1;
+      modalBg.classList.add("show");
+      frontInput.focus();
     }
 
-    // Fecha modal
+    function openEditModal(index) {
+      modalTitle.textContent = "Editar Flashcard";
+      const card = flashcards[index];
+      frontInput.value = card.front;
+      backInput.value = card.back;
+      categorySelect.value = card.category;
+      editIndex = index;
+      modalBg.classList.add("show");
+      frontInput.focus();
+    }
+
     function closeModal() {
-      modalBg.classList.remove('show');
-      modalBg.setAttribute('aria-hidden', 'true');
-      editingIndex = null;
+      modalBg.classList.remove("show");
       flashcardForm.reset();
     }
 
-    addBtn.addEventListener('click', () => {
-      openEditModal();
+    // --- Eventos ---
+
+    addFlashcardBtn.addEventListener("click", openAddModal);
+    closeModalBtn.addEventListener("click", closeModal);
+    modalBg.addEventListener("click", e => {
+      if (e.target === modalBg) closeModal();
     });
 
-    closeModalBtn.addEventListener('click', closeModal);
-
-    modalBg.addEventListener('click', e => {
-      if(e.target === modalBg) closeModal();
-    });
-
-    flashcardForm.addEventListener('submit', e => {
+    flashcardForm.addEventListener("submit", e => {
       e.preventDefault();
-      const content = contentInput.value.trim();
-      const answer = answerInput.value.trim();
-      const subject = subjectInput.value;
 
-      if(!content || !answer || !subject) return alert('Por favor, preencha todos os campos.');
+      const front = frontInput.value.trim();
+      const back = backInput.value.trim();
+      const category = categorySelect.value;
 
-      if(editingIndex !== null) {
-        // Editar
-        flashcards[editingIndex] = {content, answer, subject};
+      if (!front || !back || !category) return;
+
+      if (editIndex === -1) {
+        // Adicionar novo
+        flashcards.push({ front, back, category, flipped: false });
       } else {
-        // Adicionar
-        flashcards.push({content, answer, subject});
+        // Editar existente
+        flashcards[editIndex] = { front, back, category, flipped: false };
       }
+
       saveFlashcards();
       renderFlashcards();
       closeModal();
       resetQuizScore();
     });
 
-    clearBtn.addEventListener('click', () => {
-      if(confirm('Tem certeza que deseja excluir todos os flashcards?')) {
-        flashcards = [];
-        saveFlashcards();
-        renderFlashcards();
-        resetQuizScore();
-      }
+    // Tema escuro toggle
+    themeToggleBtn.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      themeToggleBtn.textContent = document.body.classList.contains("dark") ? "Modo Claro" : "Modo Escuro";
     });
 
-    // Alternar modo escuro/claro
-    themeBtn.addEventListener('click', () => {
-      document.body.classList.toggle('dark');
-      if(document.body.classList.contains('dark')) {
-        themeBtn.textContent = 'Modo Claro';
-      } else {
-        themeBtn.textContent = 'Modo Escuro';
-      }
+    // Modo quiz toggle
+    quizToggleBtn.addEventListener("click", () => {
+      quizMode = !quizMode;
+      quizToggleBtn.textContent = quizMode ? "Sair do Modo Quiz" : "Modo Quiz";
+      scoreDisplay.style.display = quizMode ? "inline-block" : "none";
+      resetQuizScore();
+      renderFlashcards();
     });
 
-    // Função para resetar pontuação quiz
+    // --- Funções de pontuação ---
+
     function resetQuizScore() {
       score = 0;
       totalAnswered = 0;
-      scoreDisplay.style.display = 'none';
-      scoreDisplay.textContent = 'Pontuação: 0 / 0';
+      updateScoreDisplay();
     }
 
-        // Embaralhar array (Fisher-Yates)
-    function shuffle(array) {
-      let currentIndex = array.length, randomIndex;
-
-      while (currentIndex !== 0) {
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex--;
-        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
-      }
-      return array;
-    }
-
-    // Alternar modo quiz
-    quizToggleBtn.addEventListener('click', () => {
-      quizMode = !quizMode;
-      if(quizMode) {
-        startQuizMode();
-      } else {
-        stopQuizMode();
-      }
-    });
-
-    function startQuizMode() {
-      score = 0;
-      totalAnswered = 0;
-      scoreDisplay.style.display = 'inline-block';
-      quizToggleBtn.textContent = 'Modo Flashcards';
-      renderQuizFlashcards();
-      addBtn.disabled = true;
-      clearBtn.disabled = true;
-      // Remove edit/delete buttons during quiz
-      flashcardContainer.querySelectorAll('.buttons').forEach(btns => btns.style.display = 'none');
-    }
-
-    function stopQuizMode() {
-      scoreDisplay.style.display = 'none';
-      quizToggleBtn.textContent = 'Modo Quiz';
-      addBtn.disabled = false;
-      clearBtn.disabled = false;
-      renderFlashcards();
-    }
-
-    // Renderiza flashcards para modo quiz embaralhado
-    function renderQuizFlashcards() {
-      flashcardContainer.innerHTML = '';
-
-      if(flashcards.length === 0) {
-        flashcardContainer.innerHTML = '<p style="color:gray; user-select:none;">Nenhum flashcard disponível para o quiz.</p>';
-        return;
-      }
-
-      const shuffled = shuffle([...flashcards]);
-      shuffled.forEach((card, index) => {
-        const cardDiv = document.createElement('div');
-        cardDiv.className = `flashcard ${card.subject}`;
-        cardDiv.setAttribute('tabindex', 0);
-        cardDiv.setAttribute('role', 'region');
-        cardDiv.setAttribute('aria-label', `Quiz flashcard ${index + 1}`);
-
-        const innerDiv = document.createElement('div');
-        innerDiv.className = 'card-inner quiz-card-inner';
-        innerDiv.style.backgroundColor = getComputedStyle(document.documentElement)
-          .getPropertyValue(`--${card.subject}-color`) || '';
-
-        // Fronte - Pergunta
-        const frontDiv = document.createElement('div');
-        frontDiv.className = 'card-front';
-        frontDiv.textContent = card.content;
-
-        // Verso - Input para resposta
-        const backDiv = document.createElement('div');
-        backDiv.className = 'card-back';
-
-        // Pergunta acima do input no verso
-        const questionP = document.createElement('p');
-        questionP.textContent = card.content;
-        questionP.style.marginBottom = '10px';
-        questionP.style.fontWeight = '600';
-
-        // Input de resposta
-        const inputAnswer = document.createElement('input');
-        inputAnswer.type = 'text';
-        inputAnswer.className = 'quiz-input';
-        inputAnswer.setAttribute('aria-label', `Resposta para flashcard ${index + 1}`);
-        inputAnswer.autocomplete = 'off';
-
-        // Botão para verificar resposta
-        const checkBtn = document.createElement('button');
-        checkBtn.className = 'quiz-button';
-        checkBtn.textContent = 'Verificar';
-
-        // Resultado
-        const resultP = document.createElement('div');
-        resultP.className = 'quiz-result';
-
-        backDiv.appendChild(questionP);
-        backDiv.appendChild(inputAnswer);
-        backDiv.appendChild(checkBtn);
-        backDiv.appendChild(resultP);
-
-        innerDiv.appendChild(frontDiv);
-        innerDiv.appendChild(backDiv);
-        cardDiv.appendChild(innerDiv);
-        flashcardContainer.appendChild(cardDiv);
-
-        // Função para virar o card para trás (mostrar input)
-        cardDiv.addEventListener('click', () => {
-          cardDiv.classList.add('flipped');
-          inputAnswer.focus();
-        });
-
-        // Evitar virar novamente ao clicar no verso
-        backDiv.addEventListener('click', e => {
-          e.stopPropagation();
-        });
-
-        checkBtn.addEventListener('click', () => {
-          const userAnswer = inputAnswer.value.trim().toLowerCase();
-          const correctAnswer = card.answer.trim().toLowerCase();
-
-          if(userAnswer === '') {
-            resultP.textContent = 'Por favor, digite sua resposta.';
-            resultP.style.color = 'orange';
-            return;
-          }
-
-          if(userAnswer === correctAnswer) {
-            resultP.textContent = 'Correto! 🎉';
-            resultP.style.color = '#10b981';
-            score++;
-          } else {
-            resultP.textContent = `Incorreto. Resposta correta: ${card.answer}`;
-            resultP.style.color = '#ef4444';
-          }
-
-          totalAnswered++;
-          updateScore();
-
-          // Desabilita input e botão após resposta
-          inputAnswer.disabled = true;
-          checkBtn.disabled = true;
-        });
-
-        // Permitir submit pelo Enter no input
-        inputAnswer.addEventListener('keydown', e => {
-          if(e.key === 'Enter') {
-            e.preventDefault();
-            checkBtn.click();
-          }
-        });
-      });
-      updateScore();
-    }
-
-    function updateScore() {
+    function updateScoreDisplay() {
       scoreDisplay.textContent = `Pontuação: ${score} / ${totalAnswered}`;
     }
 
-    // Inicialização
-    loadFlashcards();
-    renderFlashcards();
+    // --- Autenticação Firebase ---
+
+    // Para teste, vamos simular login anônimo ou você pode substituir por login real
+    // Aqui só aguardamos o usuário logar para carregar os flashcards
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUser = user;
+        loadFlashcards();
+      } else {
+        // Usuário não está logado, pode implementar login ou criar anônimo
+        currentUser = null;
+        flashcards = [];
+        renderFlashcards();
+        resetQuizScore();
+        // Exemplo: login anônimo automático
+        // signInAnonymously(auth).catch(console.error);
+      }
+    });
+
+    // Você pode adicionar aqui a função para login real (e.g., com Google, email/senha)
+
   </script>
 </body>
 </html>
