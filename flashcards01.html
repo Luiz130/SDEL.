@@ -353,43 +353,24 @@
     </div>
   </div>
 
+  <script>
 
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-  // Configuração do Firebase
-  const firebaseConfig = {
-    apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
-    authDomain: "sdel-b3f65.firebaseapp.com",
-    projectId: "sdel-b3f65",
-    storageBucket: "sdel-b3f65.appspot.com",
-    messagingSenderId: "297725999985",
-    appId: "1:297725999985:web:d41da68311c190ef8a54d0",
-    measurementId: "G-PT92VECJ2H"
-  };
-
-  // Inicializar Firebase
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const auth = getAuth(app);
-
-  // Monitorar autenticação
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      console.log("Usuário logado:", user.displayName || user.email);
-      // Aqui você pode carregar os flashcards do Firestore se quiser
-    } else {
-      console.log("Usuário deslogado.");
-      // Redirecione ou bloqueie se necessário
-    }
-  });
-
-  // Resto do seu código JavaScript aqui
-
-
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
+  authDomain: "sdel-b3f65.firebaseapp.com",
+  projectId: "sdel-b3f65",
+  storageBucket: "sdel-b3f65.firebasestorage.app",
+  messagingSenderId: "297725999985",
+  appId: "1:297725999985:web:d41da68311c190ef8a54d0",
+  measurementId: "G-PT92VECJ2H"
+};
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
     // Estado global
     let flashcards = [];
     let editingIndex = null;
@@ -411,18 +392,35 @@
     const flashcardForm = document.getElementById('flashcardForm');
     const closeModalBtn = document.getElementById('closeModalBtn');
 
-    // Função para salvar no localStorage
-    function saveFlashcards() {
-      localStorage.setItem('flashcards', JSON.stringify(flashcards));
+   // Salvar flashcards no Firestore
+async function saveFlashcards() {
+  const user = auth.currentUser;
+  if (!user) return;
+  try {
+    await setDoc(doc(db, "flashcards", user.uid), {
+      cards: flashcards
+    });
+    console.log("Flashcards salvos com sucesso no Firestore!");
+  } catch (error) {
+    console.error("Erro ao salvar flashcards:", error);
+  }
+}
+// Carregar flashcards do Firestore
+async function loadFlashcards() {
+  const user = auth.currentUser;
+  if (!user) return;
+  try {
+    const docSnap = await getDoc(doc(db, "flashcards", user.uid));
+    if (docSnap.exists()) {
+      flashcards = docSnap.data().cards || [];
+    } else {
+      flashcards = [];
     }
-
-    // Função para carregar do localStorage
-    function loadFlashcards() {
-      const data = localStorage.getItem('flashcards');
-      if(data) {
-        flashcards = JSON.parse(data);
-      }
-    }
+    renderFlashcards();
+  } catch (error) {
+    console.error("Erro ao carregar flashcards:", error);
+  }
+}
 
     // Criar card HTML
     function createFlashcardElement(card, index) {
