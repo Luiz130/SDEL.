@@ -54,12 +54,8 @@
       transition: background-color 0.2s ease;
       user-select: none;
     }
-    .controls button:hover:not(:disabled) {
+    .controls button:hover {
       background-color: #4338ca;
-    }
-    .controls button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
     }
 
     #scoreDisplay {
@@ -85,7 +81,6 @@
       height: 200px;
       perspective: 1000px;
       user-select: none;
-      position: relative;
     }
 
     .card-inner {
@@ -103,7 +98,6 @@
       padding: 20px;
       box-sizing: border-box;
       color: white;
-      background-color: #3b82f6;
     }
 
     .flashcard.flipped .card-inner {
@@ -209,16 +203,6 @@
       outline-offset: 2px;
     }
 
-    .quiz-input.correct {
-      border-color: #10b981;
-      background-color: #dcfce7;
-    }
-
-    .quiz-input.incorrect {
-      border-color: #ef4444;
-      background-color: #fee2e2;
-    }
-
     .quiz-button {
       margin-top: 10px;
       padding: 8px 16px;
@@ -230,12 +214,8 @@
       font-weight: 600;
       transition: background-color 0.2s;
     }
-    .quiz-button:hover:not(:disabled) {
+    .quiz-button:hover {
       background-color: #e5e7eb;
-    }
-    .quiz-button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
     }
 
     /* Resultado quiz */
@@ -320,311 +300,219 @@
     .close-btn {
       position: absolute;
       top: 8px;
-      right: 10px;
-      background: none;
-      border: none;
+      right: 12px;
       font-size: 24px;
+      background: transparent;
+      border: none;
       cursor: pointer;
       user-select: none;
       color: #999;
       transition: color 0.2s;
     }
     .close-btn:hover {
-      color: #444;
+      color: #555;
     }
 
-    @media (max-width: 450px) {
-      .flashcard {
-        width: 90vw;
-        height: auto;
-      }
-      .card-front, .card-back {
-        position: relative;
-        height: auto;
-      }
-    }
-      /* Botão flutuante lateral */
-    #botaoPainel {
-      position: fixed;
-      top: 50%;
-      right: 0;
-      transform: translateY(-50%);
-      background-color: #2563eb;
-      color: white;
-      padding: 14px 18px;
-      border-radius: 12px 0 0 12px;
-      cursor: pointer;
-      font-size: 24px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      z-index: 10000;
-      transition: background 0.3s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #botaoPainel:hover {
-      background-color: #1e40af;
-    }
-
-    /* Painel lateral movível */
-    #painel {
-      position: fixed;
-      top: 50%;
-      right: 0;
-  
-      width: 340px;
-      background: white;
-      border-left: 4px solid #2563eb;
-      border-radius: 16px 0 0 16px;
-      padding: 16px 24px 24px 24px;
-      box-shadow: -4px 0 16px rgba(0,0,0,0.1);
-      display: none;
-      z-index: 9999;
-      cursor: default;
-      user-select: none;
-    }
-
-    /* Cabeçalho do painel (área para arrastar) */
-    #cabecalhoPainel {
-      cursor: grab;
-      padding-bottom: 12px;
-      border-bottom: 1px solid #e5e7eb;
-      margin-bottom: 16px;
-      font-weight: 700;
-      font-size: 20px;
-      color: #111827;
-      user-select: none;
-    }
-
-    #cabecalhoPainel:active {
-      cursor: grabbing;
-    }
-
-    .botaoSecao {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 14px;
-      background-color: #2563eb;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 15px;
-      transition: background 0.3s, transform 0.2s;
-    }
-
-    .botaoSecao:hover {
-      background-color: #1e3a8a;
-      transform: scale(1.02);
-    }
-
-    .secaoPainel {
-      display: none;
-      margin-bottom: 24px;
-    }
-
-    /* Estilo do bloco de notas */
-    #blocoNotas label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: #374151;
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 120px;
-      resize: vertical;
-      padding: 14px 16px;
-      font-size: 15px;
-      border-radius: 10px;
-      border: 1.5px solid #cbd5e1;
-      box-shadow: inset 0 1px 4px rgba(0,0,0,0.08);
-      outline-offset: 2px;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: #111827;
-      box-sizing: border-box;
-      transition: border-color 0.3s ease;
-    }
-
-    textarea:focus {
-      border-color: #2563eb;
-      box-shadow: 0 0 6px rgba(37, 99, 235, 0.5);
-    }
-
-    /* Estilo do cronômetro */
-    #cronometro {
-      font-size: 28px;
-      font-weight: bold;
-      margin-bottom: 16px;
-      text-align: center;
-      color: #111827;
-    }
-
-    #botoesCronometro {
-      display: flex;
-      justify-content: space-around;
-    }
-
-    #botoesCronometro button {
-      background: #4b5563;
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      font-size: 14px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s;
+    /* Scrollbar for cards content */
+    .card-front p, .card-back p {
+      margin: 0;
+      white-space: pre-wrap;
     }
   </style>
 </head>
 <body>
-
   <h1>Flashcards de Estudo</h1>
 
   <div class="controls">
-    <button id="addBtn" aria-label="Adicionar novo flashcard">Adicionar</button>
-    <button id="clearBtn" aria-label="Limpar todos os flashcards">Limpar Tudo</button>
-    <button id="darkModeToggle" aria-label="Ativar ou desativar modo escuro">Modo Escuro</button>
-    <button id="quizToggleBtn" aria-label="Ativar ou desativar modo quiz">Modo Quiz</button>
-    <div id="scoreDisplay" aria-live="polite" role="status" style="display:none;">Pontuação: 0 / 0</div>
+    <button id="addBtn" aria-label="Adicionar novo flashcard">Adicionar Flashcard</button>
+    <button id="themeBtn" aria-label="Alternar modo claro e escuro">Modo Escuro</button>
+    <button id="clearBtn" aria-label="Excluir todos os flashcards">Excluir Todos</button>
+    <button id="quizToggleBtn" aria-label="Alternar modo quiz">Modo Quiz</button>
+    <div id="scoreDisplay" style="display:none;" aria-live="polite">Pontuação: 0 / 0</div>
   </div>
 
-  <div id="flashcardContainer" class="flashcards" aria-live="polite" aria-relevant="additions removals"></div>
+  <div class="flashcards" id="flashcardContainer" aria-live="polite" aria-atomic="true"></div>
 
-  <!-- Modal para adicionar/editar flashcard -->
-  <div id="modalBg" class="modal-bg" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1" aria-hidden="true">
+  <!-- Modal Criar / Editar -->
+  <div class="modal-bg" id="modalBg" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
     <div class="modal">
-      <button class="close-btn" aria-label="Fechar modal">&times;</button>
+      <button class="close-btn" id="closeModalBtn" aria-label="Fechar">&times;</button>
       <h2 id="modalTitle">Adicionar Flashcard</h2>
       <form id="flashcardForm">
-        <input type="text" id="contentInput" placeholder="Pergunta ou conteúdo" required aria-required="true" />
-        <input type="text" id="answerInput" placeholder="Resposta correta" required aria-required="true" />
-        <select id="subjectSelect" aria-label="Selecionar disciplina">
+        <input type="text" id="contentInput" placeholder="Conteúdo do flashcard" required maxlength="150" autocomplete="off" />
+        <input type="text" id="answerInput" placeholder="Resposta do flashcard" required maxlength="150" autocomplete="off" />
+        <select id="subjectInput" required aria-label="Selecione a disciplina">
+          <option value="" disabled selected>Selecione a disciplina</option>
           <option value="math">Matemática</option>
           <option value="history">História</option>
-          <option value="science">Ciência</option>
+          <option value="science">Ciências</option>
           <option value="language">Língua</option>
         </select>
-        <button type="submit" id="submitFlashcardBtn">Adicionar</button>
+        <button type="submit">Salvar</button>
       </form>
     </div>
   </div>
- <!-- Botão lateral com ícone de ferramenta para abrir/fechar o painel -->
-<div id="botaoPainel" title="Abrir Painel">🛠️</div>
 
-<!-- Painel flutuante movível -->
-<div id="painel">
-  <div id="cabecalhoPainel">Painel Rápido</div>
-
-  <!-- Botão para mostrar/esconder bloco de notas -->
-  <button class="botaoSecao" onclick="alternarSecao('blocoNotas')">📘 Bloco de Notas</button>
-  <div id="blocoNotas" class="secaoPainel">
-    <label for="textareaNotas">Suas Anotações:</label>
-    <textarea id="textareaNotas" placeholder="Digite suas anotações..."></textarea>
-  </div>
-
-  <!-- Botão para mostrar/esconder cronômetro -->
-  <button class="botaoSecao" onclick="alternarSecao('containerCronometro')">⏱️ Cronômetro</button>
-  <div id="containerCronometro" class="secaoPainel">
-    <div id="cronometro">00:00:00</div>
-    <div id="botoesCronometro">
-      <button onclick="iniciarCronometro()">Iniciar</button>
-      <button onclick="pararCronometro()">Parar</button>
-      <button onclick="resetarCronometro()">Resetar</button>
-    </div>
-  </div>
-</div>
-
-
-</body>
-</html>
-
-<!--java-script-->
-   
-<script>
-    const image = document.getElementById('profileImage');
-    const menu = document.getElementById('perfilOptions');
-  
-    image.addEventListener('click', () => {
-      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-    });
-  
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.perfil-container')) {
-        perfil.style.display = 'none';
-      }
-    });
-
-    // Elementos DOM
-    const flashcardContainer = document.getElementById('flashcardContainer');
-    const addBtn = document.getElementById('addBtn');
-    const clearBtn = document.getElementById('clearBtn');
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    const quizToggleBtn = document.getElementById('quizToggleBtn');
-    const scoreDisplay = document.getElementById('scoreDisplay');
-
-    const modalBg = document.getElementById('modalBg');
-    const modal = modalBg.querySelector('.modal');
-    const closeModalBtn = modal.querySelector('.close-btn');
-    const flashcardForm = document.getElementById('flashcardForm');
-    const contentInput = document.getElementById('contentInput');
-    const answerInput = document.getElementById('answerInput');
-    const subjectSelect = document.getElementById('subjectSelect');
-    const submitFlashcardBtn = document.getElementById('submitFlashcardBtn');
-
-    // Dados
-    let flashcards = JSON.parse(localStorage.getItem('flashcards')) || [];
-    let darkMode = JSON.parse(localStorage.getItem('darkMode')) || false;
-
-    // Estado do modo quiz
+  <script>
+    // Estado global
+    let flashcards = [];
+    let editingIndex = null;
     let quizMode = false;
     let score = 0;
     let totalAnswered = 0;
 
-    // Estado edição
-    let editingIndex = null;
+    const flashcardContainer = document.getElementById('flashcardContainer');
+    const modalBg = document.getElementById('modalBg');
+    const addBtn = document.getElementById('addBtn');
+    const themeBtn = document.getElementById('themeBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const quizToggleBtn = document.getElementById('quizToggleBtn');
+    const scoreDisplay = document.getElementById('scoreDisplay');
 
-    // Inicialização
-    if(darkMode) {
-      document.body.classList.add('dark');
-      darkModeToggle.textContent = 'Modo Claro';
+    const contentInput = document.getElementById('contentInput');
+    const answerInput = document.getElementById('answerInput');
+    const subjectInput = document.getElementById('subjectInput');
+    const flashcardForm = document.getElementById('flashcardForm');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+
+    // Função para salvar no localStorage
+    function saveFlashcards() {
+      localStorage.setItem('flashcards', JSON.stringify(flashcards));
     }
 
-    renderFlashcards();
-
-    // Eventos
-    addBtn.addEventListener('click', () => openModal());
-    clearBtn.addEventListener('click', () => {
-      if(confirm('Deseja realmente apagar todos os flashcards?')) {
-        flashcards = [];
-        saveAndRender();
+    // Função para carregar do localStorage
+    function loadFlashcards() {
+      const data = localStorage.getItem('flashcards');
+      if(data) {
+        flashcards = JSON.parse(data);
       }
-    });
+    }
 
-    darkModeToggle.addEventListener('click', () => {
-      darkMode = !darkMode;
-      if(darkMode) {
-        document.body.classList.add('dark');
-        darkModeToggle.textContent = 'Modo Claro';
+    // Criar card HTML
+    function createFlashcardElement(card, index) {
+      const cardDiv = document.createElement('div');
+      cardDiv.className = `flashcard ${card.subject}`;
+      cardDiv.setAttribute('data-index', index);
+      cardDiv.setAttribute('tabindex', 0);
+      cardDiv.setAttribute('role', 'button');
+      cardDiv.setAttribute('aria-pressed', 'false');
+
+      const innerDiv = document.createElement('div');
+      innerDiv.className = 'card-inner';
+
+      // Buttons container (edit, delete)
+      const buttonsDiv = document.createElement('div');
+      buttonsDiv.className = 'buttons';
+
+      const editBtn = document.createElement('button');
+      editBtn.className = 'edit';
+      editBtn.textContent = 'Editar';
+      editBtn.setAttribute('aria-label', `Editar flashcard ${index + 1}`);
+      buttonsDiv.appendChild(editBtn);
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'delete';
+      deleteBtn.textContent = 'Excluir';
+      deleteBtn.setAttribute('aria-label', `Excluir flashcard ${index + 1}`);
+      buttonsDiv.appendChild(deleteBtn);
+
+      innerDiv.appendChild(buttonsDiv);
+
+      // Frente do cartão (conteúdo)
+      const frontDiv = document.createElement('div');
+      frontDiv.className = 'card-front';
+      frontDiv.textContent = card.content;
+
+      // Verso do cartão (resposta)
+      const backDiv = document.createElement('div');
+      backDiv.className = 'card-back';
+      backDiv.textContent = card.answer;
+
+      innerDiv.appendChild(frontDiv);
+      innerDiv.appendChild(backDiv);
+
+      cardDiv.appendChild(innerDiv);
+
+      // Eventos
+      if(!quizMode) {
+        cardDiv.addEventListener('click', () => {
+          cardDiv.classList.toggle('flipped');
+          cardDiv.setAttribute('aria-pressed', cardDiv.classList.contains('flipped') ? 'true' : 'false');
+        });
+
+        cardDiv.addEventListener('keydown', e => {
+          if(e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            cardDiv.classList.toggle('flipped');
+            cardDiv.setAttribute('aria-pressed', cardDiv.classList.contains('flipped') ? 'true' : 'false');
+          }
+        });
+      }
+
+      editBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        openEditModal(index);
+      });
+
+      deleteBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        if(confirm('Tem certeza que deseja excluir este flashcard?')) {
+          flashcards.splice(index,1);
+          saveFlashcards();
+          renderFlashcards();
+          resetQuizScore();
+        }
+      });
+
+      return cardDiv;
+    }
+
+    // Renderiza os flashcards na tela
+    function renderFlashcards() {
+      flashcardContainer.innerHTML = '';
+      flashcards.forEach((card, index) => {
+        const cardEl = createFlashcardElement(card, index);
+        flashcardContainer.appendChild(cardEl);
+      });
+      if(flashcards.length === 0){
+        flashcardContainer.innerHTML = '<p style="color:gray; user-select:none;">Nenhum flashcard disponível. Clique em "Adicionar Flashcard" para criar um.</p>';
+      }
+    }
+
+    // Abre modal para adicionar ou editar flashcard
+    function openEditModal(index = null) {
+      editingIndex = index;
+      if(index !== null) {
+        modalTitle.textContent = 'Editar Flashcard';
+        const card = flashcards[index];
+        contentInput.value = card.content;
+        answerInput.value = card.answer;
+        subjectInput.value = card.subject;
       } else {
-        document.body.classList.remove('dark');
-        darkModeToggle.textContent = 'Modo Escuro';
+        modalTitle.textContent = 'Adicionar Flashcard';
+        contentInput.value = '';
+        answerInput.value = '';
+        subjectInput.value = '';
       }
-      localStorage.setItem('darkMode', JSON.stringify(darkMode));
-    });
+      modalBg.classList.add('show');
+      modalBg.setAttribute('aria-hidden', 'false');
+      contentInput.focus();
+    }
 
-    quizToggleBtn.addEventListener('click', () => {
-      if(quizMode) {
-        stopQuizMode();
-      } else {
-        startQuizMode();
-      }
+    // Fecha modal
+    function closeModal() {
+      modalBg.classList.remove('show');
+      modalBg.setAttribute('aria-hidden', 'true');
+      editingIndex = null;
+      flashcardForm.reset();
+    }
+
+    addBtn.addEventListener('click', () => {
+      openEditModal();
     });
 
     closeModalBtn.addEventListener('click', closeModal);
+
     modalBg.addEventListener('click', e => {
       if(e.target === modalBg) closeModal();
     });
@@ -633,162 +521,93 @@
       e.preventDefault();
       const content = contentInput.value.trim();
       const answer = answerInput.value.trim();
-      const subject = subjectSelect.value;
+      const subject = subjectInput.value;
 
-      if(!content || !answer) {
-        alert('Por favor, preencha pergunta e resposta.');
-        return;
-      }
+      if(!content || !answer || !subject) return alert('Por favor, preencha todos os campos.');
 
       if(editingIndex !== null) {
-        flashcards[editingIndex] = { content, answer, subject };
-        editingIndex = null;
-        submitFlashcardBtn.textContent = 'Adicionar';
-        modal.querySelector('h2').textContent = 'Adicionar Flashcard';
+        // Editar
+        flashcards[editingIndex] = {content, answer, subject};
       } else {
-        flashcards.push({ content, answer, subject });
+        // Adicionar
+        flashcards.push({content, answer, subject});
       }
-      saveAndRender();
+      saveFlashcards();
+      renderFlashcards();
       closeModal();
+      resetQuizScore();
     });
 
-    // Funções
-
-    function renderFlashcards() {
-      flashcardContainer.innerHTML = '';
-      if(flashcards.length === 0) {
-        flashcardContainer.innerHTML = '<p style="color:gray; user-select:none;">Nenhum flashcard disponível. Adicione um novo!</p>';
-        return;
-      }
-
-      flashcards.forEach((card, index) => {
-        const cardDiv = createFlashcardElement(card, index);
-        flashcardContainer.appendChild(cardDiv);
-      });
-    }
-
-    function createFlashcardElement(card, index) {
-      const cardDiv = document.createElement('div');
-      cardDiv.className = `flashcard ${card.subject}`;
-      cardDiv.setAttribute('tabindex', 0);
-      cardDiv.setAttribute('role', 'region');
-      cardDiv.setAttribute('aria-label', `Flashcard número ${index + 1} de disciplina ${card.subject}`);
-
-      const innerDiv = document.createElement('div');
-      innerDiv.className = 'card-inner';
-
-      const frontDiv = document.createElement('div');
-      frontDiv.className = 'card-front';
-      frontDiv.textContent = card.content;
-
-      const backDiv = document.createElement('div');
-      backDiv.className = 'card-back';
-      backDiv.textContent = card.answer;
-
-      // Botões editar e excluir
-      const buttonsDiv = document.createElement('div');
-      buttonsDiv.className = 'buttons';
-
-      const editBtn = document.createElement('button');
-      editBtn.className = 'edit';
-      editBtn.textContent = 'Editar';
-      editBtn.setAttribute('aria-label', `Editar flashcard número ${index + 1}`);
-      editBtn.addEventListener('click', e => {
-        e.stopPropagation();
-        openModal(true, index);
-      });
-
-      const deleteBtn = document.createElement('button');
-      deleteBtn.className = 'delete';
-      deleteBtn.textContent = 'Excluir';
-      deleteBtn.setAttribute('aria-label', `Excluir flashcard número ${index + 1}`);
-      deleteBtn.addEventListener('click', e => {
-        e.stopPropagation();
-        if(confirm('Confirma exclusão deste flashcard?')) {
-          flashcards.splice(index, 1);
-          saveAndRender();
-        }
-      });
-
-      buttonsDiv.appendChild(editBtn);
-      buttonsDiv.appendChild(deleteBtn);
-
-      innerDiv.appendChild(buttonsDiv);
-      innerDiv.appendChild(frontDiv);
-      innerDiv.appendChild(backDiv);
-      cardDiv.appendChild(innerDiv);
-
-      // Virar cartão ao clicar
-      cardDiv.addEventListener('click', () => {
-        cardDiv.classList.toggle('flipped');
-      });
-
-      return cardDiv;
-    }
-
-    function saveAndRender() {
-      localStorage.setItem('flashcards', JSON.stringify(flashcards));
-      if(quizMode) {
-        renderQuizFlashcards();
-      } else {
+    clearBtn.addEventListener('click', () => {
+      if(confirm('Tem certeza que deseja excluir todos os flashcards?')) {
+        flashcards = [];
+        saveFlashcards();
         renderFlashcards();
+        resetQuizScore();
       }
-    }
+    });
 
-    function openModal(edit = false, index = null) {
-      modalBg.classList.add('show');
-      modalBg.setAttribute('aria-hidden', 'false');
-      contentInput.focus();
-
-      if(edit) {
-        const card = flashcards[index];
-        contentInput.value = card.content;
-        answerInput.value = card.answer;
-        subjectSelect.value = card.subject;
-        editingIndex = index;
-        submitFlashcardBtn.textContent = 'Salvar';
-        modal.querySelector('h2').textContent = 'Editar Flashcard';
+    // Alternar modo escuro/claro
+    themeBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark');
+      if(document.body.classList.contains('dark')) {
+        themeBtn.textContent = 'Modo Claro';
       } else {
-        flashcardForm.reset();
-        editingIndex = null;
-        submitFlashcardBtn.textContent = 'Adicionar';
-        modal.querySelector('h2').textContent = 'Adicionar Flashcard';
+        themeBtn.textContent = 'Modo Escuro';
       }
-    }
+    });
 
-    function closeModal() {
-      modalBg.classList.remove('show');
-      modalBg.setAttribute('aria-hidden', 'true');
-      editingIndex = null;
-    }
-
-    function startQuizMode() {
-      quizMode = true;
-      score = 0;
-      totalAnswered = 0;
-      scoreDisplay.style.display = 'inline-block';
-      addBtn.disabled = true;
-      clearBtn.disabled = true;
-      quizToggleBtn.textContent = 'Sair do Quiz';
-      renderQuizFlashcards();
-    }
-
-    function stopQuizMode() {
-      quizMode = false;
-      scoreDisplay.style.display = 'none';
-      addBtn.disabled = false;
-      clearBtn.disabled = false;
-      quizToggleBtn.textContent = 'Modo Quiz';
-      renderFlashcards();
-      resetQuizScore();
-    }
-
+    // Função para resetar pontuação quiz
     function resetQuizScore() {
       score = 0;
       totalAnswered = 0;
-      updateScoreDisplay();
+      scoreDisplay.style.display = 'none';
+      scoreDisplay.textContent = 'Pontuação: 0 / 0';
     }
 
+        // Embaralhar array (Fisher-Yates)
+    function shuffle(array) {
+      let currentIndex = array.length, randomIndex;
+
+      while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+      }
+      return array;
+    }
+
+    // Alternar modo quiz
+    quizToggleBtn.addEventListener('click', () => {
+      quizMode = !quizMode;
+      if(quizMode) {
+        startQuizMode();
+      } else {
+        stopQuizMode();
+      }
+    });
+
+    function startQuizMode() {
+      score = 0;
+      totalAnswered = 0;
+      scoreDisplay.style.display = 'inline-block';
+      quizToggleBtn.textContent = 'Modo Flashcards';
+      renderQuizFlashcards();
+      addBtn.disabled = true;
+      clearBtn.disabled = true;
+      // Remove edit/delete buttons during quiz
+      flashcardContainer.querySelectorAll('.buttons').forEach(btns => btns.style.display = 'none');
+    }
+
+    function stopQuizMode() {
+      scoreDisplay.style.display = 'none';
+      quizToggleBtn.textContent = 'Modo Quiz';
+      addBtn.disabled = false;
+      clearBtn.disabled = false;
+      renderFlashcards();
+    }
+
+    // Renderiza flashcards para modo quiz embaralhado
     function renderQuizFlashcards() {
       flashcardContainer.innerHTML = '';
 
@@ -797,272 +616,116 @@
         return;
       }
 
-      // Embaralhar para o quiz
       const shuffled = shuffle([...flashcards]);
-
       shuffled.forEach((card, index) => {
         const cardDiv = document.createElement('div');
         cardDiv.className = `flashcard ${card.subject}`;
-        cardDiv.setAttribute('data-index', index);
         cardDiv.setAttribute('tabindex', 0);
         cardDiv.setAttribute('role', 'region');
-        cardDiv.setAttribute('aria-label', `Flashcard de quiz número ${index + 1}`);
+        cardDiv.setAttribute('aria-label', `Quiz flashcard ${index + 1}`);
 
         const innerDiv = document.createElement('div');
-        innerDiv.className = 'card-inner';
+        innerDiv.className = 'card-inner quiz-card-inner';
+        innerDiv.style.backgroundColor = getComputedStyle(document.documentElement)
+          .getPropertyValue(`--${card.subject}-color`) || '';
 
+        // Fronte - Pergunta
         const frontDiv = document.createElement('div');
         frontDiv.className = 'card-front';
+        frontDiv.textContent = card.content;
 
-        const questionP = document.createElement('p');
-        questionP.textContent = card.content;
-        frontDiv.appendChild(questionP);
-
-        // Input para resposta
-        const answerInputQuiz = document.createElement('input');
-        answerInputQuiz.type = 'text';
-        answerInputQuiz.className = 'quiz-input';
-        answerInputQuiz.setAttribute('aria-label', `Resposta para a pergunta ${index + 1}`);
-        answerInputQuiz.autocomplete = 'off';
-        frontDiv.appendChild(answerInputQuiz);
-
-        // Botão para enviar resposta
-        const submitBtn = document.createElement('button');
-        submitBtn.className = 'quiz-button';
-        submitBtn.textContent = 'Responder';
-        submitBtn.setAttribute('aria-label', `Enviar resposta para pergunta ${index + 1}`);
-        frontDiv.appendChild(submitBtn);
-
-        // Div para resultado
-        const resultDiv = document.createElement('div');
-        resultDiv.className = 'quiz-result';
-        frontDiv.appendChild(resultDiv);
-
+        // Verso - Input para resposta
         const backDiv = document.createElement('div');
         backDiv.className = 'card-back';
-        backDiv.textContent = card.answer;
+
+        // Pergunta acima do input no verso
+        const questionP = document.createElement('p');
+        questionP.textContent = card.content;
+        questionP.style.marginBottom = '10px';
+        questionP.style.fontWeight = '600';
+
+        // Input de resposta
+        const inputAnswer = document.createElement('input');
+        inputAnswer.type = 'text';
+        inputAnswer.className = 'quiz-input';
+        inputAnswer.setAttribute('aria-label', `Resposta para flashcard ${index + 1}`);
+        inputAnswer.autocomplete = 'off';
+
+        // Botão para verificar resposta
+        const checkBtn = document.createElement('button');
+        checkBtn.className = 'quiz-button';
+        checkBtn.textContent = 'Verificar';
+
+        // Resultado
+        const resultP = document.createElement('div');
+        resultP.className = 'quiz-result';
+
+        backDiv.appendChild(questionP);
+        backDiv.appendChild(inputAnswer);
+        backDiv.appendChild(checkBtn);
+        backDiv.appendChild(resultP);
 
         innerDiv.appendChild(frontDiv);
         innerDiv.appendChild(backDiv);
         cardDiv.appendChild(innerDiv);
         flashcardContainer.appendChild(cardDiv);
 
-        submitBtn.addEventListener('click', () => {
-          const userAnswer = answerInputQuiz.value.trim().toLowerCase();
+        // Função para virar o card para trás (mostrar input)
+        cardDiv.addEventListener('click', () => {
+          cardDiv.classList.add('flipped');
+          inputAnswer.focus();
+        });
+
+        // Evitar virar novamente ao clicar no verso
+        backDiv.addEventListener('click', e => {
+          e.stopPropagation();
+        });
+
+        checkBtn.addEventListener('click', () => {
+          const userAnswer = inputAnswer.value.trim().toLowerCase();
           const correctAnswer = card.answer.trim().toLowerCase();
 
           if(userAnswer === '') {
-            alert('Por favor, digite uma resposta.');
-            answerInputQuiz.focus();
+            resultP.textContent = 'Por favor, digite sua resposta.';
+            resultP.style.color = 'orange';
             return;
           }
 
           if(userAnswer === correctAnswer) {
-            resultDiv.textContent = 'Correto! ✅';
-            resultDiv.style.color = '#10b981';
-            answerInputQuiz.classList.add('correct');
+            resultP.textContent = 'Correto! 🎉';
+            resultP.style.color = '#10b981';
             score++;
           } else {
-            resultDiv.textContent = `Incorreto ❌ Resposta correta: ${card.answer}`;
-            resultDiv.style.color = '#ef4444';
-            answerInputQuiz.classList.add('incorrect');
+            resultP.textContent = `Incorreto. Resposta correta: ${card.answer}`;
+            resultP.style.color = '#ef4444';
           }
+
           totalAnswered++;
-          updateScoreDisplay();
+          updateScore();
 
-          // Bloqueia input e botão após responder
-          answerInputQuiz.disabled = true;
-          submitBtn.disabled = true;
+          // Desabilita input e botão após resposta
+          inputAnswer.disabled = true;
+          checkBtn.disabled = true;
+        });
 
-          // Vira o cartão para mostrar resposta correta
-          cardDiv.classList.add('flipped');
-          cardDiv.setAttribute('aria-pressed', 'true');
+        // Permitir submit pelo Enter no input
+        inputAnswer.addEventListener('keydown', e => {
+          if(e.key === 'Enter') {
+            e.preventDefault();
+            checkBtn.click();
+          }
         });
       });
-
-      updateScoreDisplay();
+      updateScore();
     }
 
-    function updateScoreDisplay() {
+    function updateScore() {
       scoreDisplay.textContent = `Pontuação: ${score} / ${totalAnswered}`;
     }
 
-    // Função para embaralhar array
-    function shuffle(array) {
-      for(let i = array.length -1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
-    }
+    // Inicialização
+    loadFlashcards();
+    renderFlashcards();
   </script>
-<script type="module">
-  // Importações Firebase SDK (modular)
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-analytics.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
-
-  // Configuração do Firebase (sua config)
-  const firebaseConfig = {
-    apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
-    authDomain: "sdel-b3f65.firebaseapp.com",
-    projectId: "sdel-b3f65",
-    storageBucket: "sdel-b3f65.firebasestorage.app",
-    messagingSenderId: "297725999985",
-    appId: "1:297725999985:web:d41da68311c190ef8a54d0",
-    measurementId: "G-PT92VECJ2H"
-  };
-
-  // Inicializa Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-
-  // Elementos do DOM
-  const botaoPainel = document.getElementById('botaoPainel');
-  const painel = document.getElementById('painel');
-  const textareaNotas = document.getElementById('textareaNotas');
-
-  // Controle painel abrir/fechar
-  botaoPainel.onclick = () => {
-    if (painel.style.display === 'block') {
-      painel.style.display = 'none';
-    } else {
-      painel.style.display = 'block';
-    }
-  };
-
-  // Alternar visibilidade das seções
-  window.alternarSecao = function(id) {
-    const secao = document.getElementById(id);
-    if (secao.style.display === 'block') {
-      secao.style.display = 'none';
-    } else {
-      secao.style.display = 'block';
-    }
-  };
-
-  // Variáveis para usuário logado e controle do salvamento
-  let usuarioAtual = null;
-
-  // Quando usuário autenticar, carrega as notas
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      usuarioAtual = user;
-      await carregarNotas(user.uid);
-    } else {
-      usuarioAtual = null;
-      textareaNotas.value = "";
-    }
-  });
-
-  // Carrega as notas do Firestore para o textarea
-  async function carregarNotas(uid) {
-    const docRef = doc(db, "notasUsuario", uid);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      textareaNotas.value = docSnap.data().texto || "";
-    } else {
-      textareaNotas.value = "";
-    }
-  }
-
-  // Salva as notas no Firestore ao digitar, se usuário logado
-  textareaNotas.addEventListener("input", () => {
-    if (!usuarioAtual) return;
-    salvarNotas(usuarioAtual.uid, textareaNotas.value);
-  });
-
-  // Função para salvar as notas no Firestore
-  async function salvarNotas(uid, texto) {
-    const docRef = doc(db, "notasUsuario", uid);
-    await setDoc(docRef, { texto });
-  }
-
-  // -- Cronômetro --
-  let segundos = 0;
-  let minutos = 0;
-  let horas = 0;
-  let intervaloCronometro = null;
-
-  function atualizarCronometro() {
-    segundos++;
-    if (segundos >= 60) {
-      segundos = 0;
-      minutos++;
-    }
-    if (minutos >= 60) {
-      minutos = 0;
-      horas++;
-    }
-    const formatarNumero = (numero) => numero.toString().padStart(2, '0');
-    document.getElementById('cronometro').innerText =
-      ${formatarNumero(horas)}:${formatarNumero(minutos)}:${formatarNumero(segundos)};
-  }
-
-  window.iniciarCronometro = function() {
-    if (!intervaloCronometro) {
-      intervaloCronometro = setInterval(atualizarCronometro, 1000);
-    }
-  };
-
-  window.pararCronometro = function() {
-    clearInterval(intervaloCronometro);
-    intervaloCronometro = null;
-  };
-
-  window.resetarCronometro = function() {
-    window.pararCronometro();
-    segundos = 0;
-    minutos = 0;
-    horas = 0;
-    document.getElementById('cronometro').innerText = '00:00:00';
-  };
-
-  // -- Arrastar painel pelo cabeçalho --
-  const cabecalhoPainel = document.getElementById('cabecalhoPainel');
-
-  let posX = 0, posY = 0, posInicialX = 0, posInicialY = 0;
-
-  cabecalhoPainel.onmousedown = dragMouseDown;
-
-  function dragMouseDown(e) {
-    e.preventDefault();
-    posInicialX = e.clientX;
-    posInicialY = e.clientY;
-    document.onmouseup = fecharDrag;
-    document.onmousemove = moverPainel;
-  }
-
-  function moverPainel(e) {
-    e.preventDefault();
-    posX = posInicialX - e.clientX;
-    posY = posInicialY - e.clientY;
-    posInicialX = e.clientX;
-    posInicialY = e.clientY;
-
-    const rect = painel.getBoundingClientRect();
-
-    // Calcula nova posição respeitando a viewport para não sumir
-    let novaTop = rect.top - posY;
-    let novaRight = window.innerWidth - (rect.right - posX);
-
-    // Limites
-    if (novaTop < 0) novaTop = 0;
-    if (novaTop + rect.height > window.innerHeight) novaTop = window.innerHeight - rect.height;
-    if (novaRight < 0) novaRight = 0;
-    if (novaRight > window.innerWidth - rect.width) novaRight = window.innerWidth - rect.width;
-
-    painel.style.top = novaTop + "px";
-    painel.style.right = novaRight + "px";
-  }
-
-  function fecharDrag() {
-    document.onmouseup = null;
-    document.onmousemove = null;
-  }
-</script>
 </body>
 </html>
