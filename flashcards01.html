@@ -437,7 +437,7 @@
 
       flashcards.forEach((card, index) => {
         const cardEl = document.createElement("div");
-        cardEl.className = `flashcard ${card.category}`;
+        cardEl.className = flashcard ${card.category};
         if (card.flipped) cardEl.classList.add("flipped");
 
         const cardInner = document.createElement("div");
@@ -510,7 +510,7 @@
               resultSpan.textContent = "✔️ Correto!";
               score++;
             } else {
-              resultSpan.textContent = `❌ Incorreto! Resposta correta: ${card.back}`;
+              resultSpan.textContent = ❌ Incorreto! Resposta correta: ${card.back};
             }
             answerInput.disabled = true;
             checkBtn.disabled = true;
@@ -622,7 +622,7 @@
     }
 
     function updateScoreDisplay() {
-      scoreDisplay.textContent = `Pontuação: ${score} / ${totalAnswered}`;
+      scoreDisplay.textContent = Pontuação: ${score} / ${totalAnswered};
     }
 
     // --- Autenticação Firebase ---
