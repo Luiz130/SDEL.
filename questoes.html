@@ -1,228 +1,345 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Quiz com Firebase</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quiz | SDEL</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #eef3f8;
+    * {
       margin: 0;
       padding: 0;
+      font-family: "Poppins", sans-serif;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #44749D;
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-height: 100vh;
     }
-    .hidden { display: none; }
-    h2 { color: #333; }
-    .app, #filter-screen, #login-screen {
-      background: white;
-      padding: 30px;
-      border-radius: 15px;
-      margin-top: 40px;
+
+    #timer {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #d32f2f;
+      margin: 30px 0 10px;
+      background-color: #fff3f3;
+      padding: 10px 20px;
+      border: 2px solid #d32f2f;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(211, 47, 47, 0.2);
+      display: none;
+    }
+
+    .app {
+      background: #fff;
       width: 90%;
       max-width: 600px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 30px;
+      border-radius: 30px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
+      margin-bottom: 30px;
     }
-    .question { margin-bottom: 20px; font-weight: bold; }
-    .answers { list-style: none; padding: 0; }
-    .answers li { margin-bottom: 10px; }
-    button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      background: #007bff;
-      color: white;
+
+    h1 {
+      color: #001e4d;
+      font-weight: 600;
+      border-bottom: 1px solid #333;
+      padding-bottom: 30px;
+      text-align: center;
+    }
+
+    .quiz, .filter-section {
+      padding: 20px 0;
+    }
+
+    .quiz h2 {
+      font-size: 18px;
+      color: #001e4d;
+      font-weight: 600;
+    }
+
+    .btn {
+      background: #fff;
+      color: #222;
+      font-weight: 500;
+      width: 100%;
+      border: 1px solid #222;
+      padding: 10px;
+      margin: 10px 0;
+      text-align: left;
+      border-radius: 4px;
       cursor: pointer;
+      transition: all 0.3s;
     }
-    button:hover { background: #0056b3; }
+
+    .btn:hover:not([disabled]) {
+      background: #222;
+      color: #fff;
+    }
+
+    .btn:disabled {
+      cursor: no-drop;
+    }
+
+    #next-btn, #start-btn {
+      background: #001e4d;
+      color: #fff;
+      font-weight: 500;
+      width: 150px;
+      border: 0;
+      padding: 10px;
+      margin: 20px auto 0;
+      border-radius: 4px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .correct {
+      background: #9aeabc;
+    }
+
+    .incorrect {
+      background: #ff9393;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    progress {
+      width: 100%;
+      height: 20px;
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 20px;
+    }
+
+    .checkbox-group label {
+      margin: 5px 0;
+      font-size: 16px;
+    }
   </style>
 </head>
 <body>
+  <div id="timer">02:30:00</div>
 
-  <!-- Login -->
-  <div id="login-screen">
-    <h2>Login com Google</h2>
-    <button onclick="loginWithGoogle()">Entrar com Google</button>
+  <div class="app">
+    <h1>Quiz</h1>
+
+    <div class="filter-section" id="filter-section">
+      <h2>Escolha as matérias:</h2>
+      <div class="checkbox-group">
+        <label><input type="checkbox" value="Matemática" /> Matemática</label>
+        <label><input type="checkbox" value="Física" /> Física</label>
+        <label><input type="checkbox" value="Química" /> Química</label>
+        <label><input type="checkbox" value="Biologia" /> Biologia</label>
+        <label><input type="checkbox" value="Português" /> Português</label>
+      </div>
+      <button id="start-btn">Iniciar Quiz</button>
+    </div>
+
+    <div class="quiz" id="quiz-section" style="display:none;">
+      <div class="progress-bar-container">
+        <progress id="progress-bar" value="0" max="100"></progress>
+      </div>
+      <h2 id="question">Questão</h2>
+      <div id="answer-buttons"></div>
+      <button id="next-btn">Próximo</button>
+    </div>
   </div>
 
-  <!-- Seleção de matérias -->
-  <div id="filter-screen" class="hidden">
-    <h2>Escolha as matérias:</h2>
-    <form id="subject-form">
-      <label><input type="checkbox" name="subject" value="Álgebra" /> Álgebra</label><br/>
-      <label><input type="checkbox" name="subject" value="Geometria" /> Geometria</label><br/>
-      <label><input type="checkbox" name="subject" value="Funções" /> Funções</label><br/>
-      <label><input type="checkbox" name="subject" value="Estatística" /> Estatística</label><br/>
-      <label><input type="checkbox" name="subject" value="Logaritmo" /> Logaritmo</label><br/>
-      <button type="submit" style="margin-top: 20px;">Iniciar Quiz</button>
-    </form>
-  </div>
-
-  <!-- Quiz -->
-  <div class="app hidden">
-    <div class="question" id="question">Pergunta</div>
-    <ul class="answers" id="answers"></ul>
-    <button onclick="nextQuestion()">Próxima</button>
-    <div id="score" style="margin-top: 20px; font-weight: bold;"></div>
-  </div>
-
-  <!-- Firebase SDK -->
-  <script type="module">
-    // Importa Firebase
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import {
-      getAuth,
-      GoogleAuthProvider,
-      signInWithPopup,
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import {
-      getFirestore,
-      collection,
-      addDoc,
-      serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-    // CONFIGURE SEU FIREBASE AQUI:
-       const firebaseConfig = {
-      apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
-      authDomain: "sdel-b3f65.firebaseapp.com",
-      projectId: "sdel-b3f65",
-      storageBucket: "sdel-b3f65.appspot.com",
-      messagingSenderId: "297725999985",
-      appId: "1:297725999985:web:d41da68311c190ef8a54d0",
-      measurementId: "G-PT92VECJ2H"
-    };
-
-    // Inicializa Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth();
-    const db = getFirestore();
-
-    let user = null;
-
-    onAuthStateChanged(auth, (u) => {
-      if (u) {
-        user = u;
-        document.getElementById("login-screen").classList.add("hidden");
-        document.getElementById("filter-screen").classList.remove("hidden");
-      }
-    });
-
-    function loginWithGoogle() {
-      const provider = new GoogleAuthProvider();
-      signInWithPopup(auth, provider).catch((error) => {
-        alert("Erro no login: " + error.message);
-      });
-    }
-
-    // QUESTÕES EXEMPLO
+  <script>
     const baseQuestions = [
       {
-        question: "Se log₂(x) = 5, então x é:",
-        subject: "Logaritmo",
+        question: "Se log₂(x) = 5, então o valor de x é:",
+        subject: "Matemática",
         answers: [
           { id: 1, text: "10", correct: false },
           { id: 2, text: "16", correct: false },
-          { id: 3, text: "32", correct: true },
-          { id: 4, text: "64", correct: false },
+          { id: 3, text: "25", correct: false },
+          { id: 4, text: "32", correct: true },
+          { id: 5, text: "64", correct: false },
         ],
       },
       {
-        question: "A distância entre A(0,0) e B(3,4):",
-        subject: "Geometria",
+        question: "A força resultante é nula quando:",
+        subject: "Física",
         answers: [
-          { id: 1, text: "5", correct: true },
-          { id: 2, text: "7", correct: false },
-          { id: 3, text: "6", correct: false },
-          { id: 4, text: "4", correct: false },
+          { id: 1, text: "O corpo está acelerando", correct: false },
+          { id: 2, text: "O corpo está em repouso ou MRU", correct: true },
+          { id: 3, text: "A massa é negativa", correct: false },
+          { id: 4, text: "A gravidade é zero", correct: false },
+          { id: 5, text: "O atrito é máximo", correct: false },
         ],
       },
       {
-        question: "Média de 2, 4, 6, 8:",
-        subject: "Estatística",
+        question: "Qual é a fórmula da água?",
+        subject: "Química",
         answers: [
-          { id: 1, text: "5", correct: false },
-          { id: 2, text: "6", correct: true },
-          { id: 3, text: "7", correct: false },
-          { id: 4, text: "8", correct: false },
+          { id: 1, text: "CO2", correct: false },
+          { id: 2, text: "H2O", correct: true },
+          { id: 3, text: "O2", correct: false },
+          { id: 4, text: "NaCl", correct: false },
+          { id: 5, text: "CH4", correct: false },
         ],
       },
+      {
+        question: "O coração humano possui quantas cavidades?",
+        subject: "Biologia",
+        answers: [
+          { id: 1, text: "2", correct: false },
+          { id: 2, text: "3", correct: false },
+          { id: 3, text: "4", correct: true },
+          { id: 4, text: "5", correct: false },
+          { id: 5, text: "6", correct: false },
+        ],
+      },
+      {
+        question: "Qual frase está escrita corretamente?",
+        subject: "Português",
+        answers: [
+          { id: 1, text: "Fazem dois anos que viajei.", correct: false },
+          { id: 2, text: "Houveram muitos problemas.", correct: false },
+          { id: 3, text: "Faz dois anos que viajei.", correct: true },
+          { id: 4, text: "Existiu problemas na escola.", correct: false },
+          { id: 5, text: "Foi resolvido as questões.", correct: false },
+        ],
+      }
     ];
 
+    const totalQuestions = 45;
+    let selectedSubjects = [];
     let questions = [];
-    let currentQuestion = 0;
+    let currentQuestionIndex = 0;
     let score = 0;
+    let totalTime = 2 * 60 * 60 + 30 * 60;
+    let timerInterval;
 
-    document.getElementById("subject-form").addEventListener("submit", function (e) {
-      e.preventDefault();
+    const timerElement = document.getElementById("timer");
+    const questionElement = document.getElementById("question");
+    const answerButtons = document.getElementById("answer-buttons");
+    const nextButton = document.getElementById("next-btn");
+    const startButton = document.getElementById("start-btn");
+    const quizSection = document.getElementById("quiz-section");
+    const filterSection = document.getElementById("filter-section");
+    const progressBar = document.getElementById("progress-bar");
 
-      const selectedSubjects = Array.from(document.querySelectorAll('input[name="subject"]:checked')).map(cb => cb.value);
-
-      if (selectedSubjects.length === 0) {
-        alert("Selecione pelo menos uma matéria.");
-        return;
-      }
-
-      const filtered = baseQuestions.filter(q => selectedSubjects.includes(q.subject));
-      const shuffled = [...filtered].sort(() => 0.5 - Math.random());
-
-      while (questions.length < 45) questions.push(...shuffled);
-      questions.length = 45;
-
-      document.getElementById("filter-screen").classList.add("hidden");
-      document.querySelector(".app").classList.remove("hidden");
-      showQuestion();
+    document.querySelectorAll(".checkbox-group input").forEach(input => {
+      input.addEventListener("change", () => {
+        const checked = Array.from(document.querySelectorAll(".checkbox-group input:checked"));
+        startButton.style.display = checked.length ? "block" : "none";
+      });
     });
 
-    function showQuestion() {
-      const q = questions[currentQuestion];
-      document.getElementById("question").innerText = `(${currentQuestion + 1}/45) ${q.question}`;
-      const answerList = document.getElementById("answers");
-      answerList.innerHTML = "";
+    startButton.addEventListener("click", () => {
+      selectedSubjects = Array.from(document.querySelectorAll(".checkbox-group input:checked")).map(i => i.value);
+      questions = baseQuestions
+        .filter(q => selectedSubjects.includes(q.subject));
+      while (questions.length < totalQuestions) {
+        questions.push(...questions);
+      }
+      questions.length = totalQuestions;
+      startQuiz();
+    });
 
-      q.answers.forEach((ans, i) => {
-        const li = document.createElement("li");
-        li.innerHTML = `<label><input type="radio" name="answer" value="${i}"> ${ans.text}</label>`;
-        answerList.appendChild(li);
-      });
+    function startQuiz() {
+      filterSection.style.display = "none";
+      quizSection.style.display = "block";
+      timerElement.style.display = "block";
+      score = 0;
+      currentQuestionIndex = 0;
+      startTimer();
+      showQuestion();
     }
 
-    async function nextQuestion() {
-      const selected = document.querySelector('input[name="answer"]:checked');
-      if (!selected) {
-        alert("Selecione uma alternativa.");
-        return;
-      }
+    function startTimer() {
+      clearInterval(timerInterval);
+      updateTimerDisplay();
+      timerInterval = setInterval(() => {
+        totalTime--;
+        if (totalTime <= 0) {
+          clearInterval(timerInterval);
+          showScore();
+        } else {
+          updateTimerDisplay();
+        }
+      }, 1000);
+    }
 
-      const index = parseInt(selected.value);
-      if (questions[currentQuestion].answers[index].correct) score++;
+    function updateTimerDisplay() {
+      const h = String(Math.floor(totalTime / 3600)).padStart(2, '0');
+      const m = String(Math.floor((totalTime % 3600) / 60)).padStart(2, '0');
+      const s = String(totalTime % 60).padStart(2, '0');
+      timerElement.textContent = `${h}:${m}:${s}`;
+    }
 
-      currentQuestion++;
+    function showQuestion() {
+      resetState();
+      const current = questions[currentQuestionIndex];
+      questionElement.innerText = `${currentQuestionIndex + 1}. ${current.question}`;
+      current.answers.forEach(ans => {
+        const btn = document.createElement("button");
+        btn.classList.add("btn");
+        btn.innerText = ans.text;
+        btn.dataset.correct = ans.correct;
+        btn.addEventListener("click", selectAnswer);
+        answerButtons.appendChild(btn);
+      });
+      updateProgressBar();
+    }
 
-      if (currentQuestion < 45) {
+    function resetState() {
+      nextButton.style.display = "none";
+      answerButtons.innerHTML = "";
+    }
+
+    function selectAnswer(e) {
+      const selected = e.target;
+      const isCorrect = selected.dataset.correct === "true";
+      if (isCorrect) score++;
+      Array.from(answerButtons.children).forEach(btn => {
+        btn.disabled = true;
+        if (btn.dataset.correct === "true") btn.classList.add("correct");
+        else if (btn === selected) btn.classList.add("incorrect");
+      });
+      nextButton.style.display = "block";
+    }
+
+    nextButton.addEventListener("click", () => {
+      currentQuestionIndex++;
+      if (currentQuestionIndex < questions.length) {
         showQuestion();
       } else {
-        document.querySelector(".app").innerHTML = `<h2>Fim!</h2><p>Você acertou ${score} de 45.</p>`;
-        
-        if (user) {
-          try {
-            await addDoc(collection(db, "resultadosQuiz"), {
-              uid: user.uid,
-              nome: user.displayName,
-              email: user.email,
-              acertos: score,
-              total: 45,
-              criadoEm: serverTimestamp(),
-            });
-          } catch (err) {
-            alert("Erro ao salvar resultado: " + err.message);
-          }
-        }
+        showScore();
       }
+    });
+
+    function updateProgressBar() {
+      progressBar.value = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+    }
+
+    function showScore() {
+      clearInterval(timerInterval);
+      resetState();
+      timerElement.style.display = "none";
+      progressBar.style.display = "none";
+      questionElement.innerHTML = `
+        <h2>Fim do Quiz</h2>
+        <p>Você acertou <strong>${score}</strong> de <strong>${totalQuestions}</strong> questões.</p>
+        <p>Erros: <strong>${totalQuestions - score}</strong></p>
+        <button id="restart-btn" class="btn" style="width:auto; margin-top:20px;">Voltar ao Início</button>
+      `;
+      const restartBtn = document.getElementById("restart-btn");
+      restartBtn.addEventListener("click", () => {
+        location.reload();
+      });
     }
   </script>
 </body>
