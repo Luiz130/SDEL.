@@ -1,365 +1,228 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Quiz | SDEL</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz com Firebase</title>
   <style>
-    * {
+    body {
+      font-family: Arial, sans-serif;
+      background: #eef3f8;
       margin: 0;
       padding: 0;
-      font-family: "Poppins", sans-serif;
-      box-sizing: border-box;
-    }
-
-    body {
-      background: #44749D;
       display: flex;
       flex-direction: column;
       align-items: center;
+      min-height: 100vh;
     }
-
-    #timer {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #d32f2f;
-      margin: 30px 0 10px;
-      background-color: #fff3f3;
-      padding: 10px 20px;
-      border: 2px solid #d32f2f;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(211, 47, 47, 0.2);
-    }
-
-    .app {
-      background: #fff;
+    .hidden { display: none; }
+    h2 { color: #333; }
+    .app, #filter-screen, #login-screen {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      margin-top: 40px;
       width: 90%;
       max-width: 600px;
-      padding: 30px;
-      border-radius: 30px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-
-    h1 {
-      color: #001e4d;
-      font-weight: 600;
-      border-bottom: 1px solid #333;
-      padding-bottom: 30px;
-      text-align: center;
-    }
-
-    .quiz {
-      padding: 20px 0;
-    }
-
-    .quiz h2 {
-      font-size: 18px;
-      color: #001e4d;
-      font-weight: 600;
-    }
-
-    .btn {
-      background: #fff;
-      color: #222;
-      font-weight: 500;
-      width: 100%;
-      border: 1px solid #222;
-      padding: 10px;
-      margin: 10px 0;
-      text-align: left;
-      border-radius: 4px;
+    .question { margin-bottom: 20px; font-weight: bold; }
+    .answers { list-style: none; padding: 0; }
+    .answers li { margin-bottom: 10px; }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #007bff;
+      color: white;
       cursor: pointer;
-      transition: all 0.3s;
     }
-
-    .btn:hover:not([disabled]) {
-      background: #222;
-      color: #fff;
-    }
-
-    .btn:disabled {
-      cursor: no-drop;
-    }
-
-    #next-btn {
-      background: #001e4d;
-      color: #fff;
-      font-weight: 500;
-      width: 150px;
-      border: 0;
-      padding: 10px;
-      margin: 20px auto 0;
-      border-radius: 4px;
-      cursor: pointer;
-      display: none;
-    }
-
-    .correct {
-      background: #9aeabc;
-    }
-
-    .incorrect {
-      background: #ff9393;
-    }
-
-    .progress-bar-container {
-      width: 100%;
-      margin-bottom: 20px;
-    }
-
-    progress {
-      width: 100%;
-      height: 20px;
-    }
+    button:hover { background: #0056b3; }
   </style>
 </head>
 <body>
-  <div id="timer">02:30:00</div>
-  <div class="app">
-    <h1>Quiz</h1>
-    <div class="progress-bar-container">
-      <progress id="progress-bar" value="0" max="100"></progress>
-    </div>
-    <div class="quiz">
-      <h2 id="question">Questão</h2>
-      <div id="answer-buttons"></div>
-      <button id="next-btn">Próximo</button>
-    </div>
+
+  <!-- Login -->
+  <div id="login-screen">
+    <h2>Login com Google</h2>
+    <button onclick="loginWithGoogle()">Entrar com Google</button>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+  <!-- Seleção de matérias -->
+  <div id="filter-screen" class="hidden">
+    <h2>Escolha as matérias:</h2>
+    <form id="subject-form">
+      <label><input type="checkbox" name="subject" value="Álgebra" /> Álgebra</label><br/>
+      <label><input type="checkbox" name="subject" value="Geometria" /> Geometria</label><br/>
+      <label><input type="checkbox" name="subject" value="Funções" /> Funções</label><br/>
+      <label><input type="checkbox" name="subject" value="Estatística" /> Estatística</label><br/>
+      <label><input type="checkbox" name="subject" value="Logaritmo" /> Logaritmo</label><br/>
+      <button type="submit" style="margin-top: 20px;">Iniciar Quiz</button>
+    </form>
+  </div>
 
+  <!-- Quiz -->
+  <div class="app hidden">
+    <div class="question" id="question">Pergunta</div>
+    <ul class="answers" id="answers"></ul>
+    <button onclick="nextQuestion()">Próxima</button>
+    <div id="score" style="margin-top: 20px; font-weight: bold;"></div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    // Importa Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getAuth,
+      GoogleAuthProvider,
+      signInWithPopup,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // CONFIGURE SEU FIREBASE AQUI:
     const firebaseConfig = {
-      apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
-      authDomain: "sdel-b3f65.firebaseapp.com",
-      projectId: "sdel-b3f65",
-      storageBucket: "sdel-b3f65.appspot.com",
-      messagingSenderId: "297725999985",
-      appId: "1:297725999985:web:d41da68311c190ef8a54d0",
-      measurementId: "G-PT92VECJ2H"
+      apiKey: "SUA_API_KEY",
+      authDomain: "SEU_AUTH_DOMAIN",
+      projectId: "SEU_PROJECT_ID",
+      storageBucket: "SEU_BUCKET",
+      messagingSenderId: "SEU_SENDER_ID",
+      appId: "SEU_APP_ID"
     };
 
+    // Inicializa Firebase
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    const auth = getAuth();
+    const db = getFirestore();
 
+    let user = null;
+
+    onAuthStateChanged(auth, (u) => {
+      if (u) {
+        user = u;
+        document.getElementById("login-screen").classList.add("hidden");
+        document.getElementById("filter-screen").classList.remove("hidden");
+      }
+    });
+
+    function loginWithGoogle() {
+      const provider = new GoogleAuthProvider();
+      signInWithPopup(auth, provider).catch((error) => {
+        alert("Erro no login: " + error.message);
+      });
+    }
+
+    // QUESTÕES EXEMPLO
     const baseQuestions = [
       {
-        question: "Se log₂(x) = 5, então o valor de x é:",
+        question: "Se log₂(x) = 5, então x é:",
+        subject: "Logaritmo",
         answers: [
           { id: 1, text: "10", correct: false },
           { id: 2, text: "16", correct: false },
-          { id: 3, text: "25", correct: false },
-          { id: 4, text: "32", correct: true },
-          { id: 5, text: "64", correct: false },
+          { id: 3, text: "32", correct: true },
+          { id: 4, text: "64", correct: false },
         ],
       },
       {
-        question: "A distância entre os pontos A(2, -3) e B(6, 1) no plano cartesiano é:",
+        question: "A distância entre A(0,0) e B(3,4):",
+        subject: "Geometria",
         answers: [
-          { id: 1, text: "4", correct: false },
-          { id: 2, text: "5", correct: false },
-          { id: 3, text: "6", correct: true },
-          { id: 4, text: "√32", correct: false },
-          { id: 5, text: "8", correct: false },
-        ],
-      },
-      {
-        question: "Em uma PA de 10 termos, o primeiro é 3 e o último é 30. Qual é a soma dos termos dessa PA?",
-        answers: [
-          { id: 1, text: "150", correct: false },
-          { id: 2, text: "155", correct: false },
-          { id: 3, text: "160", correct: true },
-          { id: 4, text: "165", correct: false },
-          { id: 5, text: "170", correct: false },
-        ],
-      },
-      {
-        question: "Um sólido geométrico tem base quadrada de 4 cm de lado e altura de 9 cm. Qual é o volume desse sólido, sabendo que se trata de uma pirâmide?",
-        answers: [
-          { id: 1, text: "36 cm³", correct: false },
-          { id: 2, text: "48 cm³", correct: false },
-          { id: 3, text: "60 cm³", correct: false },
-          { id: 4, text: "72 cm³", correct: true },
-          { id: 5, text: "80 cm³", correct: false },
-        ],
-      },
-      {
-        question: "A solução da equação logₓ(81) = 4 é:",
-        answers: [
-          { id: 1, text: "9", correct: true },
-          { id: 2, text: "3", correct: false },
-          { id: 3, text: "81", correct: false },
+          { id: 1, text: "5", correct: true },
+          { id: 2, text: "7", correct: false },
+          { id: 3, text: "6", correct: false },
           { id: 4, text: "4", correct: false },
-          { id: 5, text: "16", correct: false },
+        ],
+      },
+      {
+        question: "Média de 2, 4, 6, 8:",
+        subject: "Estatística",
+        answers: [
+          { id: 1, text: "5", correct: false },
+          { id: 2, text: "6", correct: true },
+          { id: 3, text: "7", correct: false },
+          { id: 4, text: "8", correct: false },
         ],
       },
     ];
 
-    // Duplicar baseQuestions para ter 45 questões (exemplo)
-    const questions = [];
-    while (questions.length < 45) {
-      questions.push(...baseQuestions);
-    }
-    questions.length = 45; // garante que sejam 45 exatas
-
-    const questionElement = document.getElementById("question");
-    const answerButtons = document.getElementById("answer-buttons");
-    const nextButton = document.getElementById("next-btn");
-    const progressBar = document.getElementById("progress-bar");
-    const timerElement = document.getElementById("timer");
-
-    let currentQuestionIndex = 0;
+    let questions = [];
+    let currentQuestion = 0;
     let score = 0;
-    const totalQuestions = questions.length;
-    let totalTime = 2 * 60 * 60 + 30 * 60; // 2h30min em segundos
-    let timerInterval;
-    let currentUser = null;
 
-    onAuthStateChanged(auth, user => {
-      if (user) {
-        currentUser = user;
-        startQuiz();
-      } else {
-        alert("Você precisa estar logado para fazer o quiz.");
-        window.location.href = "login.html";
+    document.getElementById("subject-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const selectedSubjects = Array.from(document.querySelectorAll('input[name="subject"]:checked')).map(cb => cb.value);
+
+      if (selectedSubjects.length === 0) {
+        alert("Selecione pelo menos uma matéria.");
+        return;
       }
-    });
 
-    function startQuiz() {
-      currentQuestionIndex = 0;
-      score = 0;
-      nextButton.innerHTML = "Próximo";
-      timerElement.style.display = "block";
-      progressBar.style.display = "block";
-      totalTime = 2 * 60 * 60 + 30 * 60;
-      startTimer();
+      const filtered = baseQuestions.filter(q => selectedSubjects.includes(q.subject));
+      const shuffled = [...filtered].sort(() => 0.5 - Math.random());
+
+      while (questions.length < 45) questions.push(...shuffled);
+      questions.length = 45;
+
+      document.getElementById("filter-screen").classList.add("hidden");
+      document.querySelector(".app").classList.remove("hidden");
       showQuestion();
-    }
-
-    function startTimer() {
-      clearInterval(timerInterval);
-      updateTimerDisplay();
-      timerInterval = setInterval(() => {
-        totalTime--;
-        if (totalTime <= 0) {
-          clearInterval(timerInterval);
-          showScore();
-        } else {
-          updateTimerDisplay();
-        }
-      }, 1000);
-    }
-
-    function updateTimerDisplay() {
-      const hours = Math.floor(totalTime / 3600);
-      const minutes = Math.floor((totalTime % 3600) / 60);
-      const seconds = totalTime % 60;
-      timerElement.textContent =
-        `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    }
+    });
 
     function showQuestion() {
-      resetState();
-      const currentQuestion = questions[currentQuestionIndex];
-      questionElement.innerHTML = `${currentQuestionIndex + 1}. ${currentQuestion.question}`;
-      currentQuestion.answers.forEach(answer => {
-        const button = document.createElement("button");
-        button.innerHTML = answer.text;
-        button.classList.add("btn");
-        button.dataset.correct = answer.correct;
-        button.dataset.id = answer.id;
-        button.addEventListener("click", selectAnswer);
-        answerButtons.appendChild(button);
-      });
-      updateProgressBar();
-    }
+      const q = questions[currentQuestion];
+      document.getElementById("question").innerText = `(${currentQuestion + 1}/45) ${q.question}`;
+      const answerList = document.getElementById("answers");
+      answerList.innerHTML = "";
 
-    function resetState() {
-      nextButton.style.display = "none";
-      while (answerButtons.firstChild) {
-        answerButtons.removeChild(answerButtons.firstChild);
-      }
-    }
-
-    function selectAnswer(e) {
-      const selectedBtn = e.target;
-      const isCorrect = selectedBtn.dataset.correct === "true";
-      if (isCorrect) {
-        selectedBtn.classList.add("correct");
-        score++;
-      } else {
-        selectedBtn.classList.add("incorrect");
-      }
-      Array.from(answerButtons.children).forEach(button => {
-        if (button.dataset.correct === "true") {
-          button.classList.add("correct");
-        }
-        button.disabled = true;
-      });
-      nextButton.style.display = "block";
-    }
-
-    function updateProgressBar() {
-      const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
-      progressBar.value = progress;
-    }
-
-    async function showScore() {
-      clearInterval(timerInterval);
-      resetState();
-
-      questionElement.innerHTML = `
-        <h2>Fim do Quiz</h2>
-        <p>Você acertou <strong>${score}</strong> de <strong>${totalQuestions}</strong> questões.</p>
-        <p>Erros: <strong>${totalQuestions - score}</strong></p>
-        <button id="restart-btn" class="btn" style="width:auto; margin-top:20px;">Recomeçar Quiz</button>
-      `;
-      answerButtons.innerHTML = "";
-      nextButton.style.display = "none";
-      timerElement.style.display = "none";
-      progressBar.style.display = "none";
-
-      if (currentUser) {
-        const resultado = {
-          score: score,
-          totalQuestions: totalQuestions,
-          tempoRestante: timerElement.textContent,
-          timestamp: serverTimestamp()
-        };
-        try {
-          await setDoc(doc(db, "quizResults", currentUser.uid), resultado);
-          console.log("Resultado salvo com sucesso");
-        } catch (error) {
-          console.error("Erro ao salvar resultado:", error);
-        }
-      }
-
-      const restartBtn = document.getElementById("restart-btn");
-      restartBtn.addEventListener("click", () => {
-        timerElement.style.display = "block";
-        progressBar.style.display = "block";
-        startQuiz();
+      q.answers.forEach((ans, i) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<label><input type="radio" name="answer" value="${i}"> ${ans.text}</label>`;
+        answerList.appendChild(li);
       });
     }
 
-    function handleNextButton() {
-      currentQuestionIndex++;
-      if (currentQuestionIndex < questions.length) {
+    async function nextQuestion() {
+      const selected = document.querySelector('input[name="answer"]:checked');
+      if (!selected) {
+        alert("Selecione uma alternativa.");
+        return;
+      }
+
+      const index = parseInt(selected.value);
+      if (questions[currentQuestion].answers[index].correct) score++;
+
+      currentQuestion++;
+
+      if (currentQuestion < 45) {
         showQuestion();
       } else {
-        showScore();
+        document.querySelector(".app").innerHTML = `<h2>Fim!</h2><p>Você acertou ${score} de 45.</p>`;
+        
+        if (user) {
+          try {
+            await addDoc(collection(db, "resultadosQuiz"), {
+              uid: user.uid,
+              nome: user.displayName,
+              email: user.email,
+              acertos: score,
+              total: 45,
+              criadoEm: serverTimestamp(),
+            });
+          } catch (err) {
+            alert("Erro ao salvar resultado: " + err.message);
+          }
+        }
       }
-      updateProgressBar();
     }
-
-    nextButton.addEventListener('click', () => {
-      handleNextButton();
-    });
   </script>
 </body>
 </html>
