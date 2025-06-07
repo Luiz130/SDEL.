@@ -789,84 +789,100 @@ h1 {
       transition: background 0.3s;
     }
 
- .pagina-enem {
-      font-family: Arial, sans-serif;
-      background-color: #fafafa;
-      padding: 40px;
-      margin: 0;
-    }
+.pagina-enem {
+  font-family: Arial, sans-serif;
+  background-color: #fafafa;
+  padding: 40px 20px; /* padding lateral menor para mobile */
+  margin: 0;
+}
 
-    .pagina-enem h2 {
-      font-size: 20px;
-      margin-bottom: 20px;
-      color: #111;
-    }
+.pagina-enem h2 {
+  font-size: 20px;
+  margin-bottom: 20px;
+  color: #111;
+  text-align: center; /* opcional para centralizar título */
+}
 
 .secao-enem {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centraliza horizontalmente */
-  margin-left:0px;
+  align-items: center;
   gap: 40px;
 }
 
-    .cartao-enem {
-      display: flex;
-      background-color: #fff;
-      border-radius: 10px;
-      padding: 20px;
-       width: 1250px;
-      height: 200px;
-      align-items: flex-start;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      cursor: pointer;
-      transition: box-shadow 0.2s ease;
+.cartao-enem {
+  display: flex;
+  flex-direction: column; /* muda para coluna no mobile */
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  width: 100%;
+  max-width: 1250px;
+  box-sizing: border-box;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+}
 
-    }
+.cartao-enem:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
 
-    .cartao-enem:hover {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
+.imagem-enem {
+  width: 100%;
+  max-width: 400px;
+  height: 200px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
 
-    .imagem-enem {
-      width: 400px;
-      height: 200px;
-      margin-right: 20px;
-      border-radius: 6px;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
+.imagem-enem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 
-    .imagem-enem img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
+.info-enem {
+  max-width: 100%;
+}
 
-    .info-enem {
-      max-width: 400px;
-    }
+.info-enem h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: #111;
+}
 
-    .info-enem h3 {
-      margin: 0;
-      font-size: 20px;
-      font-weight: bold;
-      color: #111;
-    }
+.info-enem p {
+  margin: 10px 0 0;
+  font-size: 16px;
+  color: #444;
+}
 
-    .info-enem p {
-      margin: 10px 0 0;
-      font-size: 16px;
-      color: #444;
-    }
+.Vestibular-enem {
+  text-align: center;
+  margin: 0 auto 20px auto;
+}
 
-    .Vestibular-enem{
-    text-align:center;
-     margin-right:1020px;
+/* Responsivo para telas menores */
+@media (min-width: 768px) {
+  .cartao-enem {
+    flex-direction: row;
+    height: 200px;
+  }
 
-    }
+  .imagem-enem {
+    margin-right: 20px;
+    margin-bottom: 0;
+  }
 
+  .info-enem {
+    max-width: 800px;
+  }
+}
 
 
 
