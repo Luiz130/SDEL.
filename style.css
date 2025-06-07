@@ -319,7 +319,8 @@ h1 {
     overflow-x: auto;
     gap: 35px;
     justify-content: center; /* alinha horizontalmente */
-    align-items: center;     /* alinha verticalmente */
+    align-items: center; 
+    margin-right:100px;/* alinha verticalmente */
   
   }
   .seta-esquerda{
