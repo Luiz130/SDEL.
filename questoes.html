@@ -100,12 +100,179 @@
     const db = getFirestore(app);
 
     const allQuestions = [
-      { question: "Qual o valor de x na equação 2x + 5 = 11?", subject: "álgebra", answers: [{ id: 1, text: "2", correct: false }, { id: 2, text: "3", correct: true }, { id: 3, text: "4", correct: false }, { id: 4, text: "5", correct: false }, { id: 5, text: "6", correct: false }] },
-      { question: "Área de um triângulo com base 8 e altura 5?", subject: "geometria", answers: [{ id: 1, text: "20", correct: true }, { id: 2, text: "30", correct: false }, { id: 3, text: "40", correct: false }, { id: 4, text: "15", correct: false }, { id: 5, text: "25", correct: false }] },
-      { question: "Quanto é 15% de 200?", subject: "aritmética", answers: [{ id: 1, text: "20", correct: false }, { id: 2, text: "25", correct: false }, { id: 3, text: "30", correct: true }, { id: 4, text: "35", correct: false }, { id: 5, text: "40", correct: false }] },
-      { question: "A função f(x) = x² é:", subject: "funções", answers: [{ id: 1, text: "Linear", correct: false }, { id: 2, text: "Exponencial", correct: false }, { id: 3, text: "Quadrática", correct: true }, { id: 4, text: "Afim", correct: false }, { id: 5, text: "Constante", correct: false }] },
-      { question: "A chance de sair cara ao lançar uma moeda é:", subject: "probabilidade", answers: [{ id: 1, text: "1/3", correct: false }, { id: 2, text: "1/4", correct: false }, { id: 3, text: "1/2", correct: true }, { id: 4, text: "2/3", correct: false }, { id: 5, text: "2/5", correct: false }] },
-    ];
+
+  {
+    question: "Em uma determinada escola, o diretor decidiu distribuir igualmente uma verba de R$ 18.000,00 entre os departamentos de Matemática, Física e Química. Contudo, como o departamento de Matemática tinha mais projetos aprovados, ficou decidido que ele receberia o dobro do valor destinado à Física, enquanto Química receberia o mesmo que Física. Com base nessa divisão proporcional, qual será o valor destinado ao departamento de Matemática?",
+    subject: "álgebra",
+    answers: [
+      { id: 1, text: "R$ 6.000,00", correct: false },
+      { id: 2, text: "R$ 9.000,00", correct: true },
+      { id: 3, text: "R$ 7.000,00", correct: false },
+      { id: 4, text: "R$ 8.000,00", correct: false },
+      { id: 5, text: "R$ 5.000,00", correct: false },
+    ],
+  },
+  {
+    question: "Durante uma reforma, um engenheiro precisa calcular a quantidade de cerâmica necessária para cobrir o piso de um salão em formato triangular. O triângulo tem lados medindo 13 m, 14 m e 15 m. Para isso, o engenheiro opta por utilizar a fórmula de Heron, que requer o cálculo do semiperímetro antes da aplicação da raiz quadrada. Considerando essa abordagem, qual é a área aproximada do salão, em metros quadrados?",
+    subject: "geometria",
+    answers: [
+      { id: 1, text: "84 m²", correct: true },
+      { id: 2, text: "78 m²", correct: false },
+      { id: 3, text: "90 m²", correct: false },
+      { id: 4, text: "92 m²", correct: false },
+      { id: 5, text: "88 m²", correct: false },
+    ],
+  },
+  {
+    question: "Uma fábrica produz caixas de papelão e vende cada unidade por R$ 4,50. O custo de produção de cada caixa é de R$ 2,00 e existem despesas fixas mensais de R$ 3.000,00. Considerando o lucro líquido como a diferença entre o total arrecadado com as vendas e a soma dos custos variáveis e fixos, quantas caixas precisam ser vendidas para que o lucro líquido seja exatamente R$ 1.500,00 no mês?",
+    subject: "aritmética",
+    answers: [
+      { id: 1, text: "1.800", correct: false },
+      { id: 2, text: "2.000", correct: false },
+      { id: 3, text: "2.500", correct: true },
+      { id: 4, text: "2.400", correct: false },
+      { id: 5, text: "2.200", correct: false },
+    ],
+  },
+  {
+    question: "Considere a função f(x) = -2x² + 8x + 5, que representa a trajetória de um projétil lançado a partir do solo. Esse tipo de função é utilizado na física para modelar movimentos com aceleração constante, como no caso de lançamentos oblíquos. Determine a altura máxima atingida pelo projétil durante sua trajetória.",
+    subject: "funções",
+    answers: [
+      { id: 1, text: "9 metros", correct: true },
+      { id: 2, text: "8 metros", correct: false },
+      { id: 3, text: "10 metros", correct: false },
+      { id: 4, text: "12 metros", correct: false },
+      { id: 5, text: "11 metros", correct: false },
+    ],
+  },
+  {
+    question: "Em uma urna existem 5 bolas vermelhas, 3 bolas verdes e 2 bolas azuis. Duas bolas são retiradas sucessivamente sem reposição. Sabendo que a primeira bola retirada foi vermelha, qual é a probabilidade de a segunda bola também ser vermelha?",
+    subject: "probabilidade",
+    answers: [
+      { id: 1, text: "4/9", correct: true },
+      { id: 2, text: "5/9", correct: false },
+      { id: 3, text: "3/10", correct: false },
+      { id: 4, text: "1/2", correct: false },
+      { id: 5, text: "2/9", correct: false },
+    ],
+  },
+  [
+  {
+    question: "Uma empresa oferece aos seus funcionários um plano de participação nos lucros. A cada semestre, o valor P a ser distribuído é dividido entre os setores proporcionalmente ao número de funcionários e ao desempenho obtido, representado por um índice entre 0 e 1. O setor de logística, com 20 funcionários e índice 0,8, e o setor administrativo, com 25 funcionários e índice 0,6, disputam a verba total de R$ 22.000. Qual será o valor destinado ao setor de logística, considerando a proporcionalidade descrita?",
+    subject: "álgebra",
+    answers: [
+      { id: 1, text: "R$ 10.000,00", correct: false },
+      { id: 2, text: "R$ 11.000,00", correct: false },
+      { id: 3, text: "R$ 12.000,00", correct: true },
+      { id: 4, text: "R$ 13.000,00", correct: false },
+      { id: 5, text: "R$ 14.000,00", correct: false }
+    ]
+  },
+  {
+    question: "Uma empresa de paisagismo foi contratada para construir um jardim circular em uma praça pública. Para delimitar a área do jardim, será usado um cordão de aço em torno de todo o perímetro do círculo. Sabendo que a área do jardim será de 314 m² e considerando π ≈ 3,14, qual será o comprimento aproximado desse cordão de aço necessário para contornar completamente o jardim?",
+    subject: "geometria",
+    answers: [
+      { id: 1, text: "50 metros", correct: false },
+      { id: 2, text: "60 metros", correct: true },
+      { id: 3, text: "55 metros", correct: false },
+      { id: 4, text: "45 metros", correct: false },
+      { id: 5, text: "65 metros", correct: false }
+    ]
+  },
+  {
+    question: "Durante um evento de arrecadação, foram vendidas 120 camisetas ao preço promocional de R$ 35,00 cada. Com esse valor, a organização arrecadou parte do necessário para cobrir os custos do evento, que somam R$ 6.800,00. Considerando apenas essa fonte de renda, quanto ainda faltará arrecadar para cobrir totalmente os custos do evento?",
+    subject: "aritmética",
+    answers: [
+      { id: 1, text: "R$ 1.600,00", correct: false },
+      { id: 2, text: "R$ 2.600,00", correct: true },
+      { id: 3, text: "R$ 3.200,00", correct: false },
+      { id: 4, text: "R$ 2.000,00", correct: false },
+      { id: 5, text: "R$ 3.600,00", correct: false }
+    ]
+  },
+  {
+    question: "Em um estudo populacional, a quantidade de indivíduos de uma determinada espécie em uma reserva natural foi modelada pela função P(t) = 500 * (1,05)^t, onde t representa o tempo em anos após o início da observação. Com base nesse modelo exponencial de crescimento, qual será a população estimada após 4 anos?",
+    subject: "funções",
+    answers: [
+      { id: 1, text: "607", correct: false },
+      { id: 2, text: "610", correct: false },
+      { id: 3, text: "608", correct: true },
+      { id: 4, text: "615", correct: false },
+      { id: 5, text: "620", correct: false }
+    ]
+  },
+  {
+    question: "Em uma loteria, um bilhete é composto por uma sequência de três dígitos distintos, sorteados de 0 a 9. Qual é a probabilidade de que um bilhete aleatório contenha exatamente os números 2, 4 e 6, em qualquer ordem?",
+    subject: "probabilidade",
+    answers: [
+      { id: 1, text: "1/720", correct: false },
+      { id: 2, text: "1/120", correct: false },
+      { id: 3, text: "1/60", correct: true },
+      { id: 4, text: "1/90", correct: false },
+      { id: 5, text: "1/45", correct: false }
+    ]
+  }
+]
+[
+  {
+    question: "Em uma pesquisa de mercado, observou-se que a demanda por certo produto varia de forma inversamente proporcional ao seu preço. Se quando o produto custa R$ 40,00 a empresa vende 500 unidades, quantas unidades ela venderá se o preço for reduzido para R$ 32,00, mantendo-se as demais condições constantes?",
+    subject: "álgebra",
+    answers: [
+      { id: 1, text: "625", correct: true },
+      { id: 2, text: "600", correct: false },
+      { id: 3, text: "550", correct: false },
+      { id: 4, text: "700", correct: false },
+      { id: 5, text: "680", correct: false }
+    ]
+  },
+  {
+    question: "Uma empresa deseja projetar um reservatório de água no formato de um cilindro reto, com raio da base de 3 metros e altura de 5 metros. Para calcular a quantidade de material necessário para fabricar a superfície lateral e as tampas superior e inferior, deve-se considerar a área total do cilindro. Utilizando π ≈ 3,14, qual será essa área total em metros quadrados?",
+    subject: "geometria",
+    answers: [
+      { id: 1, text: "150,72", correct: true },
+      { id: 2, text: "141,30", correct: false },
+      { id: 3, text: "160,50", correct: false },
+      { id: 4, text: "147,00", correct: false },
+      { id: 5, text: "155,40", correct: false }
+    ]
+  },
+  {
+    question: "Durante uma viagem, um carro percorre uma distância total de 420 km dividida em três trechos. No primeiro trecho, de 120 km, o carro consome 8 litros de combustível. No segundo, de 180 km, consome 12 litros, e no terceiro trecho, de 120 km, consome 10 litros. Qual foi o consumo médio de combustível do carro em km por litro durante toda a viagem?",
+    subject: "aritmética",
+    answers: [
+      { id: 1, text: "14 km/L", correct: false },
+      { id: 2, text: "13 km/L", correct: false },
+      { id: 3, text: "12 km/L", correct: true },
+      { id: 4, text: "11 km/L", correct: false },
+      { id: 5, text: "10 km/L", correct: false }
+    ]
+  },
+  {
+    question: "Uma empresa de tecnologia modela seus custos de produção de um novo dispositivo com a função C(x) = 100x + 5000, onde x representa o número de unidades produzidas e C(x) o custo total em reais. Ao mesmo tempo, o preço de venda de cada unidade é fixado em R$ 150,00. Qual é o número mínimo de unidades que devem ser vendidas para que a empresa tenha lucro?",
+    subject: "funções",
+    answers: [
+      { id: 1, text: "101", correct: false },
+      { id: 2, text: "125", correct: true },
+      { id: 3, text: "100", correct: false },
+      { id: 4, text: "130", correct: false },
+      { id: 5, text: "120", correct: false }
+    ]
+  },
+  {
+    question: "Em uma urna há 5 bolas vermelhas, 3 bolas azuis e 2 bolas verdes, todas de mesma forma e tamanho. Duas bolas são retiradas aleatoriamente, sem reposição. Qual é a probabilidade de que as duas bolas retiradas sejam da mesma cor?",
+    subject: "probabilidade",
+    answers: [
+      { id: 1, text: "7/45", correct: false },
+      { id: 2, text: "11/45", correct: false },
+      { id: 3, text: "13/45", correct: true },
+      { id: 4, text: "5/18", correct: false },
+      { id: 5, text: "9/50", correct: false }
+    ]
+  }
+]
+    
+];
+
 
     const filterSection = document.getElementById("filter-section");
     const startBtn = document.getElementById("start-btn");
