@@ -290,22 +290,7 @@ h1 {
     border-radius:20px;
   }
 
-  .seta {
-    position: absolute;
-    top: 50%;
-    margin-top: -25px; /* metade da altura da imagem */
-    width: 50px; /* ajuste conforme o tamanho da sua imagem */
-    height: 50px;
-    cursor: pointer;
-  }
 
-  .seta.esquerda {
-    left: 15px;
-  }
-
-  .seta.direita {
-    right: 15px;
-  }
  /*Pertencem a imagem inicial*/
   /*titulo*/
   .titulo{
