@@ -1,5 +1,22 @@
-// Assumindo que Firebase já foi inicializado na página de login e você já tem firebase.auth() ativo
+// ============================
+// 1. Firebase Config
+// ============================
+const firebaseConfig = {
+  apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
+  authDomain: "sdel-b3f65.firebaseapp.com",
+  projectId: "sdel-b3f65",
+  storageBucket: "sdel-b3f65.appspot.com",
+  messagingSenderId: "297725999985",
+  appId: "1:297725999985:web:d41da68311c190ef8a54d0",
+  measurementId: "G-PT92VECJ2H"
+};
 
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// ============================
+// 2. Variáveis da interface
+// ============================
 const grid = document.getElementById('schedule-grid');
 const modal = document.getElementById('modal');
 const subjectSelect = document.getElementById('subject');
@@ -14,7 +31,9 @@ const hours = Array.from({ length: 15 }, (_, i) => `${7 + i}:00`); // 7h até 21
 
 let selectedCell = null;
 
-// Cria a grade de estudos
+// ============================
+// 3. Criar grade
+// ============================
 function createScheduleGrid() {
   grid.innerHTML = '';
 
@@ -22,13 +41,11 @@ function createScheduleGrid() {
     const row = document.createElement('div');
     row.className = 'grid-row';
 
-    // Coluna de horário
     const timeSlot = document.createElement('div');
     timeSlot.className = 'time-slot';
     timeSlot.textContent = hour;
     row.appendChild(timeSlot);
 
-    // 7 dias da semana (0=seg, 6=dom)
     for (let day = 0; day < 7; day++) {
       const cell = document.createElement('div');
       cell.className = 'cell';
@@ -37,11 +54,8 @@ function createScheduleGrid() {
 
       cell.addEventListener('click', () => {
         selectedCell = cell;
-
-        // Pega dados existentes
         const existingSubject = subjects.find(s => cell.classList.contains(s)) || '';
         const existingTime = cell.dataset.studyTime || '';
-
         subjectSelect.value = existingSubject;
         studyTimeInput.value = existingTime;
         modal.style.display = 'block';
@@ -54,13 +68,12 @@ function createScheduleGrid() {
   });
 }
 
-// Salvar grade no Firestore
+// ============================
+// 4. Salvar no Firestore
+// ============================
 function saveScheduleToFirebase() {
   const user = firebase.auth().currentUser;
-  if (!user) {
-    alert('Usuário não autenticado!');
-    return;
-  }
+  if (!user) return;
 
   const allCells = document.querySelectorAll('.cell');
   const scheduleData = [];
@@ -76,44 +89,40 @@ function saveScheduleToFirebase() {
     }
   });
 
-  firebase.firestore().collection('schedules').doc(user.uid).set({
+  db.collection('schedules').doc(user.uid).set({
     schedule: scheduleData
-  }).then(() => {
-    console.log('Grade salva no Firestore');
-  }).catch(err => {
-    console.error('Erro ao salvar:', err);
   });
 }
 
-// Carregar dados do Firestore
+// ============================
+// 5. Carregar do Firestore
+// ============================
 function loadScheduleFromFirebase() {
   const user = firebase.auth().currentUser;
   if (!user) return;
 
-  firebase.firestore().collection('schedules').doc(user.uid).get()
-    .then(doc => {
-      if (!doc.exists) return;
+  db.collection('schedules').doc(user.uid).get().then(doc => {
+    if (!doc.exists) return;
 
-      const scheduleData = doc.data().schedule || [];
+    const scheduleData = doc.data().schedule || [];
 
-      scheduleData.forEach(item => {
-        const cell = document.querySelector(`.cell[data-day="${item.day}"][data-time="${item.time}"]`);
-        if (cell) {
-          cell.className = `cell ${item.subject}`;
-          cell.dataset.studyTime = item.studyTime;
-          cell.innerHTML = `
-            <strong>${item.subject.charAt(0).toUpperCase() + item.subject.slice(1)}</strong><br>
-            <small>${item.studyTime} min</small>
-          `;
-        }
-      });
-    })
-    .catch(err => {
-      console.error('Erro ao carregar:', err);
+    scheduleData.forEach(item => {
+      const cell = document.querySelector(`.cell[data-day="${item.day}"][data-time="${item.time}"]`);
+      if (cell) {
+        cell.className = `cell ${item.subject}`;
+        cell.dataset.studyTime = item.studyTime;
+        cell.innerHTML = `
+          <strong>${item.subject.charAt(0).toUpperCase() + item.subject.slice(1)}</strong><br>
+          <small>${item.studyTime} min</small>
+        `;
+      }
     });
+  });
 }
 
-// Eventos modal
+// ============================
+// 6. Eventos do modal
+// ============================
 closeModal.onclick = () => {
   modal.style.display = 'none';
 };
@@ -123,7 +132,7 @@ saveBtn.onclick = () => {
   const time = studyTimeInput.value;
 
   if (!subject || !time) {
-    alert('Por favor, selecione uma disciplina e informe o tempo de estudo.');
+    alert('Selecione uma disciplina e tempo.');
     return;
   }
 
@@ -161,12 +170,7 @@ clearAllBtn.onclick = () => {
 
   const user = firebase.auth().currentUser;
   if (user) {
-    firebase.firestore().collection('schedules').doc(user.uid).delete()
-      .then(() => {
-        console.log('Grade apagada no Firestore');
-      }).catch(err => {
-        console.error('Erro ao apagar grade:', err);
-      });
+    db.collection('schedules').doc(user.uid).delete();
   }
 };
 
@@ -176,14 +180,14 @@ window.onclick = (event) => {
   }
 };
 
-// Inicia
-createScheduleGrid();
-
-// Espera o usuário estar autenticado para carregar dados
+// ============================
+// 7. Inicialização
+// ============================
 firebase.auth().onAuthStateChanged(user => {
   if (user) {
+    createScheduleGrid();
     loadScheduleFromFirebase();
   } else {
-    console.log('Usuário não autenticado');
+    window.location.href = "login.html"; // redireciona se não estiver logado
   }
 });
