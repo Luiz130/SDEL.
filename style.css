@@ -339,7 +339,7 @@ h1 {
     margin: 40px auto;
     overflow: hidden;
      overflow: hidden; /* CORRETO - impede que elementos (como setas) quebrem o layout */
-       margin-right:100px;
+      
 
   }
   
