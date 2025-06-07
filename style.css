@@ -313,19 +313,46 @@ h1 {
     font-size:10px;
     margin-right:1050px;
   }
-  .barra-materia{
-  
-    display: flex;
-    overflow-x: auto;
-    gap: 35px;
-    justify-content: center; /* alinha horizontalmente */
-    align-items: center;     /* alinha verticalmente */
-  
+.barra-materia {
+  display: flex;
+  overflow-x: auto;
+  gap: 35px;
+  justify-content: center;
+  align-items: center;
+  position: relative; /* necessário para as setas funcionarem com absolute */
+}
+
+.seta-esquerda,
+.seta-direita {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: white;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* Posição das setas */
+.seta-esquerda {
+  left: 0;
+}
+
+.seta-direita {
+  right: 0;
+}
+
+/* Em telas pequenas, mantenha visível sem causar scroll lateral */
+@media (max-width: 768px) {
+  .seta-esquerda {
+    left: 5px;
   }
-  .seta-esquerda{
-    margin-left:-300px;
-    height:20px;
-    display: flex;
+
+  .seta-direita {
+    right: 5px;
+  }
+}
   
 /*------------------------------------------------------------*/
 
