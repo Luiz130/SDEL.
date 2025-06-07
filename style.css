@@ -337,7 +337,8 @@ h1 {
     max-width: 1180px;
     margin: 40px auto;
     overflow: hidden;
-     overflow: visible; /* permite que as setas fiquem fora se quiser */
+     overflow: hidden; /* CORRETO - impede que elementos (como setas) quebrem o layout */
+
   }
   
   /* Container rolável */
