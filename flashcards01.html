@@ -1,62 +1,58 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Flashcards com Quiz</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flashcards SDEL</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f0f4f8; margin: 0; padding: 20px; }
-    #app { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px #ccc; }
-    h1 { text-align: center; color: #2c3e50; }
-    .hidden { display: none; }
-    button { margin: 5px; padding: 10px 15px; border: none; border-radius: 5px; background: #3498db; color: white; cursor: pointer; }
-    input, textarea { width: 100%; margin: 5px 0; padding: 10px; border-radius: 5px; border: 1px solid #ccc; }
-    .card { background: #ecf0f1; padding: 20px; border-radius: 10px; margin-bottom: 15px; text-align: center; }
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    .card { border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; background: #f9f9f9; }
+    #quiz-area { margin-top: 2rem; }
+    button { margin: 5px; padding: 8px 12px; }
   </style>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js"></script>
 </head>
 <body>
-  <div id="app">
-    <h1>Flashcards com Quiz</h1>
-    
-    <!-- Área de login -->
-    <div id="login-area">
-      <button onclick="login()">Entrar com Google</button>
-    </div>
+  <h1>Bem-vindo ao SDEL Flashcards</h1>
 
-    <!-- Área principal (só aparece após login) -->
-    <div id="main-area" class="hidden">
-      <p>Bem-vindo, <span id="user-name"></span>!</p>
-      <button onclick="logout()">Sair</button>
+  <button id="logout">Sair</button>
 
-      <h3>Novo Flashcard</h3>
-      <input type="text" id="subject" placeholder="Matéria">
-      <textarea id="question" placeholder="Pergunta"></textarea>
-      <textarea id="answer" placeholder="Resposta"></textarea>
-      <button onclick="addFlashcard()">Salvar Flashcard</button>
+  <h2>Criar novo flashcard</h2>
+  <input type="text" id="subject" placeholder="Matéria"><br>
+  <input type="text" id="question" placeholder="Pergunta"><br>
+  <input type="text" id="answer" placeholder="Resposta"><br>
+  <button id="create">Criar Flashcard</button>
 
-      <h3>Seus Flashcards</h3>
-      <div id="flashcard-list"></div>
+  <h2>Seus Flashcards</h2>
+  <div id="flashcards"></div>
 
-      <button onclick="startQuiz()">Iniciar Quiz</button>
-      <div id="quiz-area" class="hidden">
-        <div class="card">
-          <p id="quiz-question"></p>
-          <button onclick="showAnswer()">Mostrar Resposta</button>
-          <p id="quiz-answer" class="hidden"></p>
-          <button onclick="nextQuiz()">Próxima</button>
-        </div>
-      </div>
-    </div>
+  <button id="start-quiz">Iniciar Quiz</button>
+
+  <div id="quiz-area" style="display:none;">
+    <h2>Quiz</h2>
+    <p id="quiz-question"></p>
+    <button id="show-answer">Mostrar Resposta</button>
+    <p id="quiz-answer" style="display:none;"></p>
+    <button id="next-question">Próxima Pergunta</button>
   </div>
 
+  <!-- Firebase -->
   <script type="module">
-    // Configuração Firebase (substitua pelos dados do seu projeto)
-      const firebaseConfig = {
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      getDocs,
+      query,
+      where
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
       apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
       authDomain: "sdel-b3f65.firebaseapp.com",
       projectId: "sdel-b3f65",
@@ -71,95 +67,104 @@
     const db = getFirestore(app);
 
     let currentUser = null;
-    let flashcards = [];
-    let quizIndex = 0;
+    let userFlashcards = [];
+    let currentQuizIndex = 0;
 
+    const subjectInput = document.getElementById("subject");
+    const questionInput = document.getElementById("question");
+    const answerInput = document.getElementById("answer");
+    const flashcardsDiv = document.getElementById("flashcards");
+    const quizArea = document.getElementById("quiz-area");
+    const quizQuestion = document.getElementById("quiz-question");
+    const quizAnswer = document.getElementById("quiz-answer");
+
+    // Verifica se o usuário está logado
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUser = user;
-        document.getElementById("user-name").innerText = user.displayName || user.email;
-        document.getElementById("login-area").classList.add("hidden");
-        document.getElementById("main-area").classList.remove("hidden");
-        await loadFlashcards();
+        await carregarFlashcards();
+      } else {
+        window.location.href = "login.html";
       }
     });
 
-    async function login() {
-      const provider = new GoogleAuthProvider();
-      try {
-        await signInWithPopup(auth, provider);
-      } catch (error) {
-        alert("Erro no login: " + error.message);
+    // Criar flashcard
+    document.getElementById("create").addEventListener("click", async () => {
+      const subject = subjectInput.value.trim();
+      const question = questionInput.value.trim();
+      const answer = answerInput.value.trim();
+
+      if (subject && question && answer) {
+        const docRef = await addDoc(collection(db, "flashcards"), {
+          uid: currentUser.uid,
+          subject,
+          question,
+          answer
+        });
+        subjectInput.value = "";
+        questionInput.value = "";
+        answerInput.value = "";
+        await carregarFlashcards();
       }
-    }
+    });
 
-    function logout() {
-      signOut(auth);
-      location.reload();
-    }
+    // Carregar flashcards
+    async function carregarFlashcards() {
+      flashcardsDiv.innerHTML = "";
+      userFlashcards = [];
 
-    async function addFlashcard() {
-      const subject = document.getElementById("subject").value.trim();
-      const question = document.getElementById("question").value.trim();
-      const answer = document.getElementById("answer").value.trim();
-      if (!subject || !question || !answer) {
-        alert("Preencha todos os campos!");
-        return;
-      }
-
-      await addDoc(collection(db, "flashcards"), {
-        uid: currentUser.uid,
-        subject,
-        question,
-        answer
-      });
-
-      document.getElementById("subject").value = "";
-      document.getElementById("question").value = "";
-      document.getElementById("answer").value = "";
-      await loadFlashcards();
-    }
-
-    async function loadFlashcards() {
       const q = query(collection(db, "flashcards"), where("uid", "==", currentUser.uid));
-      const snapshot = await getDocs(q);
-      flashcards = snapshot.docs.map(doc => doc.data());
-      renderFlashcards();
-    }
-
-    function renderFlashcards() {
-      const list = document.getElementById("flashcard-list");
-      list.innerHTML = "";
-      flashcards.forEach((card, i) => {
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        userFlashcards.push(data);
         const div = document.createElement("div");
         div.className = "card";
-        div.innerHTML = `<strong>${card.subject}</strong><br><em>${card.question}</em><br>${card.answer}`;
-        list.appendChild(div);
+        div.innerHTML = `<strong>${data.subject}</strong><br>Pergunta: ${data.question}<br>Resposta: ${data.answer}`;
+        flashcardsDiv.appendChild(div);
       });
     }
 
-    function startQuiz() {
-      if (flashcards.length === 0) return alert("Nenhum flashcard encontrado.");
-      document.getElementById("quiz-area").classList.remove("hidden");
-      quizIndex = 0;
-      showQuiz();
+    // Iniciar quiz
+    document.getElementById("start-quiz").addEventListener("click", () => {
+      if (userFlashcards.length === 0) {
+        alert("Você não tem flashcards.");
+        return;
+      }
+      currentQuizIndex = 0;
+      quizArea.style.display = "block";
+      flashcardsDiv.style.display = "none";
+      mostrarPergunta();
+    });
+
+    function mostrarPergunta() {
+      const card = userFlashcards[currentQuizIndex];
+      quizQuestion.textContent = card.question;
+      quizAnswer.textContent = card.answer;
+      quizAnswer.style.display = "none";
     }
 
-    function showQuiz() {
-      const card = flashcards[quizIndex];
-      document.getElementById("quiz-question").innerText = card.question;
-      document.getElementById("quiz-answer").innerText = card.answer;
-      document.getElementById("quiz-answer").classList.add("hidden");
-    }
+    document.getElementById("show-answer").addEventListener("click", () => {
+      quizAnswer.style.display = "block";
+    });
 
-    function showAnswer() {
-      document.getElementById("quiz-answer").classList.remove("hidden");
-    }
+    document.getElementById("next-question").addEventListener("click", () => {
+      currentQuizIndex++;
+      if (currentQuizIndex < userFlashcards.length) {
+        mostrarPergunta();
+      } else {
+        alert("Quiz finalizado!");
+        quizArea.style.display = "none";
+        flashcardsDiv.style.display = "block";
+      }
+    });
 
-    function nextQuiz() {
-      quizIndex = (quizIndex + 1) % flashcards.length;
-      showQuiz();
-    }
+    // Sair
+    document.getElementById("logout").addEventListener("click", () => {
+      signOut(auth).then(() => {
+        window.location.href = "login.html";
+      });
+    });
   </script>
 </body>
 </html>
