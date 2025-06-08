@@ -304,22 +304,15 @@ h1 {
 
 /*Rolagem das matérias*/
   /*Rolagem das matérias*/
-.carrossel-wrapper {
-  position: relative;
-  width: 100%;
-  max-width: 1280px;
-  margin: 60px auto;
-  overflow: hidden;
-  padding: 0 100px;
-}
-
-/* Em telas pequenas, reduz o padding */
-@media (max-width: 768px) {
-  .carrossel-wrapper {
-    padding: 0 20px;
-    max-width: 1180px;
-  }
-}
+   .carrossel-wrapper {
+      position: relative;
+      width: 110%;
+      max-width: 1180px;
+      margin: 60px auto;
+      overflow: hidden;
+      padding: 0 100px;
+    
+    }
 
     .carrossel-container::-webkit-scrollbar {
       display: none; /* Chrome */
