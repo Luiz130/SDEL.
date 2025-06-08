@@ -361,7 +361,7 @@ h1 {
     }
 
     .seta-direita {
-      right: 10px;
+      right: 80px;
     }
 
   /*----------------------------------------------------*/
@@ -823,7 +823,7 @@ h1 {
 .Vestibular-enem {
   text-align: center;
   margin: 0 auto 20px auto;
-      margin-right:1100px;
+      margin-right:1000px;
 }
 
 /* Responsivo para telas menores */
@@ -1013,7 +1013,6 @@ h1 {
     max-width: 100%;
   }
 }
-
 
 
 
