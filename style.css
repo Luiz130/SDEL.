@@ -303,24 +303,23 @@ h1 {
 /*------------------------------------------------------------*/
 
 /*Rolagem das matérias*/
-  
-    .carrossel-wrapper {
-      position: relative;
-      width: 100%;
-      max-width: 1280px;
-      margin: 60px auto;
-      overflow: hidden;
-      padding: 0 60px;
-    }
+  /*Rolagem das matérias*/
+.carrossel-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 1280px;
+  margin: 60px auto;
+  overflow: hidden;
+  padding: 0 100px;
+}
 
-    .carrossel-container {
-      display: flex;
-      overflow-x: auto;
-      scroll-behavior: smooth;
-      gap: 40px;
-      padding: 10px 0;
-      scrollbar-width: none; /* Firefox */
-    }
+/* Em telas pequenas, reduz o padding */
+@media (max-width: 768px) {
+  .carrossel-wrapper {
+    padding: 0 20px;
+    max-width: 1180px;
+  }
+}
 
     .carrossel-container::-webkit-scrollbar {
       display: none; /* Chrome */
