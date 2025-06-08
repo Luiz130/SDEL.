@@ -1,731 +1,168 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Flashcards de Estudo - Modo Quiz</title>
+  <meta charset="UTF-8">
+  <title>Flashcards com Quiz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    :root {
-      --bg-color: #f5f7fa;
-      --text-color: #333;
-      --shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    body.dark {
-      --bg-color: #121212;
-      --text-color: #e0e0e0;
-      --shadow: 0 4px 12px rgba(255,255,255,0.05);
-    }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      margin: 0;
-      padding: 20px;
-      transition: all 0.3s ease;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    h1 {
-      margin-bottom: 20px;
-      user-select: none;
-    }
-
-    .controls {
-      margin-bottom: 25px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .controls button {
-      background-color: #4f46e5;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      cursor: pointer;
-      font-size: 16px;
-      padding: 10px 18px;
-      transition: background-color 0.2s ease;
-      user-select: none;
-    }
-    .controls button:hover {
-      background-color: #4338ca;
-    }
-
-    #scoreDisplay {
-      font-weight: bold;
-      font-size: 18px;
-      margin-left: 10px;
-      align-self: center;
-      user-select: none;
-      color: #10b981;
-    }
-
-    .flashcards {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-      max-width: 1000px;
-      width: 100%;
-    }
-
-    .flashcard {
-      width: 260px;
-      height: 200px;
-      perspective: 1000px;
-      user-select: none;
-    }
-
-    .card-inner {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      border-radius: 12px;
-      box-shadow: var(--shadow);
-      transition: transform 0.8s;
-      transform-style: preserve-3d;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 20px;
-      box-sizing: border-box;
-      color: white;
-    }
-
-    .flashcard.flipped .card-inner {
-      transform: rotateY(180deg);
-      cursor: default;
-    }
-
-    .card-front, .card-back {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      border-radius: 12px;
-      backface-visibility: hidden;
-      overflow-y: auto;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 20px;
-      user-select: text;
-    }
-
-    .card-front {
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-    }
-
-    .card-back {
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      transform: rotateY(180deg);
-    }
-
-    .card-inner .buttons {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      display: flex;
-      gap: 6px;
-      z-index: 2;
-    }
-
-    .flashcard.flipped .buttons {
-      display: none;
-    }
-
-    .card-inner .buttons button {
-      font-size: 12px;
-      padding: 4px 8px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .card-inner .buttons button.edit {
-      background-color: #fbbf24;
-      color: black;
-      transition: background-color 0.2s;
-    }
-    .card-inner .buttons button.edit:hover {
-      background-color: #f59e0b;
-    }
-
-    .card-inner .buttons button.delete {
-      background-color: #ef4444;
-      color: white;
-      transition: background-color 0.2s;
-    }
-    .card-inner .buttons button.delete:hover {
-      background-color: #dc2626;
-    }
-
-    /* Cores por disciplina */
-    .math .card-inner {
-      background-color: #3b82f6;
-    }
-    .history .card-inner {
-      background-color: #ef4444;
-    }
-    .science .card-inner {
-      background-color: #10b981;
-    }
-    .language .card-inner {
-      background-color: #facc15;
-      color: #333;
-    }
-
-    /* Inputs no modo quiz */
-    .quiz-input {
-      width: 100%;
-      padding: 8px 10px;
-      border-radius: 6px;
-      border: 2px solid transparent;
-      font-size: 16px;
-      margin-top: 12px;
-      box-sizing: border-box;
-      transition: border-color 0.3s;
-      outline-offset: 2px;
-    }
-
-    .quiz-button {
-      margin-top: 10px;
-      padding: 8px 16px;
-      border-radius: 8px;
-      border: none;
-      background-color: white;
-      color: #333;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background-color 0.2s;
-    }
-    .quiz-button:hover {
-      background-color: #e5e7eb;
-    }
-
-    /* Resultado quiz */
-    .quiz-result {
-      margin-top: 10px;
-      font-weight: bold;
-      font-size: 16px;
-      min-height: 22px;
-      user-select: none;
-    }
-
-    /* Modal fundo */
-    .modal-bg {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.45);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-      z-index: 100;
-    }
-    .modal-bg.show {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    /* Modal */
-    .modal {
-      background: white;
-      border-radius: 12px;
-      padding: 25px 30px 30px 30px;
-      box-shadow: var(--shadow);
-      width: 350px;
-      max-width: 95vw;
-      position: relative;
-      transform: translateY(-30px);
-      transition: transform 0.3s ease;
-      user-select: none;
-    }
-    .modal-bg.show .modal {
-      transform: translateY(0);
-    }
-
-    /* Modal inputs */
-    .modal form {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-    .modal input[type="text"], .modal select {
-      padding: 10px 12px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      transition: border-color 0.2s;
-    }
-    .modal input[type="text"]:focus, .modal select:focus {
-      border-color: #4f46e5;
-      outline: none;
-    }
-
-    .modal button[type="submit"] {
-      background-color: #10b981;
-      border: none;
-      padding: 12px 0;
-      font-weight: bold;
-      font-size: 16px;
-      color: white;
-      border-radius: 8px;
-      cursor: pointer;
-      user-select: none;
-      transition: background-color 0.3s;
-    }
-    .modal button[type="submit"]:hover {
-      background-color: #059669;
-    }
-
-    /* Botão fechar modal */
-    .close-btn {
-      position: absolute;
-      top: 8px;
-      right: 12px;
-      font-size: 24px;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      user-select: none;
-      color: #999;
-      transition: color 0.2s;
-    }
-    .close-btn:hover {
-      color: #555;
-    }
-
-    /* Scrollbar for cards content */
-    .card-front p, .card-back p {
-      margin: 0;
-      white-space: pre-wrap;
-    }
+    body { font-family: Arial, sans-serif; background: #f0f4f8; margin: 0; padding: 20px; }
+    #app { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px #ccc; }
+    h1 { text-align: center; color: #2c3e50; }
+    .hidden { display: none; }
+    button { margin: 5px; padding: 10px 15px; border: none; border-radius: 5px; background: #3498db; color: white; cursor: pointer; }
+    input, textarea { width: 100%; margin: 5px 0; padding: 10px; border-radius: 5px; border: 1px solid #ccc; }
+    .card { background: #ecf0f1; padding: 20px; border-radius: 10px; margin-bottom: 15px; text-align: center; }
   </style>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js"></script>
 </head>
 <body>
-  <h1>Flashcards de Estudo</h1>
+  <div id="app">
+    <h1>Flashcards com Quiz</h1>
+    
+    <!-- Área de login -->
+    <div id="login-area">
+      <button onclick="login()">Entrar com Google</button>
+    </div>
 
-  <div class="controls">
-    <button id="addBtn" aria-label="Adicionar novo flashcard">Adicionar Flashcard</button>
-    <button id="themeBtn" aria-label="Alternar modo claro e escuro">Modo Escuro</button>
-    <button id="clearBtn" aria-label="Excluir todos os flashcards">Excluir Todos</button>
-    <button id="quizToggleBtn" aria-label="Alternar modo quiz">Modo Quiz</button>
-    <div id="scoreDisplay" style="display:none;" aria-live="polite">Pontuação: 0 / 0</div>
-  </div>
+    <!-- Área principal (só aparece após login) -->
+    <div id="main-area" class="hidden">
+      <p>Bem-vindo, <span id="user-name"></span>!</p>
+      <button onclick="logout()">Sair</button>
 
-  <div class="flashcards" id="flashcardContainer" aria-live="polite" aria-atomic="true"></div>
+      <h3>Novo Flashcard</h3>
+      <input type="text" id="subject" placeholder="Matéria">
+      <textarea id="question" placeholder="Pergunta"></textarea>
+      <textarea id="answer" placeholder="Resposta"></textarea>
+      <button onclick="addFlashcard()">Salvar Flashcard</button>
 
-  <!-- Modal Criar / Editar -->
-  <div class="modal-bg" id="modalBg" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
-    <div class="modal">
-      <button class="close-btn" id="closeModalBtn" aria-label="Fechar">&times;</button>
-      <h2 id="modalTitle">Adicionar Flashcard</h2>
-      <form id="flashcardForm">
-        <input type="text" id="contentInput" placeholder="Conteúdo do flashcard" required maxlength="150" autocomplete="off" />
-        <input type="text" id="answerInput" placeholder="Resposta do flashcard" required maxlength="150" autocomplete="off" />
-        <select id="subjectInput" required aria-label="Selecione a disciplina">
-          <option value="" disabled selected>Selecione a disciplina</option>
-          <option value="math">Matemática</option>
-          <option value="history">História</option>
-          <option value="science">Ciências</option>
-          <option value="language">Língua</option>
-        </select>
-        <button type="submit">Salvar</button>
-      </form>
+      <h3>Seus Flashcards</h3>
+      <div id="flashcard-list"></div>
+
+      <button onclick="startQuiz()">Iniciar Quiz</button>
+      <div id="quiz-area" class="hidden">
+        <div class="card">
+          <p id="quiz-question"></p>
+          <button onclick="showAnswer()">Mostrar Resposta</button>
+          <p id="quiz-answer" class="hidden"></p>
+          <button onclick="nextQuiz()">Próxima</button>
+        </div>
+      </div>
     </div>
   </div>
 
-  <script>
-    // Estado global
+  <script type="module">
+    // Configuração Firebase (substitua pelos dados do seu projeto)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+    import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "SUA_API_KEY",
+      authDomain: "seu-projeto.firebaseapp.com",
+      projectId: "seu-projeto",
+      storageBucket: "seu-projeto.appspot.com",
+      messagingSenderId: "1234567890",
+      appId: "1:1234567890:web:abcdef123456"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUser = null;
     let flashcards = [];
-    let editingIndex = null;
-    let quizMode = false;
-    let score = 0;
-    let totalAnswered = 0;
+    let quizIndex = 0;
 
-    const flashcardContainer = document.getElementById('flashcardContainer');
-    const modalBg = document.getElementById('modalBg');
-    const addBtn = document.getElementById('addBtn');
-    const themeBtn = document.getElementById('themeBtn');
-    const clearBtn = document.getElementById('clearBtn');
-    const quizToggleBtn = document.getElementById('quizToggleBtn');
-    const scoreDisplay = document.getElementById('scoreDisplay');
-
-    const contentInput = document.getElementById('contentInput');
-    const answerInput = document.getElementById('answerInput');
-    const subjectInput = document.getElementById('subjectInput');
-    const flashcardForm = document.getElementById('flashcardForm');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-
-    // Função para salvar no localStorage
-    function saveFlashcards() {
-      localStorage.setItem('flashcards', JSON.stringify(flashcards));
-    }
-
-    // Função para carregar do localStorage
-    function loadFlashcards() {
-      const data = localStorage.getItem('flashcards');
-      if(data) {
-        flashcards = JSON.parse(data);
-      }
-    }
-
-    // Criar card HTML
-    function createFlashcardElement(card, index) {
-      const cardDiv = document.createElement('div');
-      cardDiv.className = `flashcard ${card.subject}`;
-      cardDiv.setAttribute('data-index', index);
-      cardDiv.setAttribute('tabindex', 0);
-      cardDiv.setAttribute('role', 'button');
-      cardDiv.setAttribute('aria-pressed', 'false');
-
-      const innerDiv = document.createElement('div');
-      innerDiv.className = 'card-inner';
-
-      // Buttons container (edit, delete)
-      const buttonsDiv = document.createElement('div');
-      buttonsDiv.className = 'buttons';
-
-      const editBtn = document.createElement('button');
-      editBtn.className = 'edit';
-      editBtn.textContent = 'Editar';
-      editBtn.setAttribute('aria-label', `Editar flashcard ${index + 1}`);
-      buttonsDiv.appendChild(editBtn);
-
-      const deleteBtn = document.createElement('button');
-      deleteBtn.className = 'delete';
-      deleteBtn.textContent = 'Excluir';
-      deleteBtn.setAttribute('aria-label', `Excluir flashcard ${index + 1}`);
-      buttonsDiv.appendChild(deleteBtn);
-
-      innerDiv.appendChild(buttonsDiv);
-
-      // Frente do cartão (conteúdo)
-      const frontDiv = document.createElement('div');
-      frontDiv.className = 'card-front';
-      frontDiv.textContent = card.content;
-
-      // Verso do cartão (resposta)
-      const backDiv = document.createElement('div');
-      backDiv.className = 'card-back';
-      backDiv.textContent = card.answer;
-
-      innerDiv.appendChild(frontDiv);
-      innerDiv.appendChild(backDiv);
-
-      cardDiv.appendChild(innerDiv);
-
-      // Eventos
-      if(!quizMode) {
-        cardDiv.addEventListener('click', () => {
-          cardDiv.classList.toggle('flipped');
-          cardDiv.setAttribute('aria-pressed', cardDiv.classList.contains('flipped') ? 'true' : 'false');
-        });
-
-        cardDiv.addEventListener('keydown', e => {
-          if(e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            cardDiv.classList.toggle('flipped');
-            cardDiv.setAttribute('aria-pressed', cardDiv.classList.contains('flipped') ? 'true' : 'false');
-          }
-        });
-      }
-
-      editBtn.addEventListener('click', e => {
-        e.stopPropagation();
-        openEditModal(index);
-      });
-
-      deleteBtn.addEventListener('click', e => {
-        e.stopPropagation();
-        if(confirm('Tem certeza que deseja excluir este flashcard?')) {
-          flashcards.splice(index,1);
-          saveFlashcards();
-          renderFlashcards();
-          resetQuizScore();
-        }
-      });
-
-      return cardDiv;
-    }
-
-    // Renderiza os flashcards na tela
-    function renderFlashcards() {
-      flashcardContainer.innerHTML = '';
-      flashcards.forEach((card, index) => {
-        const cardEl = createFlashcardElement(card, index);
-        flashcardContainer.appendChild(cardEl);
-      });
-      if(flashcards.length === 0){
-        flashcardContainer.innerHTML = '<p style="color:gray; user-select:none;">Nenhum flashcard disponível. Clique em "Adicionar Flashcard" para criar um.</p>';
-      }
-    }
-
-    // Abre modal para adicionar ou editar flashcard
-    function openEditModal(index = null) {
-      editingIndex = index;
-      if(index !== null) {
-        modalTitle.textContent = 'Editar Flashcard';
-        const card = flashcards[index];
-        contentInput.value = card.content;
-        answerInput.value = card.answer;
-        subjectInput.value = card.subject;
-      } else {
-        modalTitle.textContent = 'Adicionar Flashcard';
-        contentInput.value = '';
-        answerInput.value = '';
-        subjectInput.value = '';
-      }
-      modalBg.classList.add('show');
-      modalBg.setAttribute('aria-hidden', 'false');
-      contentInput.focus();
-    }
-
-    // Fecha modal
-    function closeModal() {
-      modalBg.classList.remove('show');
-      modalBg.setAttribute('aria-hidden', 'true');
-      editingIndex = null;
-      flashcardForm.reset();
-    }
-
-    addBtn.addEventListener('click', () => {
-      openEditModal();
-    });
-
-    closeModalBtn.addEventListener('click', closeModal);
-
-    modalBg.addEventListener('click', e => {
-      if(e.target === modalBg) closeModal();
-    });
-
-    flashcardForm.addEventListener('submit', e => {
-      e.preventDefault();
-      const content = contentInput.value.trim();
-      const answer = answerInput.value.trim();
-      const subject = subjectInput.value;
-
-      if(!content || !answer || !subject) return alert('Por favor, preencha todos os campos.');
-
-      if(editingIndex !== null) {
-        // Editar
-        flashcards[editingIndex] = {content, answer, subject};
-      } else {
-        // Adicionar
-        flashcards.push({content, answer, subject});
-      }
-      saveFlashcards();
-      renderFlashcards();
-      closeModal();
-      resetQuizScore();
-    });
-
-    clearBtn.addEventListener('click', () => {
-      if(confirm('Tem certeza que deseja excluir todos os flashcards?')) {
-        flashcards = [];
-        saveFlashcards();
-        renderFlashcards();
-        resetQuizScore();
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        document.getElementById("user-name").innerText = user.displayName || user.email;
+        document.getElementById("login-area").classList.add("hidden");
+        document.getElementById("main-area").classList.remove("hidden");
+        await loadFlashcards();
       }
     });
 
-    // Alternar modo escuro/claro
-    themeBtn.addEventListener('click', () => {
-      document.body.classList.toggle('dark');
-      if(document.body.classList.contains('dark')) {
-        themeBtn.textContent = 'Modo Claro';
-      } else {
-        themeBtn.textContent = 'Modo Escuro';
+    async function login() {
+      const provider = new GoogleAuthProvider();
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (error) {
+        alert("Erro no login: " + error.message);
       }
-    });
-
-    // Função para resetar pontuação quiz
-    function resetQuizScore() {
-      score = 0;
-      totalAnswered = 0;
-      scoreDisplay.style.display = 'none';
-      scoreDisplay.textContent = 'Pontuação: 0 / 0';
     }
 
-        // Embaralhar array (Fisher-Yates)
-    function shuffle(array) {
-      let currentIndex = array.length, randomIndex;
-
-      while (currentIndex !== 0) {
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex--;
-        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
-      }
-      return array;
+    function logout() {
+      signOut(auth);
+      location.reload();
     }
 
-    // Alternar modo quiz
-    quizToggleBtn.addEventListener('click', () => {
-      quizMode = !quizMode;
-      if(quizMode) {
-        startQuizMode();
-      } else {
-        stopQuizMode();
-      }
-    });
-
-    function startQuizMode() {
-      score = 0;
-      totalAnswered = 0;
-      scoreDisplay.style.display = 'inline-block';
-      quizToggleBtn.textContent = 'Modo Flashcards';
-      renderQuizFlashcards();
-      addBtn.disabled = true;
-      clearBtn.disabled = true;
-      // Remove edit/delete buttons during quiz
-      flashcardContainer.querySelectorAll('.buttons').forEach(btns => btns.style.display = 'none');
-    }
-
-    function stopQuizMode() {
-      scoreDisplay.style.display = 'none';
-      quizToggleBtn.textContent = 'Modo Quiz';
-      addBtn.disabled = false;
-      clearBtn.disabled = false;
-      renderFlashcards();
-    }
-
-    // Renderiza flashcards para modo quiz embaralhado
-    function renderQuizFlashcards() {
-      flashcardContainer.innerHTML = '';
-
-      if(flashcards.length === 0) {
-        flashcardContainer.innerHTML = '<p style="color:gray; user-select:none;">Nenhum flashcard disponível para o quiz.</p>';
+    async function addFlashcard() {
+      const subject = document.getElementById("subject").value.trim();
+      const question = document.getElementById("question").value.trim();
+      const answer = document.getElementById("answer").value.trim();
+      if (!subject || !question || !answer) {
+        alert("Preencha todos os campos!");
         return;
       }
 
-      const shuffled = shuffle([...flashcards]);
-      shuffled.forEach((card, index) => {
-        const cardDiv = document.createElement('div');
-        cardDiv.className = `flashcard ${card.subject}`;
-        cardDiv.setAttribute('tabindex', 0);
-        cardDiv.setAttribute('role', 'region');
-        cardDiv.setAttribute('aria-label', `Quiz flashcard ${index + 1}`);
-
-        const innerDiv = document.createElement('div');
-        innerDiv.className = 'card-inner quiz-card-inner';
-        innerDiv.style.backgroundColor = getComputedStyle(document.documentElement)
-          .getPropertyValue(`--${card.subject}-color`) || '';
-
-        // Fronte - Pergunta
-        const frontDiv = document.createElement('div');
-        frontDiv.className = 'card-front';
-        frontDiv.textContent = card.content;
-
-        // Verso - Input para resposta
-        const backDiv = document.createElement('div');
-        backDiv.className = 'card-back';
-
-        // Pergunta acima do input no verso
-        const questionP = document.createElement('p');
-        questionP.textContent = card.content;
-        questionP.style.marginBottom = '10px';
-        questionP.style.fontWeight = '600';
-
-        // Input de resposta
-        const inputAnswer = document.createElement('input');
-        inputAnswer.type = 'text';
-        inputAnswer.className = 'quiz-input';
-        inputAnswer.setAttribute('aria-label', `Resposta para flashcard ${index + 1}`);
-        inputAnswer.autocomplete = 'off';
-
-        // Botão para verificar resposta
-        const checkBtn = document.createElement('button');
-        checkBtn.className = 'quiz-button';
-        checkBtn.textContent = 'Verificar';
-
-        // Resultado
-        const resultP = document.createElement('div');
-        resultP.className = 'quiz-result';
-
-        backDiv.appendChild(questionP);
-        backDiv.appendChild(inputAnswer);
-        backDiv.appendChild(checkBtn);
-        backDiv.appendChild(resultP);
-
-        innerDiv.appendChild(frontDiv);
-        innerDiv.appendChild(backDiv);
-        cardDiv.appendChild(innerDiv);
-        flashcardContainer.appendChild(cardDiv);
-
-        // Função para virar o card para trás (mostrar input)
-        cardDiv.addEventListener('click', () => {
-          cardDiv.classList.add('flipped');
-          inputAnswer.focus();
-        });
-
-        // Evitar virar novamente ao clicar no verso
-        backDiv.addEventListener('click', e => {
-          e.stopPropagation();
-        });
-
-        checkBtn.addEventListener('click', () => {
-          const userAnswer = inputAnswer.value.trim().toLowerCase();
-          const correctAnswer = card.answer.trim().toLowerCase();
-
-          if(userAnswer === '') {
-            resultP.textContent = 'Por favor, digite sua resposta.';
-            resultP.style.color = 'orange';
-            return;
-          }
-
-          if(userAnswer === correctAnswer) {
-            resultP.textContent = 'Correto! 🎉';
-            resultP.style.color = '#10b981';
-            score++;
-          } else {
-            resultP.textContent = `Incorreto. Resposta correta: ${card.answer}`;
-            resultP.style.color = '#ef4444';
-          }
-
-          totalAnswered++;
-          updateScore();
-
-          // Desabilita input e botão após resposta
-          inputAnswer.disabled = true;
-          checkBtn.disabled = true;
-        });
-
-        // Permitir submit pelo Enter no input
-        inputAnswer.addEventListener('keydown', e => {
-          if(e.key === 'Enter') {
-            e.preventDefault();
-            checkBtn.click();
-          }
-        });
+      await addDoc(collection(db, "flashcards"), {
+        uid: currentUser.uid,
+        subject,
+        question,
+        answer
       });
-      updateScore();
+
+      document.getElementById("subject").value = "";
+      document.getElementById("question").value = "";
+      document.getElementById("answer").value = "";
+      await loadFlashcards();
     }
 
-    function updateScore() {
-      scoreDisplay.textContent = `Pontuação: ${score} / ${totalAnswered}`;
+    async function loadFlashcards() {
+      const q = query(collection(db, "flashcards"), where("uid", "==", currentUser.uid));
+      const snapshot = await getDocs(q);
+      flashcards = snapshot.docs.map(doc => doc.data());
+      renderFlashcards();
     }
 
-    // Inicialização
-    loadFlashcards();
-    renderFlashcards();
+    function renderFlashcards() {
+      const list = document.getElementById("flashcard-list");
+      list.innerHTML = "";
+      flashcards.forEach((card, i) => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `<strong>${card.subject}</strong><br><em>${card.question}</em><br>${card.answer}`;
+        list.appendChild(div);
+      });
+    }
+
+    function startQuiz() {
+      if (flashcards.length === 0) return alert("Nenhum flashcard encontrado.");
+      document.getElementById("quiz-area").classList.remove("hidden");
+      quizIndex = 0;
+      showQuiz();
+    }
+
+    function showQuiz() {
+      const card = flashcards[quizIndex];
+      document.getElementById("quiz-question").innerText = card.question;
+      document.getElementById("quiz-answer").innerText = card.answer;
+      document.getElementById("quiz-answer").classList.add("hidden");
+    }
+
+    function showAnswer() {
+      document.getElementById("quiz-answer").classList.remove("hidden");
+    }
+
+    function nextQuiz() {
+      quizIndex = (quizIndex + 1) % flashcards.length;
+      showQuiz();
+    }
   </script>
 </body>
 </html>
