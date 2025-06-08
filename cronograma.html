@@ -1,99 +1,227 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Cronograma de Estudos</title>
-  <link rel="stylesheet" href="cronograma.css">
-
   <style>
-    /* Estilos do painel flutuante (já incluídos) */
+    /* ====== CSS ====== */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f4f8;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #1e3a8a;
+    }
+
+    .schedule-container {
+      max-width: 1000px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .header {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      text-align: center;
+      font-weight: bold;
+      background-color: #1e40af;
+      color: white;
+      padding: 10px 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+    }
+
+    .cell {
+      border: 1px solid #ccc;
+      padding: 10px;
+      height: 60px;
+      cursor: pointer;
+      text-align: center;
+      user-select: none;
+    }
+
+    .cell:hover {
+      background-color: #e0e7ff;
+    }
+
+    .time-slot {
+      background-color: #e2e8f0;
+      text-align: center;
+      font-weight: bold;
+      user-select: none;
+    }
+
+    /* Modal */
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      background: rgba(0, 0, 0, 0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      position: relative;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 300px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .close {
+      position: absolute;
+      right: 15px;
+      top: 10px;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    /* Painel flutuante */
     #botaoPainel {
       position: fixed;
-      top: 50%;
-      right: 0;
-      transform: translateY(-50%);
-      background-color: #2563eb;
+      bottom: 20px;
+      right: 20px;
+      background-color: #1d4ed8;
       color: white;
-      padding: 14px 18px;
-      border-radius: 12px 0 0 12px;
+      padding: 12px;
+      border-radius: 50%;
       cursor: pointer;
-      font-size: 24px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      z-index: 10000;
+      font-size: 18px;
+      user-select: none;
+      z-index: 1500;
     }
 
     #painel {
       position: fixed;
-      top: 50%;
-      right: 0;
-      width: 340px;
-      background: white;
-      border-left: 4px solid #2563eb;
-      border-radius: 16px 0 0 16px;
-      padding: 16px 24px;
+      right: 20px;
+      bottom: 80px;
+      background: #f9fafb;
+      border: 1px solid #cbd5e0;
+      padding: 15px;
+      width: 270px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
       display: none;
-      transform: translateY(-50%);
-      z-index: 9999;
+      z-index: 1500;
     }
 
     #cabecalhoPainel {
       font-weight: bold;
-      font-size: 20px;
-      margin-bottom: 16px;
-      cursor: grab;
+      margin-bottom: 10px;
     }
 
     .botaoSecao {
       width: 100%;
-      padding: 12px;
-      margin-bottom: 10px;
-      background-color: #2563eb;
+      margin: 5px 0;
+      padding: 8px;
+      background: #3b82f6;
       color: white;
       border: none;
-      border-radius: 10px;
-      font-weight: 600;
+      border-radius: 6px;
       cursor: pointer;
-      font-size: 15px;
+      user-select: none;
     }
 
     .secaoPainel {
+      margin-top: 10px;
       display: none;
-      margin-bottom: 24px;
     }
 
-    textarea {
+    #textareaNotas {
       width: 100%;
-      min-height: 120px;
-      padding: 14px;
-      font-size: 15px;
-      border-radius: 10px;
-      border: 1.5px solid #cbd5e1;
+      height: 100px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e0;
+      padding: 8px;
+      font-family: sans-serif;
+      resize: vertical;
     }
 
     #cronometro {
-      font-size: 28px;
-      font-weight: bold;
+      font-size: 24px;
       text-align: center;
-      margin-bottom: 16px;
-    }
-
-    #botoesCronometro {
-      display: flex;
-      justify-content: space-around;
+      margin-bottom: 10px;
+      font-family: monospace;
     }
 
     #botoesCronometro button {
-      padding: 8px 14px;
-      font-size: 14px;
-      border-radius: 8px;
-      background-color: #4b5563;
-      color: white;
+      margin: 0 3px;
+      padding: 6px 10px;
       border: none;
+      background-color: #3b82f6;
+      color: white;
+      border-radius: 6px;
       cursor: pointer;
+      user-select: none;
+    }
+
+    #botoesCronometro button:hover {
+      background-color: #2563eb;
+    }
+
+    /* Inputs e selects */
+    select, input[type="number"] {
+      width: 100%;
+      padding: 6px;
+      margin: 8px 0 12px 0;
+      box-sizing: border-box;
+      border-radius: 6px;
+      border: 1px solid #cbd5e0;
+      font-size: 14px;
+    }
+
+    button#save, button#clear-cell, button#clear-all {
+      margin: 5px 5px 0 5px;
+      padding: 8px 12px;
+      background-color: #2563eb;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      user-select: none;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    button#clear-cell {
+      background-color: #dc2626;
+    }
+
+    button#clear-all {
+      background-color: #b91c1c;
+    }
+
+    button#save:hover {
+      background-color: #1e40af;
+    }
+
+    button#clear-cell:hover {
+      background-color: #991b1b;
+    }
+
+    button#clear-all:hover {
+      background-color: #7f1d1d;
     }
   </style>
 </head>
 <body>
+
   <h1>Cronograma Semanal de Estudos</h1>
   <div class="schedule-container">
     <div class="header">
@@ -122,20 +250,18 @@
         <option value="biologia">Biologia</option>
         <option value="quimica">Química</option>
       </select>
-
       <label for="study-time">Tempo de Estudo (min):</label>
-      <input type="number" id="study-time" min="0" placeholder="Ex: 60">
-
-      <button id="save">Salvar</button>
-      <button id="clear-cell" style="margin-top: 10px; background-color: #f87171;">Limpar Bloco</button>
-      <button id="clear-all" style="margin-top: 10px; background-color: #ef4444;">Limpar Tudo</button>
+      <input type="number" id="study-time" min="0" placeholder="Ex: 60" />
+      <div>
+        <button id="save">Salvar</button>
+        <button id="clear-cell">Limpar Bloco</button>
+        <button id="clear-all">Limpar Tudo</button>
+      </div>
     </div>
   </div>
 
-  <!-- Botão para abrir painel -->
-  <div id="botaoPainel" title="Abrir Painel">🛠️</div>
-
   <!-- Painel flutuante -->
+  <div id="botaoPainel" title="Abrir Painel">🛠️</div>
   <div id="painel">
     <div id="cabecalhoPainel">Painel Rápido</div>
 
@@ -156,13 +282,12 @@
     </div>
   </div>
 
-  <!-- Firebase SDKs -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
-  <!-- Firebase Config -->
   <script>
+    // Config Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
       authDomain: "sdel-b3f65.firebaseapp.com",
@@ -175,52 +300,230 @@
     firebase.initializeApp(firebaseConfig);
   </script>
 
-  <!-- Scripts funcionais -->
   <script>
-    // Alternar visibilidade do painel lateral
-    const painel = document.getElementById('painel');
-    const botaoPainel = document.getElementById('botaoPainel');
+    /* ====== JS ====== */
 
-    botaoPainel.addEventListener('click', () => {
-      painel.style.display = painel.style.display === 'none' || painel.style.display === '' ? 'block' : 'none';
-    });
+    // Dias da semana e horários
+    const days = ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom'];
+    const startHour = 7; // 7h
+    const endHour = 22;  // 22h
 
-    function alternarSecao(id) {
-      const secao = document.getElementById(id);
-      secao.style.display = secao.style.display === 'block' ? 'none' : 'block';
+    const scheduleGrid = document.getElementById('schedule-grid');
+    const modal = document.getElementById('modal');
+    const closeModalBtn = document.getElementById('close-modal');
+    const subjectSelect = document.getElementById('subject');
+    const studyTimeInput = document.getElementById('study-time');
+    const saveBtn = document.getElementById('save');
+    const clearCellBtn = document.getElementById('clear-cell');
+    const clearAllBtn = document.getElementById('clear-all');
+
+    let currentCellId = null;
+
+    // Dados do cronograma em memória (obj com chave 'hora-dia')
+    let scheduleData = {};
+
+    // Carrega do localStorage se existir
+    if (localStorage.getItem('scheduleData')) {
+      scheduleData = JSON.parse(localStorage.getItem('scheduleData'));
     }
 
-    // Cronômetro
-    let segundos = 0, minutos = 0, horas = 0;
-    let intervaloCronometro = null;
+    // Gera células do cronograma
+    function gerarCronograma() {
+      scheduleGrid.innerHTML = '';
+
+      for(let h = startHour; h <= endHour; h++) {
+        // Linha da grade: primeiro coluna é horário
+        const timeCell = document.createElement('div');
+        timeCell.classList.add('cell', 'time-slot');
+        timeCell.textContent = `${h}:00`;
+        scheduleGrid.appendChild(timeCell);
+
+        // Células por dia da semana
+        days.forEach(day => {
+          const cell = document.createElement('div');
+          cell.classList.add('cell');
+          cell.dataset.day = day;
+          cell.dataset.hour = h;
+
+          const cellId = `${h}-${day}`;
+          cell.id = cellId;
+
+          // Se tem dado salvo, mostra texto
+          if (scheduleData[cellId]) {
+            const s = scheduleData[cellId];
+            cell.textContent = `${capitalize(s.subject)} (${s.time} min)`;
+            cell.style.backgroundColor = getColorBySubject(s.subject);
+            cell.style.color = 'white';
+            cell.style.fontWeight = 'bold';
+          } else {
+            cell.textContent = '';
+            cell.style.backgroundColor = '';
+            cell.style.color = '';
+            cell.style.fontWeight = '';
+          }
+
+          cell.addEventListener('click', () => abrirModal(cellId));
+          scheduleGrid.appendChild(cell);
+        });
+      }
+    }
+
+    function capitalize(str) {
+      if (!str) return '';
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    function getColorBySubject(subject) {
+      switch(subject) {
+        case 'matematica': return '#2563eb'; // azul
+        case 'portugues': return '#16a34a'; // verde
+        case 'historia': return '#d97706';   // laranja
+        case 'biologia': return '#059669';   // verde escuro
+        case 'quimica': return '#b91c1c';    // vermelho escuro
+        default: return '#374151';           // cinza escuro
+      }
+    }
+
+    // Abre modal para editar célula
+    function abrirModal(cellId) {
+      currentCellId = cellId;
+      // Se tem dado, preenche inputs
+      const dados = scheduleData[cellId];
+      if (dados) {
+        subjectSelect.value = dados.subject;
+        studyTimeInput.value = dados.time;
+      } else {
+        subjectSelect.value = 'matematica';
+        studyTimeInput.value = '';
+      }
+      modal.style.display = 'flex';
+      studyTimeInput.focus();
+    }
+
+    closeModalBtn.onclick = () => {
+      modal.style.display = 'none';
+    };
+
+    // Salvar dados no cronograma
+    saveBtn.onclick = () => {
+      const subject = subjectSelect.value;
+      const time = parseInt(studyTimeInput.value);
+
+      if (!time || time <= 0) {
+        alert('Informe um tempo de estudo válido!');
+        studyTimeInput.focus();
+        return;
+      }
+
+      scheduleData[currentCellId] = { subject, time };
+      salvarLocal();
+      gerarCronograma();
+      modal.style.display = 'none';
+    };
+
+    // Limpar célula atual
+    clearCellBtn.onclick = () => {
+      if (scheduleData[currentCellId]) {
+        delete scheduleData[currentCellId];
+        salvarLocal();
+        gerarCronograma();
+      }
+      modal.style.display = 'none';
+    };
+
+    // Limpar tudo
+    clearAllBtn.onclick = () => {
+      if (confirm('Tem certeza que deseja limpar todo o cronograma?')) {
+        scheduleData = {};
+        salvarLocal();
+        gerarCronograma();
+        modal.style.display = 'none';
+      }
+    };
+
+    function salvarLocal() {
+      localStorage.setItem('scheduleData', JSON.stringify(scheduleData));
+    }
+
+    // Fecha modal clicando fora do conteúdo
+    window.onclick = function(event) {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    };
+
+    // PAINEL FLUTUANTE
+
+    const botaoPainel = document.getElementById('botaoPainel');
+    const painel = document.getElementById('painel');
+
+    botaoPainel.addEventListener('click', () => {
+      if (painel.style.display === 'block') {
+        painel.style.display = 'none';
+      } else {
+        painel.style.display = 'block';
+      }
+    });
+
+    function alternarSecao(secaoId) {
+      const secoes = document.querySelectorAll('.secaoPainel');
+      secoes.forEach(secao => {
+        if (secao.id === secaoId) {
+          secao.style.display = secao.style.display === 'block' ? 'none' : 'block';
+        } else {
+          secao.style.display = 'none';
+        }
+      });
+    }
+
+    // Salvar notas no localStorage
+    const textareaNotas = document.getElementById('textareaNotas');
+    textareaNotas.value = localStorage.getItem('notas') || '';
+    textareaNotas.addEventListener('input', () => {
+      localStorage.setItem('notas', textareaNotas.value);
+    });
+
+    // CRONÔMETRO
+
+    let segundos = 0;
+    let intervalo = null;
+
+    const cronometroDisplay = document.getElementById('cronometro');
+
+    function formatarTempo(segundos) {
+      const hrs = Math.floor(segundos / 3600);
+      const mins = Math.floor((segundos % 3600) / 60);
+      const segs = segundos % 60;
+      return [hrs, mins, segs]
+        .map(n => n.toString().padStart(2, '0'))
+        .join(':');
+    }
 
     function atualizarCronometro() {
       segundos++;
-      if (segundos >= 60) { segundos = 0; minutos++; }
-      if (minutos >= 60) { minutos = 0; horas++; }
-      document.getElementById('cronometro').innerText =
-        `${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
+      cronometroDisplay.textContent = formatarTempo(segundos);
     }
 
     function iniciarCronometro() {
-      if (!intervaloCronometro)
-        intervaloCronometro = setInterval(atualizarCronometro, 1000);
+      if (!intervalo) {
+        intervalo = setInterval(atualizarCronometro, 1000);
+      }
     }
 
     function pararCronometro() {
-      clearInterval(intervaloCronometro);
-      intervaloCronometro = null;
+      clearInterval(intervalo);
+      intervalo = null;
     }
 
     function resetarCronometro() {
-      clearInterval(intervaloCronometro);
-      intervaloCronometro = null;
-      segundos = 0; minutos = 0; horas = 0;
-      document.getElementById('cronometro').innerText = "00:00:00";
+      pararCronometro();
+      segundos = 0;
+      cronometroDisplay.textContent = '00:00:00';
     }
-  </script>
 
-  <!-- Script do cronograma (se houver lógica adicional) -->
-  <script src="cronograma.js"></script>
+    // Inicializa cronograma na tela
+    gerarCronograma();
+
+  </script>
 </body>
 </html>
