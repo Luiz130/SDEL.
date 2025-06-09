@@ -915,7 +915,6 @@
 
 
 <script type="module">
-  // Firebase (mantido conforme seu código original)
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-analytics.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
@@ -933,20 +932,57 @@
 
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const textareaNotas = document.getElementById("textareaNotas");
+
+  let usuarioAtual = null;
+
+// Salvar texto no Firestore
+function salvarNotas(texto) {
+  if (!usuarioAtual) return;
+  const uid = usuarioAtual.uid;
+  const docRef = doc(db, "notasUsuario", uid); // <--- coleção atualizada
+  setDoc(docRef, { texto }, { merge: true });
+}
+
+// Carregar texto salvo
+async function carregarNotas() {
+  if (!usuarioAtual) return;
+  const uid = usuarioAtual.uid;
+  const docRef = doc(db, "notasUsuario", uid); // <--- coleção atualizada
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    textareaNotas.value = docSnap.data().texto || "";
+  }
+}
+
+  // Salvar ao digitar (auto-save)
+  textareaNotas.addEventListener("input", () => {
+    salvarNotas(textareaNotas.value);
+  });
+
+  // Detectar login
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      usuarioAtual = user;
+      carregarNotas();
+    } else {
+      usuarioAtual = null;
+      textareaNotas.value = "Faça login para salvar suas anotações.";
+    }
+  });
 </script>
 
+<!-- JS do painel e cronômetro -->
 <script>
-  // Alternar visibilidade das seções do painel
+  // Alternar painel
   function alternarSecao(id) {
     const secao = document.getElementById(id);
-    if (secao.style.display === "block") {
-      secao.style.display = "none";
-    } else {
-      secao.style.display = "block";
-    }
+    secao.style.display = (secao.style.display === "block") ? "none" : "block";
   }
 
-  // Mostrar/ocultar painel
   const botaoPainel = document.getElementById("botaoPainel");
   const painel = document.getElementById("painel");
   botaoPainel.onclick = () => {
@@ -959,38 +995,26 @@
 
   function atualizarCronometro() {
     segundos++;
-    if (segundos >= 60) {
-      segundos = 0;
-      minutos++;
-    }
-    if (minutos >= 60) {
-      minutos = 0;
-      horas++;
-    }
-    const formatarNumero = n => n.toString().padStart(2, '0');
-    const cronometroEl = document.getElementById('cronometro');
-    if (cronometroEl) {
-      cronometroEl.innerText = `${formatarNumero(horas)}:${formatarNumero(minutos)}:${formatarNumero(segundos)}`;
-    }
+    if (segundos >= 60) { segundos = 0; minutos++; }
+    if (minutos >= 60) { minutos = 0; horas++; }
+    const formatar = n => n.toString().padStart(2, '0');
+    document.getElementById("cronometro").innerText = `${formatar(horas)}:${formatar(minutos)}:${formatar(segundos)}`;
   }
 
-  window.iniciarCronometro = function () {
+  window.iniciarCronometro = () => {
     if (!intervaloCronometro) intervaloCronometro = setInterval(atualizarCronometro, 1000);
   };
-
-  window.pararCronometro = function () {
+  window.pararCronometro = () => {
     clearInterval(intervaloCronometro);
     intervaloCronometro = null;
   };
-
-  window.resetarCronometro = function () {
+  window.resetarCronometro = () => {
     window.pararCronometro();
     segundos = minutos = horas = 0;
-    const cronometroEl = document.getElementById('cronometro');
-    if (cronometroEl) cronometroEl.innerText = '00:00:00';
+    document.getElementById("cronometro").innerText = "00:00:00";
   };
 
-  // Arrastar painel
+  // Mover painel
   let posX = 0, posY = 0, posInicialX = 0, posInicialY = 0;
   const cabecalho = document.getElementById("cabecalhoPainel");
 
@@ -1000,7 +1024,7 @@
     e.preventDefault();
     posInicialX = e.clientX;
     posInicialY = e.clientY;
-    document.onmouseup = fecharDrag;
+    document.onmouseup = () => { document.onmousemove = null; };
     document.onmousemove = moverPainel;
   }
 
@@ -1014,17 +1038,10 @@
     const rect = painel.getBoundingClientRect();
     let novaTop = rect.top + dy;
     let novaLeft = rect.left + dx;
-
-    novaTop = Math.min(Math.max(novaTop, 0), window.innerHeight - rect.height);
-    novaLeft = Math.min(Math.max(novaLeft, 0), window.innerWidth - rect.width);
-
+    novaTop = Math.max(0, Math.min(novaTop, window.innerHeight - rect.height));
+    novaLeft = Math.max(0, Math.min(novaLeft, window.innerWidth - rect.width));
     painel.style.top = novaTop + "px";
     painel.style.left = novaLeft + "px";
     painel.style.right = "auto";
-  }
-
-  function fecharDrag() {
-    document.onmouseup = null;
-    document.onmousemove = null;
   }
 </script>
