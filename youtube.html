@@ -301,24 +301,24 @@
 
   let usuarioAtual = null;
 
-  // Salvar texto no Firestore
-  function salvarNotas(texto) {
-    if (!usuarioAtual) return;
-    const uid = usuarioAtual.uid;
-    const docRef = doc(db, "notas", uid);
-    setDoc(docRef, { texto }, { merge: true });
-  }
+// Salvar texto no Firestore
+function salvarNotas(texto) {
+  if (!usuarioAtual) return;
+  const uid = usuarioAtual.uid;
+  const docRef = doc(db, "notasUsuario", uid); // <--- coleção atualizada
+  setDoc(docRef, { texto }, { merge: true });
+}
 
-  // Carregar texto salvo
-  async function carregarNotas() {
-    if (!usuarioAtual) return;
-    const uid = usuarioAtual.uid;
-    const docRef = doc(db, "notas", uid);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      textareaNotas.value = docSnap.data().texto || "";
-    }
+// Carregar texto salvo
+async function carregarNotas() {
+  if (!usuarioAtual) return;
+  const uid = usuarioAtual.uid;
+  const docRef = doc(db, "notasUsuario", uid); // <--- coleção atualizada
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    textareaNotas.value = docSnap.data().texto || "";
   }
+}
 
   // Salvar ao digitar (auto-save)
   textareaNotas.addEventListener("input", () => {
