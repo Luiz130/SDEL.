@@ -505,8 +505,7 @@
 
 </script>
 <script>
-    // Aplica o tema salvo no localStorage ao carregar a página
-function aplicarTemaSalvo() {
+  function aplicarTemaSalvo() {
   const tema = localStorage.getItem('tema');
   if (tema === 'dark') {
     document.body.classList.add('dark-mode');
@@ -515,7 +514,6 @@ function aplicarTemaSalvo() {
   }
 }
 
-// Alterna entre claro e escuro e salva no localStorage
 function alternarTema() {
   if (document.body.classList.contains('dark-mode')) {
     document.body.classList.remove('dark-mode');
@@ -528,11 +526,10 @@ function alternarTema() {
   }
 }
 
-// Chama a função ao carregar a página
 document.addEventListener('DOMContentLoaded', () => {
   aplicarTemaSalvo();
 
-  // Cria botão automaticamente
+  // Criar botão de alternância
   const botao = document.createElement('button');
   botao.textContent = 'Alternar Tema';
   botao.className = 'toggle-btn';
