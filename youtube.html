@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Vídeos</title>
   <style>
-     body {
+    body {
       font-family: sans-serif;
       background-color: #fafafa;
       padding: 40px;
@@ -39,7 +39,6 @@
 
     .video-box {
       background-color: #eee;
-      height: auto;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -91,7 +90,6 @@
       cursor: pointer;
     }
 
-       /* Botão flutuante lateral */
     #botaoPainel {
       position: fixed;
       top: 50%;
@@ -221,22 +219,19 @@
       cursor: pointer;
       transition: background 0.3s;
     }
-
   </style>
 </head>
 <body>
 
 <div class="container">
   <div class="header">
-
-            <img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" alt="YouTube" />
+    <div class="header-icon">▶</div>
     <h2>Disciplina</h2>
   </div>
 
-  <!-- Vídeos principais -->
   <div class="video-box">
     <a href="https://www.youtube.com/watch?v=H5Rcxjn6rp0" target="_blank">
-      <img src="https://img.youtube.com/vi/H5Rcxjn6rp0/maxresdefault.jpg" alt="Vídeo YouTube">
+      <img src="https://i.ytimg.com/vi/H5Rcxjn6rp0/hqdefault.jpg" alt="Vídeo YouTube">
     </a>
   </div>
 
@@ -248,12 +243,10 @@
           <img src="https://img.youtube.com/vi/F2y6cwqFhkE/default.jpg" alt="Miniatura">
         </a>
       </div>
-      <!-- ... outras miniaturas ... -->
     </div>
   </div>
 </div>
 
-<!-- Botão e painel -->
 <div id="botaoPainel" title="Abrir Painel">🛠</div>
 
 <div id="painel">
@@ -276,7 +269,6 @@
   </div>
 </div>
 
-<!-- Firebase -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-analytics.js";
@@ -302,31 +294,27 @@
 
   let usuarioAtual = null;
 
-// Salvar texto no Firestore
-function salvarNotas(texto) {
-  if (!usuarioAtual) return;
-  const uid = usuarioAtual.uid;
-  const docRef = doc(db, "notasUsuario", uid); // <--- coleção atualizada
-  setDoc(docRef, { texto }, { merge: true });
-}
-
-// Carregar texto salvo
-async function carregarNotas() {
-  if (!usuarioAtual) return;
-  const uid = usuarioAtual.uid;
-  const docRef = doc(db, "notasUsuario", uid); // <--- coleção atualizada
-  const docSnap = await getDoc(docRef);
-  if (docSnap.exists()) {
-    textareaNotas.value = docSnap.data().texto || "";
+  function salvarNotas(texto) {
+    if (!usuarioAtual) return;
+    const uid = usuarioAtual.uid;
+    const docRef = doc(db, "notasUsuario", uid);
+    setDoc(docRef, { texto }, { merge: true });
   }
-}
 
-  // Salvar ao digitar (auto-save)
+  async function carregarNotas() {
+    if (!usuarioAtual) return;
+    const uid = usuarioAtual.uid;
+    const docRef = doc(db, "notasUsuario", uid);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      textareaNotas.value = docSnap.data().texto || "";
+    }
+  }
+
   textareaNotas.addEventListener("input", () => {
     salvarNotas(textareaNotas.value);
   });
 
-  // Detectar login
   onAuthStateChanged(auth, user => {
     if (user) {
       usuarioAtual = user;
@@ -338,9 +326,7 @@ async function carregarNotas() {
   });
 </script>
 
-<!-- JS do painel e cronômetro -->
 <script>
-  // Alternar painel
   function alternarSecao(id) {
     const secao = document.getElementById(id);
     secao.style.display = (secao.style.display === "block") ? "none" : "block";
@@ -352,7 +338,6 @@ async function carregarNotas() {
     painel.style.display = painel.style.display === "block" ? "none" : "block";
   };
 
-  // Cronômetro
   let segundos = 0, minutos = 0, horas = 0;
   let intervaloCronometro = null;
 
@@ -377,7 +362,6 @@ async function carregarNotas() {
     document.getElementById("cronometro").innerText = "00:00:00";
   };
 
-  // Mover painel
   let posX = 0, posY = 0, posInicialX = 0, posInicialY = 0;
   const cabecalho = document.getElementById("cabecalhoPainel");
 
@@ -408,5 +392,6 @@ async function carregarNotas() {
     painel.style.right = "auto";
   }
 </script>
+
 </body>
 </html>
