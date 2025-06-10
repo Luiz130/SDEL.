@@ -50,7 +50,7 @@
 
     
     <div class="subheader-right">
-
+<button id="botao-tema" class="toggle-btn">Alternar Tema</button> 
   </div>
   
    <div class="centralizador">
@@ -505,7 +505,7 @@
 
 </script>
 <script>
-  function aplicarTemaSalvo() {
+function aplicarTemaSalvo() {
   const tema = localStorage.getItem('tema');
   if (tema === 'dark') {
     document.body.classList.add('dark-mode');
@@ -529,12 +529,11 @@ function alternarTema() {
 document.addEventListener('DOMContentLoaded', () => {
   aplicarTemaSalvo();
 
-  // Criar botão de alternância
-  const botao = document.createElement('button');
-  botao.textContent = 'Alternar Tema';
-  botao.className = 'toggle-btn';
-  botao.onclick = alternarTema;
-  document.body.appendChild(botao);
+  // Usa o botão fixo que você colocou no HTML
+  const botao = document.getElementById('botao-tema');
+  if (botao) {
+    botao.addEventListener('click', alternarTema);
+  }
 });
 
 </script>
