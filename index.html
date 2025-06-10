@@ -53,7 +53,7 @@
 
 <head>
 
-  <title>Alternar Tema</title>
+<title>Alternar Tema</title>
   <style>
     /* Tema claro */
     body {
@@ -61,6 +61,8 @@
       color: black;
       transition: background-color 0.3s, color 0.3s;
       font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
     }
 
     /* Tema escuro */
@@ -69,10 +71,11 @@
       color: white;
     }
 
-    button {
+    /* Botão fixo no canto esquerdo */
+    #themeToggle {
       position: fixed;
       top: 20px;
-      right: 20px;
+      left: 20px;
       padding: 10px 15px;
       font-size: 16px;
       background-color: #007bff;
@@ -80,6 +83,7 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      z-index: 1000;
     }
   </style>
 </head>
@@ -87,9 +91,8 @@
 
   <button id="themeToggle">Alterar Tema</button>
 
-
   <script>
-    // Ao carregar a página, aplica o tema salvo
+    // Aplica o tema salvo (claro ou escuro) ao carregar a página
     window.onload = () => {
       const savedTheme = localStorage.getItem('theme');
       if (savedTheme === 'dark') {
@@ -97,7 +100,7 @@
       }
     };
 
-    // Ao clicar no botão, alterna o tema e salva
+    // Alterna o tema ao clicar no botão
     document.getElementById('themeToggle').addEventListener('click', () => {
       document.body.classList.toggle('dark');
       const isDark = document.body.classList.contains('dark');
@@ -105,8 +108,7 @@
     });
   </script>
 
-</body>
-</html>
+
 
   </div>
   
