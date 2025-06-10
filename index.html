@@ -495,6 +495,8 @@
     });
   }
 
+
+
   // Função rolar carrossel
   window.rolar = function(direcao) {
     const carrossel = document.getElementById("carrossel");
@@ -503,13 +505,14 @@
     carrossel.scrollLeft += direcao * larguraItem;
   };
 
-
 function aplicarTemaSalvo() {
   const tema = localStorage.getItem('tema');
   if (tema === 'dark') {
     document.body.classList.add('dark-mode');
+    document.body.classList.remove('light-mode');
   } else {
     document.body.classList.add('light-mode');
+    document.body.classList.remove('dark-mode');
   }
 }
 
@@ -528,13 +531,11 @@ function alternarTema() {
 document.addEventListener('DOMContentLoaded', () => {
   aplicarTemaSalvo();
 
-  // Usa o botão fixo que você colocou no HTML
   const botao = document.getElementById('botao-tema');
   if (botao) {
     botao.addEventListener('click', alternarTema);
   }
 });
 
-</script>
 
 </body>
