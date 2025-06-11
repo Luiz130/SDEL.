@@ -351,107 +351,114 @@
   const cabecalhoPainel = document.getElementById('cabecalhoPainel');
   const profileImg = document.getElementById('profileImage');
   const perfilOptions = document.getElementById('perfilOptions'); // Corrigido nome da variável
+  const cronometroEl = document.getElementById("cronometro");
 
-  // Controle painel abrir/fechar
-  botaoPainel.onclick = () => {
-    painel.style.display = (painel.style.display === 'block') ? 'none' : 'block';
-  };
-
-  // Alternar visibilidade das seções
-  window.alternarSecao = function(id) {
-    const secao = document.getElementById(id);
-    secao.style.display = (secao.style.display === 'block') ? 'none' : 'block';
-  };
-
-  // Variável usuário logado
   let usuarioAtual = null;
-
-  // Carregar notas do Firestore
-  async function carregarNotas(uid) {
-    const docRef = doc(db, "notasUsuario", uid);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      textareaNotas.value = docSnap.data().texto || "";
-    } else {
-      textareaNotas.value = "";
-    }
-  }
-
-  // Salvar notas no Firestore
-  async function salvarNotas(uid, texto) {
-    const docRef = doc(db, "notasUsuario", uid);
-    await setDoc(docRef, { texto });
-  }
-
-  // Atualizar notas quando usuário digitar
-  textareaNotas.addEventListener("input", () => {
-    if (!usuarioAtual) return;
-    salvarNotas(usuarioAtual.uid, textareaNotas.value);
-  });
-
-  // Monitora estado do login
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      usuarioAtual = user;
-      await carregarNotas(user.uid);
-      // Atualiza imagem de perfil se existir
-      if (user.photoURL && profileImg) {
-        profileImg.src = user.photoURL;
-      }
-    } else {
-      usuarioAtual = null;
-      textareaNotas.value = "";
-      if (profileImg) profileImg.src = "default-profile.png"; // opcional: imagem default
-    }
-  });
-
-  // Cronômetro
   let segundos = 0, minutos = 0, horas = 0;
   let intervaloCronometro = null;
 
-  function atualizarCronometro() {
-    segundos++;
-    if (segundos >= 60) {
-      segundos = 0;
-      minutos++;
-    }
-    if (minutos >= 60) {
-      minutos = 0;
-      horas++;
-    }
-    const formatarNumero = n => n.toString().padStart(2, '0');
-    const cronometroEl = document.getElementById('cronometro');
-    if(cronometroEl) {
-      cronometroEl.innerText = `${formatarNumero(horas)}:${formatarNumero(minutos)}:${formatarNumero(segundos)}`;
+  // ---------- Salvar notas ----------
+  function salvarNotas(texto) {
+    if (!usuarioAtual) return;
+    const uid = usuarioAtual.uid;
+    const docRef = doc(db, "notasUsuario", uid);
+    setDoc(docRef, { texto }, { merge: true });
+  }
+
+  // ---------- Salvar tempo ----------
+  function salvarTempoCronometro() {
+    if (!usuarioAtual) return;
+    const uid = usuarioAtual.uid;
+    const docRef = doc(db, "notasUsuario", uid);
+    const tempoAtual = cronometroEl.innerText;
+    setDoc(docRef, { tempo: tempoAtual }, { merge: true });
+  }
+
+  // ---------- Carregar notas e tempo ----------
+  async function carregarNotas() {
+    if (!usuarioAtual) return;
+    const uid = usuarioAtual.uid;
+    const docRef = doc(db, "notasUsuario", uid);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      textareaNotas.value = data.texto || "";
+
+      if (data.tempo) {
+        cronometroEl.innerText = data.tempo;
+        const [h, m, s] = data.tempo.split(":").map(Number);
+        horas = h; minutos = m; segundos = s;
+      }
     }
   }
 
-  window.iniciarCronometro = function() {
+  // ---------- Login ----------
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      usuarioAtual = user;
+      carregarNotas();
+    } else {
+      usuarioAtual = null;
+      textareaNotas.value = "Faça login para salvar suas anotações.";
+    }
+  });
+
+  textareaNotas.addEventListener("input", () => {
+    salvarNotas(textareaNotas.value);
+  });
+
+  // ---------- Cronômetro ----------
+  function atualizarCronometro() {
+    segundos++;
+    if (segundos >= 60) { segundos = 0; minutos++; }
+    if (minutos >= 60) { minutos = 0; horas++; }
+    const formatar = n => n.toString().padStart(2, '0');
+    const tempo = `${formatar(horas)}:${formatar(minutos)}:${formatar(segundos)}`;
+    cronometroEl.innerText = tempo;
+    salvarTempoCronometro();
+  }
+
+  window.iniciarCronometro = () => {
     if (!intervaloCronometro) intervaloCronometro = setInterval(atualizarCronometro, 1000);
   };
 
-  window.pararCronometro = function() {
+  window.pararCronometro = () => {
     clearInterval(intervaloCronometro);
     intervaloCronometro = null;
   };
 
-  window.resetarCronometro = function() {
-    window.pararCronometro();
+  window.resetarCronometro = () => {
+    pararCronometro();
     segundos = minutos = horas = 0;
-    const cronometroEl = document.getElementById('cronometro');
-    if(cronometroEl) cronometroEl.innerText = '00:00:00';
+    cronometroEl.innerText = "00:00:00";
+    salvarTempoCronometro();
+  };
+</script>
+
+<!-- JS do painel e movimentação -->
+<script>
+  function alternarSecao(id) {
+    const secao = document.getElementById(id);
+    secao.style.display = (secao.style.display === "block") ? "none" : "block";
+  }
+
+  const botaoPainel = document.getElementById("botaoPainel");
+  const painel = document.getElementById("painel");
+  botaoPainel.onclick = () => {
+    painel.style.display = painel.style.display === "block" ? "none" : "block";
   };
 
-  // Drag painel pelo cabeçalho
+  // Mover painel
   let posX = 0, posY = 0, posInicialX = 0, posInicialY = 0;
+  const cabecalho = document.getElementById("cabecalhoPainel");
 
-  cabecalhoPainel.onmousedown = dragMouseDown;
+  cabecalho.onmousedown = dragMouseDown;
 
   function dragMouseDown(e) {
     e.preventDefault();
     posInicialX = e.clientX;
     posInicialY = e.clientY;
-    document.onmouseup = fecharDrag;
+    document.onmouseup = () => { document.onmousemove = null; };
     document.onmousemove = moverPainel;
   }
 
@@ -462,24 +469,16 @@
     posInicialX = e.clientX;
     posInicialY = e.clientY;
 
-    // Calcula posição atual e aplica deslocamento
     const rect = painel.getBoundingClientRect();
     let novaTop = rect.top + dy;
     let novaLeft = rect.left + dx;
-
-    // Limita para não sair da tela
-    novaTop = Math.min(Math.max(novaTop, 0), window.innerHeight - rect.height);
-    novaLeft = Math.min(Math.max(novaLeft, 0), window.innerWidth - rect.width);
-
+    novaTop = Math.max(0, Math.min(novaTop, window.innerHeight - rect.height));
+    novaLeft = Math.max(0, Math.min(novaLeft, window.innerWidth - rect.width));
     painel.style.top = novaTop + "px";
     painel.style.left = novaLeft + "px";
-    painel.style.right = "auto"; // Para evitar conflito se usar right antes
+    painel.style.right = "auto";
   }
 
-  function fecharDrag() {
-    document.onmouseup = null;
-    document.onmousemove = null;
-  }
 
   // Menu do perfil (toggle)
   if (profileImg && perfilOptions) {
