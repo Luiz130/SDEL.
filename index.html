@@ -509,10 +509,14 @@ const cronometroEl = document.getElementById("cronometro");
   }
 
 
+ function fecharDrag() {
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
 
 
     
-  // Menu do perfil (toggle)
+ // Menu do perfil (toggle)
   if (profileImg && perfilOptions) {
     profileImg.addEventListener('click', (e) => {
       e.stopPropagation();
