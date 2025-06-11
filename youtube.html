@@ -339,91 +339,22 @@ async function carregarNotas() {
 </script>
 
 <!-- JS do painel e cronômetro -->
-<script>
-  // Alternar painel
-  function alternarSecao(id) {
-    const secao = document.getElementById(id);
-    secao.style.display = (secao.style.display === "block") ? "none" : "block";
-  }
-
-  const botaoPainel = document.getElementById("botaoPainel");
-  const painel = document.getElementById("painel");
-  botaoPainel.onclick = () => {
-    painel.style.display = painel.style.display === "block" ? "none" : "block";
-  };
-
-  // Cronômetro
-  let segundos = 0, minutos = 0, horas = 0;
-  let intervaloCronometro = null;
-
-  function atualizarCronometro() {
-    segundos++;
-    if (segundos >= 60) { segundos = 0; minutos++; }
-    if (minutos >= 60) { minutos = 0; horas++; }
-    const formatar = n => n.toString().padStart(2, '0');
-    document.getElementById("cronometro").innerText = `${formatar(horas)}:${formatar(minutos)}:${formatar(segundos)}`;
-  }
-
-  window.iniciarCronometro = () => {
-    if (!intervaloCronometro) intervaloCronometro = setInterval(atualizarCronometro, 1000);
-  };
-  window.pararCronometro = () => {
-    clearInterval(intervaloCronometro);
-    intervaloCronometro = null;
-  };
-  window.resetarCronometro = () => {
-    window.pararCronometro();
-    segundos = minutos = horas = 0;
-    document.getElementById("cronometro").innerText = "00:00:00";
-  };
-
-  // Mover painel
-  let posX = 0, posY = 0, posInicialX = 0, posInicialY = 0;
-  const cabecalho = document.getElementById("cabecalhoPainel");
-
-  cabecalho.onmousedown = dragMouseDown;
-
-  function dragMouseDown(e) {
-    e.preventDefault();
-    posInicialX = e.clientX;
-    posInicialY = e.clientY;
-    document.onmouseup = () => { document.onmousemove = null; };
-    document.onmousemove = moverPainel;
-  }
-
-  function moverPainel(e) {
-    e.preventDefault();
-    const dx = e.clientX - posInicialX;
-    const dy = e.clientY - posInicialY;
-    posInicialX = e.clientX;
-    posInicialY = e.clientY;
-
-    const rect = painel.getBoundingClientRect();
-    let novaTop = rect.top + dy;
-    let novaLeft = rect.left + dx;
-    novaTop = Math.max(0, Math.min(novaTop, window.innerHeight - rect.height));
-    novaLeft = Math.max(0, Math.min(novaLeft, window.innerWidth - rect.width));
-    painel.style.top = novaTop + "px";
-    painel.style.left = novaLeft + "px";
-    painel.style.right = "auto";
-  }
-</script>
 
 <script>
-  // Recupera o tempo inicial salvo no localStorage ou define agora
-  let inicio = localStorage.getItem("cronometroInicio");
+  let cronometroInterval;
+  let pausado = localStorage.getItem("cronometroPausado") === "true";
+  let tempoTotalPausado = parseInt(localStorage.getItem("cronometroTempoPausado")) || 0;
+  let inicio = parseInt(localStorage.getItem("cronometroInicio"));
 
+  // Se não tiver início salvo, começa agora
   if (!inicio) {
     inicio = Date.now();
     localStorage.setItem("cronometroInicio", inicio);
-  } else {
-    inicio = parseInt(inicio);
   }
 
-  // Atualiza o cronômetro a cada segundo
-  setInterval(() => {
+  function atualizarCronometro() {
     const agora = Date.now();
-    const tempoDecorrido = agora - inicio;
+    const tempoDecorrido = (agora - inicio) + tempoTotalPausado;
 
     const horas = Math.floor(tempoDecorrido / (1000 * 60 * 60));
     const minutos = Math.floor((tempoDecorrido % (1000 * 60 * 60)) / (1000 * 60));
@@ -433,8 +364,44 @@ async function carregarNotas() {
       `${horas.toString().padStart(2, '0')}:` +
       `${minutos.toString().padStart(2, '0')}:` +
       `${segundos.toString().padStart(2, '0')}`;
-  }, 1000);
-</script>
+  }
 
+  function iniciarCronometro() {
+    cronometroInterval = setInterval(atualizarCronometro, 1000);
+  }
+
+  function pausarCronometro() {
+    clearInterval(cronometroInterval);
+    const agora = Date.now();
+    const tempoDecorrido = agora - inicio;
+    tempoTotalPausado += tempoDecorrido;
+    localStorage.setItem("cronometroTempoPausado", tempoTotalPausado);
+    localStorage.setItem("cronometroPausado", "true");
+    localStorage.removeItem("cronometroInicio");
+  }
+
+  function continuarCronometro() {
+    inicio = Date.now();
+    localStorage.setItem("cronometroInicio", inicio);
+    localStorage.setItem("cronometroPausado", "false");
+    iniciarCronometro();
+  }
+
+  // Eventos dos botões
+  document.getElementById("pausarBtn").addEventListener("click", () => {
+    pausarCronometro();
+  });
+
+  document.getElementById("continuarBtn").addEventListener("click", () => {
+    continuarCronometro();
+  });
+
+  // Inicia automaticamente se não estiver pausado
+  if (!pausado) {
+    iniciarCronometro();
+  } else {
+    atualizarCronometro(); // Mostra tempo pausado
+  }
+</script>
 </body>
 </html>
