@@ -409,44 +409,32 @@ async function carregarNotas() {
   }
 </script>
 
-  <script>
-  let tempoTotal = 2.5 * 60 * 60 * 1000; // 2h30 em milissegundos
+<script>
+  // Recupera o tempo inicial salvo no localStorage ou define agora
+  let inicio = localStorage.getItem("cronometroInicio");
 
-  // Verifica se já existe uma data final salva
-  let fim = localStorage.getItem("horarioFim");
-
-  if (!fim) {
-    // Se não existe, define um novo horário final
-    const agora = new Date().getTime();
-    const novoFim = agora + tempoTotal;
-    localStorage.setItem("horarioFim", novoFim);
-    fim = novoFim;
+  if (!inicio) {
+    inicio = Date.now();
+    localStorage.setItem("cronometroInicio", inicio);
+  } else {
+    inicio = parseInt(inicio);
   }
 
-  const cronometro = setInterval(() => {
-    const agora = new Date().getTime();
-    const tempoRestante = fim - agora;
+  // Atualiza o cronômetro a cada segundo
+  setInterval(() => {
+    const agora = Date.now();
+    const tempoDecorrido = agora - inicio;
 
-    if (tempoRestante <= 0) {
-      clearInterval(cronometro);
-      localStorage.removeItem("horarioFim");
-      document.getElementById("cronometro").innerText = "Tempo esgotado!";
-      // Aqui você pode encerrar o quiz
-      return;
-    }
-
-    // Converte o tempo restante para horas:minutos:segundos
-    const horas = Math.floor(tempoRestante / (1000 * 60 * 60));
-    const minutos = Math.floor((tempoRestante % (1000 * 60 * 60)) / (1000 * 60));
-    const segundos = Math.floor((tempoRestante % (1000 * 60)) / 1000);
+    const horas = Math.floor(tempoDecorrido / (1000 * 60 * 60));
+    const minutos = Math.floor((tempoDecorrido % (1000 * 60 * 60)) / (1000 * 60));
+    const segundos = Math.floor((tempoDecorrido % (1000 * 60)) / 1000);
 
     document.getElementById("cronometro").innerText =
-      `${horas.toString().padStart(2, "0")}:` +
-      `${minutos.toString().padStart(2, "0")}:` +
-      `${segundos.toString().padStart(2, "0")}`;
+      `${horas.toString().padStart(2, '0')}:` +
+      `${minutos.toString().padStart(2, '0')}:` +
+      `${segundos.toString().padStart(2, '0')}`;
   }, 1000);
 </script>
 
-<div id="cronometro" style="font-size: 24px; font-weight: bold;"></div>
 </body>
 </html>
