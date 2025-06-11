@@ -342,66 +342,65 @@ async function carregarNotas() {
 
 <script>
   let cronometroInterval;
-  let pausado = localStorage.getItem("cronometroPausado") === "true";
-  let tempoTotalPausado = parseInt(localStorage.getItem("cronometroTempoPausado")) || 0;
-  let inicio = parseInt(localStorage.getItem("cronometroInicio"));
-
-  // Se não tiver início salvo, começa agora
-  if (!inicio) {
-    inicio = Date.now();
-    localStorage.setItem("cronometroInicio", inicio);
-  }
+  let tempoDecorrido = parseInt(localStorage.getItem("tempoDecorrido")) || 0;
+  let rodando = localStorage.getItem("rodando") === "true";
+  let inicio;
 
   function atualizarCronometro() {
     const agora = Date.now();
-    const tempoDecorrido = (agora - inicio) + tempoTotalPausado;
+    const tempoAtual = tempoDecorrido + (agora - inicio);
 
-    const horas = Math.floor(tempoDecorrido / (1000 * 60 * 60));
-    const minutos = Math.floor((tempoDecorrido % (1000 * 60 * 60)) / (1000 * 60));
-    const segundos = Math.floor((tempoDecorrido % (1000 * 60)) / 1000);
+    const horas = Math.floor(tempoAtual / (1000 * 60 * 60));
+    const minutos = Math.floor((tempoAtual % (1000 * 60 * 60)) / (1000 * 60));
+    const segundos = Math.floor((tempoAtual % (1000 * 60)) / 1000);
 
     document.getElementById("cronometro").innerText =
-      `${horas.toString().padStart(2, '0')}:` +
-      `${minutos.toString().padStart(2, '0')}:` +
-      `${segundos.toString().padStart(2, '0')}`;
+      `${String(horas).padStart(2, "0")}:` +
+      `${String(minutos).padStart(2, "0")}:` +
+      `${String(segundos).padStart(2, "0")}`;
   }
 
   function iniciarCronometro() {
-    cronometroInterval = setInterval(atualizarCronometro, 1000);
-  }
+    if (rodando) return; // já está rodando
 
-  function pausarCronometro() {
-    clearInterval(cronometroInterval);
-    const agora = Date.now();
-    const tempoDecorrido = agora - inicio;
-    tempoTotalPausado += tempoDecorrido;
-    localStorage.setItem("cronometroTempoPausado", tempoTotalPausado);
-    localStorage.setItem("cronometroPausado", "true");
-    localStorage.removeItem("cronometroInicio");
-  }
-
-  function continuarCronometro() {
+    rodando = true;
     inicio = Date.now();
-    localStorage.setItem("cronometroInicio", inicio);
-    localStorage.setItem("cronometroPausado", "false");
-    iniciarCronometro();
+    localStorage.setItem("rodando", "true");
+
+    cronometroInterval = setInterval(() => {
+      atualizarCronometro();
+    }, 1000);
   }
 
-  // Eventos dos botões
-  document.getElementById("pausarBtn").addEventListener("click", () => {
-    pausarCronometro();
-  });
+  function pararCronometro() {
+    if (!rodando) return;
 
-  document.getElementById("continuarBtn").addEventListener("click", () => {
-    continuarCronometro();
-  });
-
-  // Inicia automaticamente se não estiver pausado
-  if (!pausado) {
-    iniciarCronometro();
-  } else {
-    atualizarCronometro(); // Mostra tempo pausado
+    clearInterval(cronometroInterval);
+    tempoDecorrido += Date.now() - inicio;
+    localStorage.setItem("tempoDecorrido", tempoDecorrido.toString());
+    localStorage.setItem("rodando", "false");
+    rodando = false;
   }
+
+  function resetarCronometro() {
+    clearInterval(cronometroInterval);
+    tempoDecorrido = 0;
+    rodando = false;
+    localStorage.removeItem("tempoDecorrido");
+    localStorage.setItem("rodando", "false");
+    document.getElementById("cronometro").innerText = "00:00:00";
+  }
+
+  // Se estava rodando antes de sair da página
+  window.addEventListener("load", () => {
+    if (rodando) {
+      inicio = Date.now();
+      iniciarCronometro();
+    } else {
+      atualizarCronometro();
+    }
+  });
 </script>
+
 </body>
 </html>
