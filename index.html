@@ -352,7 +352,7 @@
   const profileImg = document.getElementById('profileImage');
   const perfilOptions = document.getElementById('perfilOptions'); // Corrigido nome da variável
 
- const cronometroEl = document.getElementById("cronometro");
+ onst cronometroEl = document.getElementById("cronometro");
 
   let usuarioAtual = null;
   let segundos = 0, minutos = 0, horas = 0;
@@ -480,20 +480,16 @@
     painel.style.right = "auto";
   }
 
-  // Menu do perfil (toggle)
-  if (profileImg && perfilOptions) {
-    profileImg.addEventListener('click', (e) => {
-      e.stopPropagation();
-      perfilOptions.style.display = (perfilOptions.style.display === 'block') ? 'none' : 'block';
-    });
-
-    document.addEventListener('click', () => {
-      perfilOptions.style.display = 'none';
-    });
-  }
 
 
 
+
+
+
+    
+
+
+    
   // Monitora estado do login
   onAuthStateChanged(auth, async (user) => {
     if (user) {
@@ -511,7 +507,26 @@
   });
 
 
-      
+
+
+
+
+
+
+
+
+  // Menu do perfil (toggle)
+  if (profileImg && perfilOptions) {
+    profileImg.addEventListener('click', (e) => {
+      e.stopPropagation();
+      perfilOptions.style.display = (perfilOptions.style.display === 'block') ? 'none' : 'block';
+    });
+
+    document.addEventListener('click', () => {
+      perfilOptions.style.display = 'none';
+    });
+  }
+
   // Função rolar carrossel
   window.rolar = function(direcao) {
     const carrossel = document.getElementById("carrossel");
