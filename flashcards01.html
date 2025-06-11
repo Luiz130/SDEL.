@@ -977,71 +977,159 @@ async function carregarNotas() {
 
 <!-- JS do painel e cronômetro -->
 <script>
-  // Alternar painel
-  function alternarSecao(id) {
-    const secao = document.getElementById(id);
-    secao.style.display = (secao.style.display === "block") ? "none" : "block";
+  // Importações Firebase - deve estar dentro de <script type="module"> na sua página HTML
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-analytics.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
+
+// Configuração Firebase - altere para sua config
+const firebaseConfig = {
+  apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
+  authDomain: "sdel-b3f65.firebaseapp.com",
+  projectId: "sdel-b3f65",
+  storageBucket: "sdel-b3f65.appspot.com",
+  messagingSenderId: "297725999985",
+  appId: "1:297725999985:web:d41da68311c190ef8a54d0",
+  measurementId: "G-PT92VECJ2H"
+};
+
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Elementos DOM
+const textareaNotas = document.getElementById("textareaNotas");
+const cronometroEl = document.getElementById("cronometro");
+
+let usuarioAtual = null;
+
+// Variáveis cronômetro
+let segundos = 0, minutos = 0, horas = 0;
+let intervaloCronometro = null;
+
+// Salvar notas no Firestore
+function salvarNotas(texto) {
+  if (!usuarioAtual) return;
+  const uid = usuarioAtual.uid;
+  const docRef = doc(db, "notasUsuario", uid);
+  setDoc(docRef, { texto }, { merge: true });
+}
+
+// Salvar tempo do cronômetro no Firestore
+function salvarTempoCronometro() {
+  if (!usuarioAtual) return;
+  const uid = usuarioAtual.uid;
+  const docRef = doc(db, "notasUsuario", uid);
+  const tempoAtual = cronometroEl.innerText;
+  setDoc(docRef, { tempo: tempoAtual }, { merge: true });
+}
+
+// Carregar notas e tempo salvos do Firestore
+async function carregarNotas() {
+  if (!usuarioAtual) return;
+  const uid = usuarioAtual.uid;
+  const docRef = doc(db, "notasUsuario", uid);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    const data = docSnap.data();
+    textareaNotas.value = data.texto || "";
+    if (data.tempo) {
+      cronometroEl.innerText = data.tempo;
+      const [h, m, s] = data.tempo.split(":").map(Number);
+      horas = h; minutos = m; segundos = s;
+    }
   }
+}
 
-  const botaoPainel = document.getElementById("botaoPainel");
-  const painel = document.getElementById("painel");
-  botaoPainel.onclick = () => {
-    painel.style.display = painel.style.display === "block" ? "none" : "block";
-  };
+// Atualizar cronômetro e salvar no Firestore a cada segundo
+function atualizarCronometro() {
+  segundos++;
+  if (segundos >= 60) { segundos = 0; minutos++; }
+  if (minutos >= 60) { minutos = 0; horas++; }
+  const formatar = n => n.toString().padStart(2, '0');
+  const tempo = `${formatar(horas)}:${formatar(minutos)}:${formatar(segundos)}`;
+  cronometroEl.innerText = tempo;
+  salvarTempoCronometro();
+}
 
-  // Cronômetro
-  let segundos = 0, minutos = 0, horas = 0;
-  let intervaloCronometro = null;
+// Funções para controle do cronômetro
+window.iniciarCronometro = () => {
+  if (!intervaloCronometro) intervaloCronometro = setInterval(atualizarCronometro, 1000);
+};
+window.pararCronometro = () => {
+  clearInterval(intervaloCronometro);
+  intervaloCronometro = null;
+};
+window.resetarCronometro = () => {
+  window.pararCronometro();
+  segundos = minutos = horas = 0;
+  cronometroEl.innerText = "00:00:00";
+  salvarTempoCronometro();
+};
 
-  function atualizarCronometro() {
-    segundos++;
-    if (segundos >= 60) { segundos = 0; minutos++; }
-    if (minutos >= 60) { minutos = 0; horas++; }
-    const formatar = n => n.toString().padStart(2, '0');
-    document.getElementById("cronometro").innerText = `${formatar(horas)}:${formatar(minutos)}:${formatar(segundos)}`;
+// Salvar notas ao digitar (auto-save)
+textareaNotas.addEventListener("input", () => {
+  salvarNotas(textareaNotas.value);
+});
+
+// Detectar mudança de autenticação (login/logout)
+onAuthStateChanged(auth, user => {
+  if (user) {
+    usuarioAtual = user;
+    carregarNotas();
+  } else {
+    usuarioAtual = null;
+    textareaNotas.value = "Faça login para salvar suas anotações.";
+    cronometroEl.innerText = "00:00:00";
+    window.resetarCronometro();
   }
+});
 
-  window.iniciarCronometro = () => {
-    if (!intervaloCronometro) intervaloCronometro = setInterval(atualizarCronometro, 1000);
-  };
-  window.pararCronometro = () => {
-    clearInterval(intervaloCronometro);
-    intervaloCronometro = null;
-  };
-  window.resetarCronometro = () => {
-    window.pararCronometro();
-    segundos = minutos = horas = 0;
-    document.getElementById("cronometro").innerText = "00:00:00";
-  };
+// Controle do painel
 
-  // Mover painel
-  let posX = 0, posY = 0, posInicialX = 0, posInicialY = 0;
-  const cabecalho = document.getElementById("cabecalhoPainel");
+const botaoPainel = document.getElementById("botaoPainel");
+const painel = document.getElementById("painel");
 
-  cabecalho.onmousedown = dragMouseDown;
+botaoPainel.onclick = () => {
+  painel.style.display = painel.style.display === "block" ? "none" : "block";
+};
 
-  function dragMouseDown(e) {
-    e.preventDefault();
-    posInicialX = e.clientX;
-    posInicialY = e.clientY;
-    document.onmouseup = () => { document.onmousemove = null; };
-    document.onmousemove = moverPainel;
-  }
+function alternarSecao(id) {
+  const secao = document.getElementById(id);
+  secao.style.display = (secao.style.display === "block") ? "none" : "block";
+}
 
-  function moverPainel(e) {
-    e.preventDefault();
-    const dx = e.clientX - posInicialX;
-    const dy = e.clientY - posInicialY;
-    posInicialX = e.clientX;
-    posInicialY = e.clientY;
+// Arrastar painel
+let posX = 0, posY = 0, posInicialX = 0, posInicialY = 0;
+const cabecalho = document.getElementById("cabecalhoPainel");
 
-    const rect = painel.getBoundingClientRect();
-    let novaTop = rect.top + dy;
-    let novaLeft = rect.left + dx;
-    novaTop = Math.max(0, Math.min(novaTop, window.innerHeight - rect.height));
-    novaLeft = Math.max(0, Math.min(novaLeft, window.innerWidth - rect.width));
-    painel.style.top = novaTop + "px";
-    painel.style.left = novaLeft + "px";
-    painel.style.right = "auto";
-  }
+cabecalho.onmousedown = dragMouseDown;
+
+function dragMouseDown(e) {
+  e.preventDefault();
+  posInicialX = e.clientX;
+  posInicialY = e.clientY;
+  document.onmouseup = () => { document.onmousemove = null; };
+  document.onmousemove = moverPainel;
+}
+
+function moverPainel(e) {
+  e.preventDefault();
+  const dx = e.clientX - posInicialX;
+  const dy = e.clientY - posInicialY;
+  posInicialX = e.clientX;
+  posInicialY = e.clientY;
+
+  const rect = painel.getBoundingClientRect();
+  let novaTop = rect.top + dy;
+  let novaLeft = rect.left + dx;
+  novaTop = Math.max(0, Math.min(novaTop, window.innerHeight - rect.height));
+  novaLeft = Math.max(0, Math.min(novaLeft, window.innerWidth - rect.width));
+  painel.style.top = novaTop + "px";
+  painel.style.left = novaLeft + "px";
+  painel.style.right = "auto";
+}
+
 </script>
