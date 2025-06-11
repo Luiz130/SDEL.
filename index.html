@@ -320,202 +320,218 @@
     </div>
   </div>
 </div>
-
 <script type="module">
+  // Importações Firebase SDK (modular, mesma versão para evitar conflitos)
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-analytics.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
   import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
 
+  // Configuração do Firebase (sua config)
   const firebaseConfig = {
     apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
     authDomain: "sdel-b3f65.firebaseapp.com",
     projectId: "sdel-b3f65",
-    storageBucket: "sdel-b3f65.appspot.com",
+    storageBucket: "sdel-b3f65.firebasestorage.app",
     messagingSenderId: "297725999985",
     appId: "1:297725999985:web:d41da68311c190ef8a54d0",
     measurementId: "G-PT92VECJ2H"
   };
 
+  // Inicializa Firebase
   const app = initializeApp(firebaseConfig);
-  getAnalytics(app);
+  const analytics = getAnalytics(app);
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  // Elementos DOM
+  // Elementos do DOM
   const botaoPainel = document.getElementById('botaoPainel');
   const painel = document.getElementById('painel');
   const textareaNotas = document.getElementById('textareaNotas');
-  const cronometroEl = document.getElementById('cronometro');
+  const cabecalhoPainel = document.getElementById('cabecalhoPainel');
   const profileImg = document.getElementById('profileImage');
-  const perfilOptions = document.getElementById('perfilOptions');
-  const logoutBtn = document.getElementById('logoutBtn');
+  const perfilOptions = document.getElementById('perfilOptions'); // Corrigido nome da variável
+const cronometroEl = document.getElementById("cronometro");
 
-  // Estado usuário e tempo
   let usuarioAtual = null;
   let segundos = 0, minutos = 0, horas = 0;
   let intervaloCronometro = null;
 
-  // Abrir / Fechar painel
-  botaoPainel.onclick = () => {
-    painel.style.display = (painel.style.display === 'block') ? 'none' : 'block';
-  };
-
-  // Salvar notas no Firestore
-  async function salvarNotas(texto) {
+  // ---------- Salvar notas ----------
+  function salvarNotas(texto) {
     if (!usuarioAtual) return;
-    const docRef = doc(db, "notasUsuario", usuarioAtual.uid);
-    await setDoc(docRef, { texto }, { merge: true });
+    const uid = usuarioAtual.uid;
+    const docRef = doc(db, "notasUsuario", uid);
+    setDoc(docRef, { texto }, { merge: true });
   }
 
-  // Salvar tempo no Firestore
-  async function salvarTempoCronometro() {
+  // ---------- Salvar tempo ----------
+  function salvarTempoCronometro() {
     if (!usuarioAtual) return;
-    const docRef = doc(db, "notasUsuario", usuarioAtual.uid);
+    const uid = usuarioAtual.uid;
+    const docRef = doc(db, "notasUsuario", uid);
     const tempoAtual = cronometroEl.innerText;
-    await setDoc(docRef, { tempo: tempoAtual }, { merge: true });
+    setDoc(docRef, { tempo: tempoAtual }, { merge: true });
   }
 
-  // Carregar notas e tempo do Firestore
-  async function carregarDadosUsuario() {
+  // ---------- Carregar notas e tempo ----------
+  async function carregarNotas() {
     if (!usuarioAtual) return;
-    const docRef = doc(db, "notasUsuario", usuarioAtual.uid);
+    const uid = usuarioAtual.uid;
+    const docRef = doc(db, "notasUsuario", uid);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       const data = docSnap.data();
       textareaNotas.value = data.texto || "";
+
       if (data.tempo) {
         cronometroEl.innerText = data.tempo;
-        const [h,m,s] = data.tempo.split(":").map(Number);
+        const [h, m, s] = data.tempo.split(":").map(Number);
         horas = h; minutos = m; segundos = s;
       }
-    } else {
-      textareaNotas.value = "";
-      cronometroEl.innerText = "00:00:00";
-      horas = minutos = segundos = 0;
     }
   }
 
-  // Detectar mudanças no textarea e salvar
+  // ---------- Login ----------
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      usuarioAtual = user;
+      carregarNotas();
+    } else {
+      usuarioAtual = null;
+      textareaNotas.value = "Faça login para salvar suas anotações.";
+    }
+  });
+
   textareaNotas.addEventListener("input", () => {
     salvarNotas(textareaNotas.value);
   });
 
-  // Atualizar cronômetro visual e salvar no Firestore
+
+
+
+    
+  // Monitora estado do login
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      usuarioAtual = user;
+      await carregarNotas(user.uid);
+      // Atualiza imagem de perfil se existir
+      if (user.photoURL && profileImg) {
+        profileImg.src = user.photoURL;
+      }
+    } else {
+      usuarioAtual = null;
+      textareaNotas.value = "";
+      if (profileImg) profileImg.src = "default-profile.png"; // opcional: imagem default
+    }
+  });
+
+
+
+
+
+
+
+    
+  // Cronômetro
+
+  // ---------- Cronômetro ----------
   function atualizarCronometro() {
     segundos++;
-    if (segundos > 59) {
-      segundos = 0;
-      minutos++;
-    }
-    if (minutos > 59) {
-      minutos = 0;
-      horas++;
-    }
-    let h = horas.toString().padStart(2, '0');
-    let m = minutos.toString().padStart(2, '0');
-    let s = segundos.toString().padStart(2, '0');
-    cronometroEl.innerText = `${h}:${m}:${s}`;
+    if (segundos >= 60) { segundos = 0; minutos++; }
+    if (minutos >= 60) { minutos = 0; horas++; }
+    const formatar = n => n.toString().padStart(2, '0');
+    const tempo = `${formatar(horas)}:${formatar(minutos)}:${formatar(segundos)}`;
+    cronometroEl.innerText = tempo;
     salvarTempoCronometro();
   }
 
-  function iniciarCronometro() {
-    if (intervaloCronometro) return;
-    intervaloCronometro = setInterval(atualizarCronometro, 1000);
-  }
+  window.iniciarCronometro = () => {
+    if (!intervaloCronometro) intervaloCronometro = setInterval(atualizarCronometro, 1000);
+  };
 
-  function pararCronometro() {
+  window.pararCronometro = () => {
     clearInterval(intervaloCronometro);
     intervaloCronometro = null;
-  }
+  };
 
-  function resetarCronometro() {
+  window.resetarCronometro = () => {
     pararCronometro();
     segundos = minutos = horas = 0;
     cronometroEl.innerText = "00:00:00";
     salvarTempoCronometro();
+  };
+</script>
+
+<!-- JS do painel e movimentação -->
+<script>
+  function alternarSecao(id) {
+    const secao = document.getElementById(id);
+    secao.style.display = (secao.style.display === "block") ? "none" : "block";
   }
 
-  // Drag do painel
+  const botaoPainel = document.getElementById("botaoPainel");
+  const painel = document.getElementById("painel");
+  botaoPainel.onclick = () => {
+    painel.style.display = painel.style.display === "block" ? "none" : "block";
+  };
+
+  // Mover painel
+  let posX = 0, posY = 0, posInicialX = 0, posInicialY = 0;
   const cabecalho = document.getElementById("cabecalhoPainel");
-  let posX = 0, posY = 0, mouseX = 0, mouseY = 0;
 
   cabecalho.onmousedown = dragMouseDown;
+
   function dragMouseDown(e) {
     e.preventDefault();
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-    document.onmouseup = closeDragElement;
-    document.onmousemove = elementDrag;
+    posInicialX = e.clientX;
+    posInicialY = e.clientY;
+    document.onmouseup = () => { document.onmousemove = null; };
+    document.onmousemove = moverPainel;
   }
-  function elementDrag(e) {
+
+  function moverPainel(e) {
     e.preventDefault();
-    posX = mouseX - e.clientX;
-    posY = mouseY - e.clientY;
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-    let top = painel.offsetTop - posY;
-    let left = painel.offsetLeft - posX;
-    // limites simples para não sair da tela
-    top = Math.max(0, Math.min(window.innerHeight - painel.offsetHeight, top));
-    left = Math.max(0, Math.min(window.innerWidth - painel.offsetWidth, left));
-    painel.style.top = top + "px";
-    painel.style.left = left + "px";
-  }
-  function closeDragElement() {
-    document.onmouseup = null;
-    document.onmousemove = null;
+    const dx = e.clientX - posInicialX;
+    const dy = e.clientY - posInicialY;
+    posInicialX = e.clientX;
+    posInicialY = e.clientY;
+
+    const rect = painel.getBoundingClientRect();
+    let novaTop = rect.top + dy;
+    let novaLeft = rect.left + dx;
+    novaTop = Math.max(0, Math.min(novaTop, window.innerHeight - rect.height));
+    novaLeft = Math.max(0, Math.min(novaLeft, window.innerWidth - rect.width));
+    painel.style.top = novaTop + "px";
+    painel.style.left = novaLeft + "px";
+    painel.style.right = "auto";
   }
 
-  // Perfil toggle menu
-  profileImg.onclick = (e) => {
-    e.stopPropagation();
-    perfilOptions.style.display = perfilOptions.style.display === "block" ? "none" : "block";
-  };
 
-  // Fechar menu se clicar fora
-  window.onclick = () => {
-    perfilOptions.style.display = "none";
-  };
 
-  // Logout (simples, sem redirecionar)
-  logoutBtn.onclick = async () => {
-    try {
-      await signOut(auth);
-      alert("Você saiu da conta.");
-      // Pode redirecionar para login ou recarregar página
-      location.reload();
-    } catch (e) {
-      alert("Erro ao sair: " + e.message);
-    }
-  };
 
-  // Carrossel rolar
-  const carrossel = document.getElementById("carrossel");
-  function rolar(direcao) {
-    carrossel.scrollBy({
-      left: direcao * 150,
-      behavior: "smooth"
+    
+  // Menu do perfil (toggle)
+  if (profileImg && perfilOptions) {
+    profileImg.addEventListener('click', (e) => {
+      e.stopPropagation();
+      perfilOptions.style.display = (perfilOptions.style.display === 'block') ? 'none' : 'block';
+    });
+
+    document.addEventListener('click', () => {
+      perfilOptions.style.display = 'none';
     });
   }
 
-  // Monitorar autenticação
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      usuarioAtual = user;
-      // Trocar imagem de perfil se tiver foto
-      if (user.photoURL) profileImg.src = user.photoURL;
-      carregarDadosUsuario();
-      botaoPainel.disabled = false;
-    } else {
-      usuarioAtual = null;
-      botaoPainel.disabled = true;
-      painel.style.display = "none";
-      alert("Usuário não autenticado. Faça login.");
-    }
-  });
+  // Função rolar carrossel
+  window.rolar = function(direcao) {
+    const carrossel = document.getElementById("carrossel");
+    if (!carrossel) return;
+    const larguraItem = 130; // largura + espaço
+    carrossel.scrollLeft += direcao * larguraItem;
+  };
 
 </script>
-
 
 </body>
