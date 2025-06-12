@@ -7,6 +7,13 @@
 </head>
 <body>
   <h1>Cronograma Semanal de Estudos</h1>
+  
+  <div class="controls">
+    <button id="edit-study-time">Editar Horário de Estudo</button>
+    <button id="toggle-theme">Alternar Tema</button>
+    <button id="clear-all" class="danger">Limpar Tudo</button>
+  </div>
+
   <div class="schedule-container">
     <div class="header">
       <div class="time-slot">Horário</div>
@@ -21,37 +28,38 @@
     <div id="schedule-grid" class="grid"></div>
   </div>
 
-<!-- Modal -->
-<div id="modal" class="modal">
-  <div class="modal-content">
-    <span id="close-modal" class="close">&times;</span>
-    <h2>Editar Bloco de Estudo</h2>
-    <label for="subject">Disciplina:</label>
-    <select id="subject">
-      <option value="matematica">Matemática</option>
-      <option value="portugues">Português</option>
-      <option value="historia">História</option>
-      <option value="biologia">Biologia</option>
-      <option value="quimica">Química</option>
-    </select>
-
-    <label for="study-time">Tempo de Estudo (min):</label>
-    <input type="number" id="study-time" min="0" placeholder="Ex: 60">
-
-    <button id="save">Salvar</button>
-
-    <button id="clear-cell" style="margin-top: 10px; background-color: #f87171;">Limpar Bloco</button>
-    <button id="clear-all" style="margin-top: 10px; background-color: #ef4444;">Limpar Tudo</button>
-
+  <!-- Modal de Disciplinas -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span id="close-modal" class="close">&times;</span>
+      <h2>Editar Bloco de Estudo</h2>
+      <label for="subject">Disciplina:</label>
+      <select id="subject">
+        <option value="matematica">Matemática</option>
+        <option value="portugues">Português</option>
+        <option value="historia">História</option>
+        <option value="biologia">Biologia</option>
+        <option value="quimica">Química</option>
+      </select>
+      <label for="study-time">Tempo de Estudo (min):</label>
+      <input type="number" id="study-time" min="0" placeholder="Ex: 60">
+      <button id="save">Salvar</button>
+      <button id="clear-cell" class="danger">Limpar Bloco</button>
+    </div>
   </div>
-</div>
 
- <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <!-- Modal de Horário -->
+  <div id="time-modal" class="modal">
+    <div class="modal-content">
+      <h2>Definir Horário de Estudos</h2>
+      <label for="start-hour">Início (hora):</label>
+      <input type="number" id="start-hour" min="0" max="23" placeholder="Ex: 7">
+      <label for="end-hour">Fim (hora):</label>
+      <input type="number" id="end-hour" min="1" max="23" placeholder="Ex: 22">
+      <button id="set-hours">Aplicar</button>
+    </div>
+  </div>
+
   <script src="cronograma.js"></script>
 </body>
 </html>
-
-
-
