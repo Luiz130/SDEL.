@@ -13,13 +13,12 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f0f4f8;
+            background-color: #C6D4E1;
             color: #333;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-image: linear-gradient(to right, #6a11cb, #2575fc);
         }
 
         .container {
@@ -34,9 +33,15 @@
 
         header h1 {
             font-size: 3rem;
-            margin-bottom: 30px;
-            color: #333;
+            margin-bottom: 10px;
+            color: #44749D;
             font-weight: 600;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: #555;
+            margin-bottom: 30px;
         }
 
         .simulados {
@@ -61,7 +66,7 @@
         .simulado h2 {
             font-size: 1.8rem;
             margin-bottom: 10px;
-            color: #2575fc;
+            color: #44749D;
             font-weight: 500;
         }
 
@@ -71,8 +76,12 @@
             margin-bottom: 20px;
         }
 
+        a {
+            text-decoration: none;
+        }
+
         button {
-            background-color: #2575fc;
+            background-color: #44749D;
             color: white;
             border: none;
             padding: 15px 30px;
@@ -86,7 +95,7 @@
         }
 
         button:hover {
-            background-color: #1c5ab8;
+            background-color: #365a75;
             transform: translateY(-5px);
         }
 
@@ -105,19 +114,16 @@
         <div class="simulados">
             <div class="simulado">
                 <h2>Matemática</h2>
-                
-                
                 <p>Teste seus conhecimentos em Matemática com 45 questões desafiadoras.</p>
-                 <a href="questoes.html">
-                <button onclick="startSimulado('Matemática')">Iniciar Simulado</button>
-                 </a>
+                <a href="questoes.html">
+                    <button onclick="startSimulado('Matemática')">Iniciar Simulado</button>
+                </a>
             </div>
             <div class="simulado">
                 <h2>Português</h2>
-            
                 <p>Avalie seus conhecimentos em Português, com questões focadas na gramática e interpretação.</p>
-                    <a href="questoes-portugues.html">
-                <button onclick="startSimulado('Português')">Iniciar Simulado</button>
+                <a href="questoes-portugues.html">
+                    <button onclick="startSimulado('Português')">Iniciar Simulado</button>
                 </a>
             </div>
             <div class="simulado">
