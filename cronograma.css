@@ -10,13 +10,44 @@ body {
   margin: 0;
   padding: 20px;
   color: #333;
+  transition: background 0.3s, color 0.3s;
+}
+
+body.dark {
+  background: #1e293b;
+  color: #f8fafc;
 }
 
 h1 {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   font-size: 2rem;
-  color: #1e293b;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 15px;
+  border-radius: 8px;
+  border: none;
+  background-color: #3b82f6;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background-color: #2563eb;
+}
+
+.danger {
+  background-color: #ef4444;
 }
 
 .schedule-container {
@@ -29,8 +60,11 @@ h1 {
   padding: 10px;
 }
 
-.header,
-.grid-row {
+body.dark .schedule-container {
+  background: #334155;
+}
+
+.header, .grid-row {
   display: grid;
   grid-template-columns: 100px repeat(7, 1fr);
   border-bottom: 1px solid #e2e8f0;
@@ -43,9 +77,7 @@ h1 {
   border-radius: 12px 12px 0 0;
 }
 
-.time-slot,
-.day,
-.cell {
+.time-slot, .day, .cell {
   text-align: center;
   padding: 12px;
   border-right: 1px solid #e2e8f0;
@@ -57,50 +89,40 @@ h1 {
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.3s, transform 0.1s;
+  transition: background 0.3s;
   border-radius: 6px;
   margin: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+body.dark .cell {
+  background-color: #475569;
 }
 
 .cell:hover {
   background-color: #e0f2fe;
-  transform: scale(1.02);
 }
 
-/* Cores das disciplinas em tom pastel */
-.matematica {
-  background-color: #fde2e4;
-  color: #7b1e1e;
-}
-.portugues {
-  background-color: #fff4c2;
-  color: #7a6218;
-}
-.historia {
-  background-color: #d8f3dc;
-  color: #22543d;
-}
-.biologia {
-  background-color: #cafffb;
-  color: #134e4a;
-}
-.quimica {
-  background-color: #cddafd;
-  color: #1e40af;
-}
+/* Cores das disciplinas */
+.matematica { background-color: #fde2e4; color: #7b1e1e; }
+.portugues  { background-color: #fff4c2; color: #7a6218; }
+.historia   { background-color: #d8f3dc; color: #22543d; }
+.biologia   { background-color: #cafffb; color: #134e4a; }
+.quimica    { background-color: #cddafd; color: #1e40af; }
 
-/* Modal estilizado */
 .modal {
   display: none;
   position: fixed;
-  z-index: 200;
+  z-index: 100;
   left: 0; top: 0;
   width: 100%; height: 100%;
   background-color: rgba(0,0,0,0.4);
 }
 
 .modal-content {
-  background-color: #ffffff;
+  background-color: white;
   margin: 10% auto;
   padding: 25px 30px;
   width: 90%;
@@ -108,6 +130,11 @@ h1 {
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.15);
   position: relative;
+}
+
+body.dark .modal-content {
+  background-color: #1e293b;
+  color: white;
 }
 
 .close {
@@ -119,73 +146,11 @@ h1 {
   cursor: pointer;
 }
 
-.close:hover {
-  color: #e11d48;
-}
-
-.modal-content h2 {
-  margin-top: 0;
-  color: #1e293b;
-  font-size: 1.2rem;
-  margin-bottom: 20px;
-}
-
-.modal-content label {
-  font-weight: 500;
-  margin-bottom: 6px;
-  display: block;
-  color: #374151;
-}
-
+.modal-content label,
+.modal-content input,
 .modal-content select {
+  display: block;
   width: 100%;
-  padding: 10px;
-  font-size: 15px;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
+  font-size: 14px;
 }
-
-.modal-content button {
-  background-color: #3b82f6;
-  color: white;
-  border: none;
-  padding: 12px;
-  font-size: 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  width: 100%;
-  transition: background 0.3s;
-}
-
-.modal-content button:hover {
-  background-color: #2563eb;
-}
-
-/* Responsivo */
-@media (max-width: 768px) {
-  .schedule-container {
-    padding: 0;
-    border-radius: 0;
-  }
-
-  .grid-row {
-    grid-template-columns: 80px repeat(7, 1fr);
-  }
-
-  .cell {
-    height: 60px;
-    font-size: 12px;
-  }
-  .modal-content input[type="number"] {
-  width: 100%;
-  padding: 10px;
-  font-size: 15px;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  margin-bottom: 20px;
-}
-
-}
-
-
