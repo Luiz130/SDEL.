@@ -321,91 +321,88 @@
   </div>
 </div>
 <script type="module">
-  // Importações Firebase SDK (modular, mesma versão para evitar conflitos)
+  // Importações Firebase
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-analytics.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
   import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
 
-  // Configuração do Firebase (sua config)
+  // Configuração Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
     authDomain: "sdel-b3f65.firebaseapp.com",
     projectId: "sdel-b3f65",
-    storageBucket: "sdel-b3f65.firebasestorage.app",
+    storageBucket: "sdel-b3f65.appspot.com",
     messagingSenderId: "297725999985",
     appId: "1:297725999985:web:d41da68311c190ef8a54d0",
     measurementId: "G-PT92VECJ2H"
   };
 
-  // Inicializa Firebase
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  // Elementos do DOM
-  const botaoPainel = document.getElementById('botaoPainel');
-  const painel = document.getElementById('painel');
-  const textareaNotas = document.getElementById('textareaNotas');
-  const cabecalhoPainel = document.getElementById('cabecalhoPainel');
-  const profileImg = document.getElementById('profileImage');
-  const perfilOptions = document.getElementById('perfilOptions'); // Corrigido nome da variável
+  // Elementos
+  const botaoPainel = document.getElementById("botaoPainel");
+  const painel = document.getElementById("painel");
+  const cabecalho = document.getElementById("cabecalhoPainel");
+  const textareaNotas = document.getElementById("textareaNotas");
   const cronometroEl = document.getElementById("cronometro");
+  const profileImg = document.getElementById("profileImage");
+  const perfilOptions = document.getElementById("perfilOptions");
 
+  // Variáveis de controle
   let usuarioAtual = null;
   let segundos = 0, minutos = 0, horas = 0;
   let intervaloCronometro = null;
 
+  // ---------- Firebase: Login ----------
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      usuarioAtual = user;
+      await carregarNotas();
+      if (user.photoURL && profileImg) profileImg.src = user.photoURL;
+    } else {
+      usuarioAtual = null;
+      textareaNotas.value = "Faça login para salvar suas anotações.";
+      cronometroEl.innerText = "00:00:00";
+      if (profileImg) profileImg.src = "default-profile.png";
+    }
+  });
+
   // ---------- Salvar notas ----------
   function salvarNotas(texto) {
     if (!usuarioAtual) return;
-    const uid = usuarioAtual.uid;
-    const docRef = doc(db, "notasUsuario", uid);
+    const docRef = doc(db, "notasUsuario", usuarioAtual.uid);
     setDoc(docRef, { texto }, { merge: true });
   }
 
   // ---------- Salvar tempo ----------
   function salvarTempoCronometro() {
     if (!usuarioAtual) return;
-    const uid = usuarioAtual.uid;
-    const docRef = doc(db, "notasUsuario", uid);
     const tempoAtual = cronometroEl.innerText;
+    const docRef = doc(db, "notasUsuario", usuarioAtual.uid);
     setDoc(docRef, { tempo: tempoAtual }, { merge: true });
   }
 
-  // ---------- Carregar notas e tempo ----------
+  // ---------- Carregar dados ----------
   async function carregarNotas() {
-    if (!usuarioAtual) return;
-    const uid = usuarioAtual.uid;
-    const docRef = doc(db, "notasUsuario", uid);
+    const docRef = doc(db, "notasUsuario", usuarioAtual.uid);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       const data = docSnap.data();
       textareaNotas.value = data.texto || "";
-
       if (data.tempo) {
         cronometroEl.innerText = data.tempo;
         const [h, m, s] = data.tempo.split(":").map(Number);
         horas = h; minutos = m; segundos = s;
       }
+    } else {
+      textareaNotas.value = "";
+      cronometroEl.innerText = "00:00:00";
     }
   }
-
-  // ---------- Login ----------
-  onAuthStateChanged(auth, user => {
-    if (user) {
-      usuarioAtual = user;
-      carregarNotas();
-    } else {
-      usuarioAtual = null;
-      textareaNotas.value = "Faça login para salvar suas anotações.";
-    }
-  });
-
-  textareaNotas.addEventListener("input", () => {
-    salvarNotas(textareaNotas.value);
-  });
 
   // ---------- Cronômetro ----------
   function atualizarCronometro() {
@@ -428,28 +425,32 @@
   };
 
   window.resetarCronometro = () => {
-    pararCronometro();
+    window.pararCronometro();
     segundos = minutos = horas = 0;
     cronometroEl.innerText = "00:00:00";
     salvarTempoCronometro();
   };
 
+  // ---------- Eventos ----------
+  textareaNotas.addEventListener("input", () => {
+    salvarNotas(textareaNotas.value);
+  });
 
-<!-- JS do painel e movimentação -->
-
-  function alternarSecao(id) {
-    const secao = document.getElementById(id);
-    secao.style.display = (secao.style.display === "block") ? "none" : "block";
-  }
-
-
+  // ---------- Painel toggle ----------
   botaoPainel.onclick = () => {
     painel.style.display = painel.style.display === "block" ? "none" : "block";
   };
 
-  // Mover painel
+  // ---------- Alternar seções ----------
+  window.alternarSecao = function(id) {
+    const secao = document.getElementById(id);
+    if (secao) {
+      secao.style.display = secao.style.display === "block" ? "none" : "block";
+    }
+  };
+
+  // ---------- Mover painel ----------
   let posX = 0, posY = 0, posInicialX = 0, posInicialY = 0;
-  const cabecalho = document.getElementById("cabecalhoPainel");
 
   cabecalho.onmousedown = dragMouseDown;
 
@@ -457,7 +458,7 @@
     e.preventDefault();
     posInicialX = e.clientX;
     posInicialY = e.clientY;
-    document.onmouseup = () => { document.onmousemove = null; };
+    document.onmouseup = fecharDrag;
     document.onmousemove = moverPainel;
   }
 
@@ -467,44 +468,35 @@
     const dy = e.clientY - posInicialY;
     posInicialX = e.clientX;
     posInicialY = e.clientY;
-
     const rect = painel.getBoundingClientRect();
-    let novaTop = rect.top + dy;
-    let novaLeft = rect.left + dx;
-    novaTop = Math.max(0, Math.min(novaTop, window.innerHeight - rect.height));
-    novaLeft = Math.max(0, Math.min(novaLeft, window.innerWidth - rect.width));
+    let novaTop = Math.max(0, Math.min(rect.top + dy, window.innerHeight - rect.height));
+    let novaLeft = Math.max(0, Math.min(rect.left + dx, window.innerWidth - rect.width));
     painel.style.top = novaTop + "px";
     painel.style.left = novaLeft + "px";
     painel.style.right = "auto";
   }
-
-
 
   function fecharDrag() {
     document.onmouseup = null;
     document.onmousemove = null;
   }
 
-  // Menu do perfil (toggle)
+  // ---------- Menu de perfil ----------
   if (profileImg && perfilOptions) {
     profileImg.addEventListener('click', (e) => {
       e.stopPropagation();
       perfilOptions.style.display = (perfilOptions.style.display === 'block') ? 'none' : 'block';
     });
-
     document.addEventListener('click', () => {
       perfilOptions.style.display = 'none';
     });
   }
 
-  // Função rolar carrossel
+  // ---------- Carrossel ----------
   window.rolar = function(direcao) {
     const carrossel = document.getElementById("carrossel");
-    if (!carrossel) return;
-    const larguraItem = 130; // largura + espaço
-    carrossel.scrollLeft += direcao * larguraItem;
+    if (carrossel) carrossel.scrollLeft += direcao * 130;
   };
-
 </script>
 
 </body>
