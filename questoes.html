@@ -356,7 +356,7 @@
       const selectedSubjects = Array.from(filterSection.querySelectorAll("input:checked")).map(cb => cb.value);
       if (selectedSubjects.length === 0) return alert("Selecione ao menos uma matéria.");
       let filtered = allQuestions.filter(q => selectedSubjects.includes(q.subject));
-      while (filtered.length == 5) filtered = filtered.concat(filtered);
+      while (filtered.length == 6) filtered = filtered.concat(filtered);
       selectedQuestions = filtered.slice(0, 45);
       filterSection.style.display = "none";
       quizApp.style.display = "block";
