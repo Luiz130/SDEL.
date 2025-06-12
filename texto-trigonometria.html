@@ -1,190 +1,162 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Trigonometria – SDEL</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Reset básico */
-    *, *::before, *::after {
+    * {
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
     }
 
     body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #C6D4E1 0%, #A9BDD6 100%);
-      color: #333;
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 40px 20px;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to bottom right, #C6D4E1, #ffffff);
+      color: #1d2f3a;
     }
 
-    main {
-      background: #fff;
-      max-width: 900px;
-      width: 100%;
-      padding: 40px 50px;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(68, 116, 157, 0.15);
-      transition: box-shadow 0.3s ease;
+    .container {
+      max-width: 1100px;
+      margin: 3rem auto;
+      padding: 0 1rem;
     }
 
-    main:hover {
-      box-shadow: 0 15px 40px rgba(68, 116, 157, 0.25);
+    section {
+      background: white;
+      border-radius: 16px;
+      margin: 2rem 0;
+      padding: 2rem 2.5rem;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease;
     }
 
-    h1 {
+    section:hover {
+      transform: scale(1.01);
+    }
+
+    section h2 {
       color: #44749D;
-      font-weight: 700;
-      font-size: 2.8rem;
-      margin-bottom: 40px;
-      text-align: center;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-
-    h2 {
-      color: #44749D;
-      font-weight: 600;
+      border-left: 6px solid #44749D;
+      padding-left: 0.75rem;
+      margin-bottom: 1.25rem;
       font-size: 1.6rem;
-      margin: 40px 0 20px;
-      padding-bottom: 8px;
-      border-bottom: 3px solid #44749D;
-      letter-spacing: 0.03em;
-    }
-
-    p {
-      font-size: 1.1rem;
-      margin-bottom: 20px;
-      color: #444;
     }
 
     ul {
-      padding-left: 20px;
-      margin-bottom: 25px;
+      list-style-type: disc;
+      padding-left: 1.5rem;
+      margin-top: 1rem;
     }
 
-    ul li {
-      margin-bottom: 12px;
-      font-size: 1.1rem;
+    li {
+      margin-bottom: 0.6rem;
     }
 
-    strong {
-      color: #44749D;
+    .ratio-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin: 1.5rem 0;
     }
 
-    .highlight {
-      background-color: #e3efff;
-      border-left: 6px solid #44749D;
-      padding: 15px 20px;
-      margin: 30px 0;
-      font-style: italic;
-      font-size: 1.1rem;
-      border-radius: 6px;
-      color: #2a557a;
-      box-shadow: 0 3px 8px rgba(68, 116, 157, 0.1);
-    }
-
-    /* Texto centralizado especial */
-    .center-text {
+    .ratio-item {
+      background: #C6D4E1;
+      color: #1d2f3a;
+      padding: 1rem;
+      border-radius: 10px;
+      flex: 1;
+      min-width: 160px;
       text-align: center;
-      font-weight: 700;
-      font-size: 1.4rem;
-      margin: 30px 0;
-      color: #44749D;
-      letter-spacing: 0.02em;
+      font-weight: 600;
+      box-shadow: inset 0 0 8px rgba(0,0,0,0.04);
     }
 
-    /* Responsividade */
+    .circle-image {
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+
+    .circle-image img {
+      max-width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    }
+
+    p {
+      margin-top: 0.5rem;
+    }
+
     @media (max-width: 600px) {
-      main {
-        padding: 30px 25px;
+      section {
+        padding: 1.5rem;
       }
 
-      h1 {
-        font-size: 2rem;
-      }
-
-      h2 {
+      section h2 {
         font-size: 1.3rem;
-      }
-
-      p, ul li {
-        font-size: 1rem;
       }
     }
   </style>
 </head>
 <body>
-
-  <main>
-
-
+  <div class="container">
     <section>
       <h2>O que é Trigonometria?</h2>
-      <p>
-        A trigonometria é o ramo da matemática que estuda as relações entre os ângulos e os lados dos triângulos, especialmente os triângulos retângulos. Surgiu para atender necessidades práticas, como medir distâncias inacessíveis, calcular alturas e navegar em grandes extensões, sendo usada desde a antiguidade por astrônomos e navegadores.
-      </p>
+      <p>A trigonometria estuda os triângulos e as relações entre seus lados e ângulos, sendo essencial em diversos campos da ciência e tecnologia.</p>
     </section>
 
     <section>
-      <h2>Funções Trigonométricas Fundamentais</h2>
-      <p>
-        O núcleo da trigonometria é formado por três funções principais: <strong>seno</strong>, <strong>cosseno</strong> e <strong>tangente</strong>. Em um triângulo retângulo:
-      </p>
+      <h2>Razões Trigonométricas</h2>
       <ul>
-        <li><strong>Seno (sen)</strong>: razão entre o cateto oposto ao ângulo e a hipotenusa.</li>
-        <li><strong>Cosseno (cos)</strong>: razão entre o cateto adjacente ao ângulo e a hipotenusa.</li>
-        <li><strong>Tangente (tan)</strong>: razão entre o cateto oposto e o cateto adjacente.</li>
+        <li><strong>Seno (sen):</strong> cateto oposto / hipotenusa</li>
+        <li><strong>Cosseno (cos):</strong> cateto adjacente / hipotenusa</li>
+        <li><strong>Tangente (tan):</strong> cateto oposto / cateto adjacente</li>
       </ul>
-      <p>
-        Essas funções permitem determinar lados e ângulos desconhecidos, facilitando a resolução de problemas geométricos e práticos.
-      </p>
-    </section>
 
-    <section>
-      <h2>O Círculo Unitário</h2>
-      <p>
-        Para ampliar o estudo das funções trigonométricas, utiliza-se o <strong>círculo unitário</strong>, um círculo de raio 1 centrado na origem do plano cartesiano. Qualquer ponto da circunferência pode ser representado pelas coordenadas (<em>cos θ, sen θ</em>), onde θ é o ângulo formado com o eixo x.
-      </p>
-      <div class="highlight">
-        O círculo unitário permite compreender o comportamento periódico das funções seno e cosseno, que variam entre -1 e 1 conforme o ângulo aumenta, formando a base para o estudo de ondas e fenômenos cíclicos.
+      <div class="ratio-list">
+        <div class="ratio-item">sen(θ) = oposto / hipotenusa</div>
+        <div class="ratio-item">cos(θ) = adjacente / hipotenusa</div>
+        <div class="ratio-item">tan(θ) = oposto / adjacente</div>
       </div>
     </section>
 
     <section>
-      <h2>Identidades e Leis Importantes</h2>
-      <p>Uma das identidades mais conhecidas da trigonometria é a <strong>identidade fundamental</strong>:</p>
-      <p class="center-text">sen² θ + cos² θ = 1</p>
-      <p>
-        Ela decorre da equação do círculo unitário e é usada para simplificar expressões trigonométricas.
-      </p>
-      <p>
-        Além disso, as <strong>Leis dos Senos</strong> e <strong>dos Cossenos</strong> permitem resolver triângulos que não são retângulos, ampliando as aplicações da trigonometria para diversas situações.
-      </p>
-    </section>
-
-    <section>
-     
+      <h2>Identidades Trigonométricas</h2>
+      <ul>
+        <li><strong>sen²(θ) + cos²(θ) = 1</strong></li>
+        <li><strong>1 + tan²(θ) = sec²(θ)</strong></li>
+        <li><strong>sen(–θ) = –sen(θ)</strong> &nbsp;&nbsp;&nbsp; <strong>cos(–θ) = cos(θ)</strong></li>
       </ul>
-      <p class="highlight">
-        A trigonometria conecta teoria e prática, possibilitando soluções para problemas reais e inovação tecnológica em nosso cotidiano.
-      </p>
     </section>
 
     <section>
-      <h2>Por que estudar Trigonometria?</h2>
-      <p>
-        Estudar trigonometria é compreender as relações geométricas que regem grande parte do mundo físico e tecnológico. Com ela, é possível interpretar fenômenos naturais, resolver problemas de engenharia e desenvolver tecnologias que impactam diretamente nosso dia a dia.
-      </p>
+      <h2>Círculo Trigonométrico</h2>
+      <p>O círculo trigonométrico é uma ferramenta visual que representa ângulos e valores das funções seno e cosseno ao longo de uma circunferência de raio 1.</p>
+      <div class="circle-image">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Unit_circle_angles_color.svg/800px-Unit_circle_angles_color.svg.png" alt="Círculo Trigonométrico">
+      </div>
     </section>
-  </main>
 
+    <section>
+      <h2>Relações Métricas no Triângulo Retângulo</h2>
+      <ul>
+        <li><strong>h² = m · n</strong> (altura ao quadrado = produto das projeções)</li>
+        <li><strong>a² = c · m</strong> &nbsp;&nbsp; <strong>b² = c · n</strong></li>
+        <li><strong>c² = a² + b²</strong> (Teorema de Pitágoras)</li>
+      </ul>
+      <p>Essas fórmulas ajudam a calcular lados e segmentos de triângulos retângulos com facilidade.</p>
+    </section>
+
+    <section>
+      <h2>Exemplo Numérico</h2>
+      <p>Em um triângulo com hipotenusa 10 e cateto oposto 5:</p>
+      <ul>
+        <li><strong>sen(θ):</strong> 5 / 10 = 0.5</li>
+        <li><strong>cos(θ):</strong> √3 / 2 ≈ 0.866</li>
+      </ul>
+    </section>
+  </div>
 </body>
 </html>
