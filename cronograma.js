@@ -1,22 +1,3 @@
-// ============================
-// 1. Firebase Config
-// ============================
-const firebaseConfig = {
-  apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
-  authDomain: "sdel-b3f65.firebaseapp.com",
-  projectId: "sdel-b3f65",
-  storageBucket: "sdel-b3f65.appspot.com",
-  messagingSenderId: "297725999985",
-  appId: "1:297725999985:web:d41da68311c190ef8a54d0",
-  measurementId: "G-PT92VECJ2H"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-// ============================
-// 2. Variáveis da interface
-// ============================
 const grid = document.getElementById('schedule-grid');
 const modal = document.getElementById('modal');
 const subjectSelect = document.getElementById('subject');
@@ -25,32 +6,34 @@ const closeModal = document.getElementById('close-modal');
 const saveBtn = document.getElementById('save');
 const clearCellBtn = document.getElementById('clear-cell');
 const clearAllBtn = document.getElementById('clear-all');
-
-const subjects = ['matematica', 'portugues', 'historia', 'biologia', 'quimica'];
-const hours = Array.from({ length: 15 }, (_, i) => `${7 + i}:00`); // 7h até 21h
+const toggleThemeBtn = document.getElementById('toggle-theme');
+const timeModal = document.getElementById('time-modal');
+const editStudyTimeBtn = document.getElementById('edit-study-time');
+const setHoursBtn = document.getElementById('set-hours');
 
 let selectedCell = null;
+let startHour = parseInt(localStorage.getItem('startHour')) || 7;
+let endHour = parseInt(localStorage.getItem('endHour')) || 22;
 
-// ============================
-// 3. Criar grade
-// ============================
+const subjects = ['matematica', 'portugues', 'historia', 'biologia', 'quimica'];
+
+// Cria a grade do cronograma conforme o horário definido
 function createScheduleGrid() {
   grid.innerHTML = '';
-
-  hours.forEach(hour => {
+  for (let hour = startHour; hour < endHour; hour++) {
     const row = document.createElement('div');
     row.className = 'grid-row';
 
     const timeSlot = document.createElement('div');
     timeSlot.className = 'time-slot';
-    timeSlot.textContent = hour;
+    timeSlot.textContent = `${hour}:00`;
     row.appendChild(timeSlot);
 
-    for (let day = 0; day < 7; day++) {
+    for (let i = 0; i < 7; i++) {
       const cell = document.createElement('div');
       cell.className = 'cell';
-      cell.dataset.time = hour;
-      cell.dataset.day = day;
+      cell.dataset.time = `${hour}:00`;
+      cell.dataset.day = i;
 
       cell.addEventListener('click', () => {
         selectedCell = cell;
@@ -65,129 +48,153 @@ function createScheduleGrid() {
     }
 
     grid.appendChild(row);
-  });
+  }
+
+  loadSchedule();
 }
 
-// ============================
-// 4. Salvar no Firestore
-// ============================
-function saveScheduleToFirebase() {
-  const user = firebase.auth().currentUser;
-  if (!user) return;
-
-  const allCells = document.querySelectorAll('.cell');
-  const scheduleData = [];
-
-  allCells.forEach(cell => {
-    if (cell.className !== 'cell') {
-      scheduleData.push({
-        day: cell.dataset.day,
-        time: cell.dataset.time,
-        subject: subjects.find(s => cell.classList.contains(s)) || '',
-        studyTime: cell.dataset.studyTime || ''
-      });
-    }
-  });
-
-  db.collection('schedules').doc(user.uid).set({
-    schedule: scheduleData
-  });
-}
-
-// ============================
-// 5. Carregar do Firestore
-// ============================
-function loadScheduleFromFirebase() {
-  const user = firebase.auth().currentUser;
-  if (!user) return;
-
-  db.collection('schedules').doc(user.uid).get().then(doc => {
-    if (!doc.exists) return;
-
-    const scheduleData = doc.data().schedule || [];
-
-    scheduleData.forEach(item => {
-      const cell = document.querySelector(`.cell[data-day="${item.day}"][data-time="${item.time}"]`);
-      if (cell) {
-        cell.className = `cell ${item.subject}`;
-        cell.dataset.studyTime = item.studyTime;
-        cell.innerHTML = `
-          <strong>${item.subject.charAt(0).toUpperCase() + item.subject.slice(1)}</strong><br>
-          <small>${item.studyTime} min</small>
-        `;
-      }
+// Salva o cronograma no localStorage
+function saveSchedule() {
+  const data = [];
+  document.querySelectorAll('.cell').forEach(cell => {
+    data.push({
+      day: cell.dataset.day,
+      time: cell.dataset.time,
+      subject: subjects.find(s => cell.classList.contains(s)) || '',
+      studyTime: cell.dataset.studyTime || '',
+      content: cell.innerHTML
     });
   });
+  localStorage.setItem('schedule', JSON.stringify(data));
 }
 
-// ============================
-// 6. Eventos do modal
-// ============================
-closeModal.onclick = () => {
-  modal.style.display = 'none';
-};
+// Carrega o cronograma do localStorage
+function loadSchedule() {
+  const data = JSON.parse(localStorage.getItem('schedule')) || [];
+  document.querySelectorAll('.cell').forEach((cell, index) => {
+    const item = data[index];
+    if (item && item.subject) {
+      cell.className = `cell ${item.subject}`;
+      cell.innerHTML = item.content;
+      cell.dataset.studyTime = item.studyTime;
+    }
+  });
+}
 
+// Obtém célula pelo dia e hora
+function getCell(day, hour) {
+  return Array.from(document.querySelectorAll('.cell')).find(cell =>
+    cell.dataset.day === String(day) && cell.dataset.time === `${hour}:00`
+  );
+}
+
+// Evento ao salvar bloco
 saveBtn.onclick = () => {
   const subject = subjectSelect.value;
-  const time = studyTimeInput.value;
-
-  if (!subject || !time) {
-    alert('Selecione uma disciplina e tempo.');
+  let time = parseInt(studyTimeInput.value);
+  if (isNaN(time) || time <= 0) {
+    alert('Por favor, informe um tempo de estudo válido (> 0).');
     return;
   }
-
   if (selectedCell) {
-    selectedCell.className = `cell ${subject}`;
-    selectedCell.dataset.studyTime = time;
-    selectedCell.innerHTML = `
-      <strong>${subject.charAt(0).toUpperCase() + subject.slice(1)}</strong><br>
-      <small>${time} min</small>
-    `;
-  }
+    const blocksNeeded = Math.ceil(time / 60); // blocos de 1h
+    const day = selectedCell.dataset.day;
+    let hour = parseInt(selectedCell.dataset.time.split(':')[0]);
 
+    // Limpa blocos a preencher para evitar sobreposição visual
+    for (let i = 0; i < blocksNeeded; i++) {
+      let currentHour = hour + i;
+      if (currentHour >= endHour) break;
+      const cell = getCell(day, currentHour);
+      if (cell) {
+        cell.className = 'cell';
+        cell.textContent = '';
+        cell.dataset.studyTime = '';
+      }
+    }
+
+    // Preenche os blocos necessários
+    for (let i = 0; i < blocksNeeded; i++) {
+      let currentHour = hour + i;
+      if (currentHour >= endHour) break;
+      const cell = getCell(day, currentHour);
+      if (cell) {
+        cell.className = `cell ${subject}`;
+        // No último bloco, mostra tempo restante; nos outros 60 min
+        const displayTime = (i === blocksNeeded - 1 && time % 60 !== 0) ? time % 60 : 60;
+        cell.textContent = `${subject.charAt(0).toUpperCase() + subject.slice(1)} - ${displayTime} min`;
+        cell.dataset.studyTime = time;
+      }
+    }
+  }
+  saveSchedule();
   modal.style.display = 'none';
-  saveScheduleToFirebase();
 };
 
+// Limpar bloco selecionado
 clearCellBtn.onclick = () => {
   if (selectedCell) {
     selectedCell.className = 'cell';
     selectedCell.textContent = '';
     selectedCell.dataset.studyTime = '';
-  }
-  modal.style.display = 'none';
-  saveScheduleToFirebase();
-};
-
-clearAllBtn.onclick = () => {
-  const allCells = document.querySelectorAll('.cell');
-  allCells.forEach(cell => {
-    cell.className = 'cell';
-    cell.textContent = '';
-    cell.dataset.studyTime = '';
-  });
-  modal.style.display = 'none';
-
-  const user = firebase.auth().currentUser;
-  if (user) {
-    db.collection('schedules').doc(user.uid).delete();
-  }
-};
-
-window.onclick = (event) => {
-  if (event.target === modal) {
+    saveSchedule();
     modal.style.display = 'none';
   }
 };
 
-// ============================
-// 7. Inicialização
-// ============================
-firebase.auth().onAuthStateChanged(user => {
-  if (user) {
-    createScheduleGrid();
-    loadScheduleFromFirebase();
-  } else {
-    window.location.href = "login.html"; // redireciona se não estiver logado
+// Limpar todo o cronograma
+clearAllBtn.onclick = () => {
+  if (confirm('Tem certeza que deseja limpar todo o cronograma?')) {
+    document.querySelectorAll('.cell').forEach(cell => {
+      cell.className = 'cell';
+      cell.textContent = '';
+      cell.dataset.studyTime = '';
+    });
+    localStorage.removeItem('schedule');
   }
-});
+};
+
+// Alternar tema claro/escuro
+toggleThemeBtn.onclick = () => {
+  document.body.classList.toggle('dark');
+};
+
+// Fechar modal ao clicar no X
+closeModal.onclick = () => {
+  modal.style.display = 'none';
+};
+
+// Fechar modal clicando fora da área
+window.onclick = (e) => {
+  if (e.target === modal) {
+    modal.style.display = 'none';
+  }
+  if (e.target === timeModal) {
+    timeModal.style.display = 'none';
+  }
+};
+
+// Abrir modal para definir horário de estudos
+editStudyTimeBtn.onclick = () => {
+  timeModal.style.display = 'block';
+  document.getElementById('start-hour').value = startHour;
+  document.getElementById('end-hour').value = endHour;
+};
+
+// Aplicar horários definidos
+setHoursBtn.onclick = () => {
+  const start = parseInt(document.getElementById('start-hour').value);
+  const end = parseInt(document.getElementById('end-hour').value);
+  if (isNaN(start) || isNaN(end) || start < 0 || start > 23 || end <= start || end > 23) {
+    alert('Informe um horário válido. O fim deve ser maior que o início.');
+    return;
+  }
+  startHour = start;
+  endHour = end;
+  localStorage.setItem('startHour', startHour);
+  localStorage.setItem('endHour', endHour);
+  timeModal.style.display = 'none';
+  createScheduleGrid();
+};
+
+createScheduleGrid();
