@@ -2,9 +2,9 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Vídeos</title>
+  <title>Vídeo Local</title>
   <style>
-     body {
+    body {
       font-family: sans-serif;
       background-color: #fafafa;
       padding: 40px;
@@ -13,7 +13,7 @@
     .container {
       border: 1px solid #ccc;
       padding: 30px;
-      max-width: 800px;
+      max-width: 900px;
       margin: auto;
       background-color: white;
     }
@@ -39,25 +39,16 @@
 
     .video-box {
       background-color: #eee;
-      height: auto;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      width: 100%;
       margin-top: 25px;
       border-radius: 6px;
       overflow: hidden;
     }
 
-    .video-box img {
+    .video-box video {
       width: 100%;
-      max-width: 100%;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: transform 0.3s;
-    }
-
-    .video-box img:hover {
-      transform: scale(1.02);
+      height: auto;
+      display: block;
     }
 
     .related {
@@ -76,8 +67,8 @@
 
     .thumbnail {
       background-color: #eee;
-      width: 100px;
-      height: 70px;
+      width: 120px;
+      height: 80px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -91,7 +82,7 @@
       cursor: pointer;
     }
 
-       /* Botão flutuante lateral */
+    /* Botão flutuante lateral */
     #botaoPainel {
       position: fixed;
       top: 50%;
@@ -139,11 +130,6 @@
       font-weight: 700;
       font-size: 20px;
       color: #111827;
-      user-select: none;
-    }
-
-    #cabecalhoPainel:active {
-      cursor: grabbing;
     }
 
     .botaoSecao {
@@ -170,13 +156,6 @@
       margin-bottom: 24px;
     }
 
-    #blocoNotas label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: #374151;
-    }
-
     textarea {
       width: 100%;
       min-height: 120px;
@@ -186,16 +165,9 @@
       border-radius: 10px;
       border: 1.5px solid #cbd5e1;
       box-shadow: inset 0 1px 4px rgba(0,0,0,0.08);
-      outline-offset: 2px;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       color: #111827;
       box-sizing: border-box;
-      transition: border-color 0.3s ease;
-    }
-
-    textarea:focus {
-      border-color: #2563eb;
-      box-shadow: 0 0 6px rgba(37, 99, 235, 0.5);
     }
 
     #cronometro {
@@ -233,18 +205,20 @@
   </div>
 
   <div class="video-box">
-    <a href="https://www.youtube.com/watch?v=H5Rcxjn6rp0" target="_blank">
-      <img src="https://img.youtube.com/vi/H5Rcxjn6rp0/maxresdefault.jpg" alt="Vídeo YouTube">
-    </a>
+    <video controls>
+      <source src="videos/aula.mp4" type="video/mp4">
+      Seu navegador não suporta vídeos.
+    </video>
   </div>
 
   <div class="related">
-    <p>Assista também</p>
+    <p>Outros vídeos</p>
     <div class="related-thumbnails">
       <div class="thumbnail">
-        <a href="https://www.youtube.com/watch?v=F2y6cwqFhkE" target="_blank">
-          <img src="https://img.youtube.com/vi/F2y6cwqFhkE/default.jpg" alt="Miniatura">
-        </a>
+        <img src="thumbs/thumb1.jpg" alt="Miniatura 1">
+      </div>
+      <div class="thumbnail">
+        <img src="thumbs/thumb2.jpg" alt="Miniatura 2">
       </div>
     </div>
   </div>
@@ -272,114 +246,6 @@
   </div>
 </div>
 
-<!-- Firebase -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-analytics.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
-    authDomain: "sdel-b3f65.firebaseapp.com",
-    projectId: "sdel-b3f65",
-    storageBucket: "sdel-b3f65.appspot.com",
-    messagingSenderId: "297725999985",
-    appId: "1:297725999985:web:d41da68311c190ef8a54d0",
-    measurementId: "G-PT92VECJ2H"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-
-  const textareaNotas = document.getElementById("textareaNotas");
-  const cronometroEl = document.getElementById("cronometro");
-
-  let usuarioAtual = null;
-  let segundos = 0, minutos = 0, horas = 0;
-  let intervaloCronometro = null;
-
-  // ---------- Salvar notas ----------
-  function salvarNotas(texto) {
-    if (!usuarioAtual) return;
-    const uid = usuarioAtual.uid;
-    const docRef = doc(db, "notasUsuario", uid);
-    setDoc(docRef, { texto }, { merge: true });
-  }
-
-  // ---------- Salvar tempo ----------
-  function salvarTempoCronometro() {
-    if (!usuarioAtual) return;
-    const uid = usuarioAtual.uid;
-    const docRef = doc(db, "notasUsuario", uid);
-    const tempoAtual = cronometroEl.innerText;
-    setDoc(docRef, { tempo: tempoAtual }, { merge: true });
-  }
-
-  // ---------- Carregar notas e tempo ----------
-  async function carregarNotas() {
-    if (!usuarioAtual) return;
-    const uid = usuarioAtual.uid;
-    const docRef = doc(db, "notasUsuario", uid);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      textareaNotas.value = data.texto || "";
-
-      if (data.tempo) {
-        cronometroEl.innerText = data.tempo;
-        const [h, m, s] = data.tempo.split(":").map(Number);
-        horas = h; minutos = m; segundos = s;
-      }
-    }
-  }
-
-  // ---------- Login ----------
-  onAuthStateChanged(auth, user => {
-    if (user) {
-      usuarioAtual = user;
-      carregarNotas();
-    } else {
-      usuarioAtual = null;
-      textareaNotas.value = "Faça login para salvar suas anotações.";
-    }
-  });
-
-  textareaNotas.addEventListener("input", () => {
-    salvarNotas(textareaNotas.value);
-  });
-
-  // ---------- Cronômetro ----------
-  function atualizarCronometro() {
-    segundos++;
-    if (segundos >= 60) { segundos = 0; minutos++; }
-    if (minutos >= 60) { minutos = 0; horas++; }
-    const formatar = n => n.toString().padStart(2, '0');
-    const tempo = `${formatar(horas)}:${formatar(minutos)}:${formatar(segundos)}`;
-    cronometroEl.innerText = tempo;
-    salvarTempoCronometro();
-  }
-
-  window.iniciarCronometro = () => {
-    if (!intervaloCronometro) intervaloCronometro = setInterval(atualizarCronometro, 1000);
-  };
-
-  window.pararCronometro = () => {
-    clearInterval(intervaloCronometro);
-    intervaloCronometro = null;
-  };
-
-  window.resetarCronometro = () => {
-    pararCronometro();
-    segundos = minutos = horas = 0;
-    cronometroEl.innerText = "00:00:00";
-    salvarTempoCronometro();
-  };
-</script>
-
-<!-- JS do painel e movimentação -->
 <script>
   function alternarSecao(id) {
     const secao = document.getElementById(id);
@@ -392,39 +258,34 @@
     painel.style.display = painel.style.display === "block" ? "none" : "block";
   };
 
-  // Mover painel
-  let posX = 0, posY = 0, posInicialX = 0, posInicialY = 0;
-  const cabecalho = document.getElementById("cabecalhoPainel");
+  let segundos = 0, minutos = 0, horas = 0;
+  let intervaloCronometro = null;
 
-  cabecalho.onmousedown = dragMouseDown;
-
-  function dragMouseDown(e) {
-    e.preventDefault();
-    posInicialX = e.clientX;
-    posInicialY = e.clientY;
-    document.onmouseup = () => { document.onmousemove = null; };
-    document.onmousemove = moverPainel;
+  function atualizarCronometro() {
+    segundos++;
+    if (segundos >= 60) { segundos = 0; minutos++; }
+    if (minutos >= 60) { minutos = 0; horas++; }
+    const formatar = n => n.toString().padStart(2, '0');
+    const tempo = `${formatar(horas)}:${formatar(minutos)}:${formatar(segundos)}`;
+    document.getElementById("cronometro").innerText = tempo;
   }
 
-  function moverPainel(e) {
-    e.preventDefault();
-    const dx = e.clientX - posInicialX;
-    const dy = e.clientY - posInicialY;
-    posInicialX = e.clientX;
-    posInicialY = e.clientY;
+  function iniciarCronometro() {
+    if (!intervaloCronometro)
+      intervaloCronometro = setInterval(atualizarCronometro, 1000);
+  }
 
-    const rect = painel.getBoundingClientRect();
-    let novaTop = rect.top + dy;
-    let novaLeft = rect.left + dx;
-    novaTop = Math.max(0, Math.min(novaTop, window.innerHeight - rect.height));
-    novaLeft = Math.max(0, Math.min(novaLeft, window.innerWidth - rect.width));
-    painel.style.top = novaTop + "px";
-    painel.style.left = novaLeft + "px";
-    painel.style.right = "auto";
+  function pararCronometro() {
+    clearInterval(intervaloCronometro);
+    intervaloCronometro = null;
+  }
+
+  function resetarCronometro() {
+    pararCronometro();
+    segundos = minutos = horas = 0;
+    document.getElementById("cronometro").innerText = "00:00:00";
   }
 </script>
-
-
 
 </body>
 </html>
