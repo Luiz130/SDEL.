@@ -504,6 +504,7 @@
   </div>
 
   <!-- Firebase SDKs -->
+   <!-- Firebase e lógica -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
@@ -523,7 +524,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Referências dos elementos
+    // Elementos do flashcard
     const addBtn = document.getElementById('addBtn');
     const clearBtn = document.getElementById('clearBtn');
     const contentInput = document.getElementById('contentInput');
@@ -603,10 +604,8 @@
       }
     }
 
-    // Event listeners
     addBtn.addEventListener('click', () => openModal());
     closeModalBtn.addEventListener('click', closeModal);
-
     modalBg.addEventListener('click', e => {
       if (e.target === modalBg) closeModal();
     });
@@ -636,188 +635,105 @@
       closeModal();
     });
 
-    // Espera o usuário estar logado para carregar os dados
+    // Painel: Notas e Cronômetro
+    const textareaNotas = document.getElementById("textareaNotas");
+    const cronometroEl = document.getElementById("cronometro");
+
+    let segundos = 0, minutos = 0, horas = 0;
+    let intervaloCronometro = null;
+
+    function salvarNotas(texto) {
+      if (!currentUser) return;
+      const uid = currentUser.uid;
+      const docRef = doc(db, "notasUsuario", uid);
+      setDoc(docRef, { texto }, { merge: true });
+    }
+
+    function salvarTempoCronometro() {
+      if (!currentUser) return;
+      const uid = currentUser.uid;
+      const docRef = doc(db, "notasUsuario", uid);
+      const tempoAtual = cronometroEl.innerText;
+      setDoc(docRef, { tempo: tempoAtual }, { merge: true });
+    }
+
+    async function carregarNotas() {
+      if (!currentUser) return;
+      const uid = currentUser.uid;
+      const docRef = doc(db, "notasUsuario", uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        textareaNotas.value = data.texto || "";
+        if (data.tempo) {
+          cronometroEl.innerText = data.tempo;
+          const [h, m, s] = data.tempo.split(":").map(Number);
+          horas = h; minutos = m; segundos = s;
+        }
+      }
+    }
+
+    function atualizarCronometro() {
+      segundos++;
+      if (segundos >= 60) { segundos = 0; minutos++; }
+      if (minutos >= 60) { minutos = 0; horas++; }
+      const formatar = n => n.toString().padStart(2, '0');
+      const tempo = `${formatar(horas)}:${formatar(minutos)}:${formatar(segundos)}`;
+      cronometroEl.innerText = tempo;
+      salvarTempoCronometro();
+    }
+
+    window.iniciarCronometro = () => {
+      if (!intervaloCronometro) intervaloCronometro = setInterval(atualizarCronometro, 1000);
+    };
+
+    window.pararCronometro = () => {
+      clearInterval(intervaloCronometro);
+      intervaloCronometro = null;
+    };
+
+    window.resetarCronometro = () => {
+      pararCronometro();
+      segundos = minutos = horas = 0;
+      cronometroEl.innerText = "00:00:00";
+      salvarTempoCronometro();
+    };
+
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUser = user;
         await loadFromFirestore(user.uid);
+        await carregarNotas();
       } else {
-        alert("Você precisa estar logado para ver seus flashcards.");
+        alert("Você precisa estar logado.");
         window.location.href = "login.html";
       }
     });
+
+    textareaNotas.addEventListener("input", () => {
+      salvarNotas(textareaNotas.value);
+    });
+
+    // Movimentar painel
+    const botaoPainel = document.getElementById("botaoPainel");
+    const painel = document.getElementById("painel");
+    botaoPainel.onclick = () => {
+      painel.style.display = painel.style.display === "block" ? "none" : "block";
+    };
+
+    const cabecalho = document.getElementById("cabecalhoPainel");
+    cabecalho.onmousedown = function (e) {
+      e.preventDefault();
+      let startX = e.clientX;
+      let startY = e.clientY;
+      const rect = painel.getBoundingClientRect();
+      const move = (e) => {
+        painel.style.top = `${rect.top + e.clientY - startY}px`;
+        painel.style.left = `${rect.left + e.clientX - startX}px`;
+      };
+      document.onmousemove = move;
+      document.onmouseup = () => { document.onmousemove = null; };
+    };
   </script>
 </body>
-<!-- Painel -->
-<div id="botaoPainel" title="Abrir Painel">🛠</div>
-<div id="painel">
-  <div id="cabecalhoPainel">Painel Rápido</div>
-
-  <button class="botaoSecao" onclick="alternarSecao('blocoNotas')">📘 Bloco de Notas</button>
-  <div id="blocoNotas" class="secaoPainel">
-    <label for="textareaNotas">Suas Anotações:</label>
-    <textarea id="textareaNotas" placeholder="Digite suas anotações..."></textarea>
-  </div>
-
-  <button class="botaoSecao" onclick="alternarSecao('containerCronometro')">⏱ Cronômetro</button>
-  <div id="containerCronometro" class="secaoPainel">
-    <div id="cronometro">00:00:00</div>
-    <div id="botoesCronometro">
-      <button onclick="iniciarCronometro()">Iniciar</button>
-      <button onclick="pararCronometro()">Parar</button>
-      <button onclick="resetarCronometro()">Resetar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Firebase -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-analytics.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
-    authDomain: "sdel-b3f65.firebaseapp.com",
-    projectId: "sdel-b3f65",
-    storageBucket: "sdel-b3f65.appspot.com",
-    messagingSenderId: "297725999985",
-    appId: "1:297725999985:web:d41da68311c190ef8a54d0",
-    measurementId: "G-PT92VECJ2H"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-
-  const textareaNotas = document.getElementById("textareaNotas");
-  const cronometroEl = document.getElementById("cronometro");
-
-  let usuarioAtual = null;
-  let segundos = 0, minutos = 0, horas = 0;
-  let intervaloCronometro = null;
-
-  // ---------- Salvar notas ----------
-  function salvarNotas(texto) {
-    if (!usuarioAtual) return;
-    const uid = usuarioAtual.uid;
-    const docRef = doc(db, "notasUsuario", uid);
-    setDoc(docRef, { texto }, { merge: true });
-  }
-
-  // ---------- Salvar tempo ----------
-  function salvarTempoCronometro() {
-    if (!usuarioAtual) return;
-    const uid = usuarioAtual.uid;
-    const docRef = doc(db, "notasUsuario", uid);
-    const tempoAtual = cronometroEl.innerText;
-    setDoc(docRef, { tempo: tempoAtual }, { merge: true });
-  }
-
-  // ---------- Carregar notas e tempo ----------
-  async function carregarNotas() {
-    if (!usuarioAtual) return;
-    const uid = usuarioAtual.uid;
-    const docRef = doc(db, "notasUsuario", uid);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      textareaNotas.value = data.texto || "";
-
-      if (data.tempo) {
-        cronometroEl.innerText = data.tempo;
-        const [h, m, s] = data.tempo.split(":").map(Number);
-        horas = h; minutos = m; segundos = s;
-      }
-    }
-  }
-
-  // ---------- Login ----------
-  onAuthStateChanged(auth, user => {
-    if (user) {
-      usuarioAtual = user;
-      carregarNotas();
-    } else {
-      usuarioAtual = null;
-      textareaNotas.value = "Faça login para salvar suas anotações.";
-    }
-  });
-
-  textareaNotas.addEventListener("input", () => {
-    salvarNotas(textareaNotas.value);
-  });
-
-  // ---------- Cronômetro ----------
-  function atualizarCronometro() {
-    segundos++;
-    if (segundos >= 60) { segundos = 0; minutos++; }
-    if (minutos >= 60) { minutos = 0; horas++; }
-    const formatar = n => n.toString().padStart(2, '0');
-    const tempo = `${formatar(horas)}:${formatar(minutos)}:${formatar(segundos)}`;
-    cronometroEl.innerText = tempo;
-    salvarTempoCronometro();
-  }
-
-  window.iniciarCronometro = () => {
-    if (!intervaloCronometro) intervaloCronometro = setInterval(atualizarCronometro, 1000);
-  };
-
-  window.pararCronometro = () => {
-    clearInterval(intervaloCronometro);
-    intervaloCronometro = null;
-  };
-
-  window.resetarCronometro = () => {
-    pararCronometro();
-    segundos = minutos = horas = 0;
-    cronometroEl.innerText = "00:00:00";
-    salvarTempoCronometro();
-  };
-</script>
-
-<!-- JS do painel e movimentação -->
-<script>
-  function alternarSecao(id) {
-    const secao = document.getElementById(id);
-    secao.style.display = (secao.style.display === "block") ? "none" : "block";
-  }
-
-  const botaoPainel = document.getElementById("botaoPainel");
-  const painel = document.getElementById("painel");
-  botaoPainel.onclick = () => {
-    painel.style.display = painel.style.display === "block" ? "none" : "block";
-  };
-
-  // Mover painel
-  let posX = 0, posY = 0, posInicialX = 0, posInicialY = 0;
-  const cabecalho = document.getElementById("cabecalhoPainel");
-
-  cabecalho.onmousedown = dragMouseDown;
-
-  function dragMouseDown(e) {
-    e.preventDefault();
-    posInicialX = e.clientX;
-    posInicialY = e.clientY;
-    document.onmouseup = () => { document.onmousemove = null; };
-    document.onmousemove = moverPainel;
-  }
-
-  function moverPainel(e) {
-    e.preventDefault();
-    const dx = e.clientX - posInicialX;
-    const dy = e.clientY - posInicialY;
-    posInicialX = e.clientX;
-    posInicialY = e.clientY;
-
-    const rect = painel.getBoundingClientRect();
-    let novaTop = rect.top + dy;
-    let novaLeft = rect.left + dx;
-    novaTop = Math.max(0, Math.min(novaTop, window.innerHeight - rect.height));
-    novaLeft = Math.max(0, Math.min(novaLeft, window.innerWidth - rect.width));
-    painel.style.top = novaTop + "px";
-    painel.style.left = novaLeft + "px";
-    painel.style.right = "auto";
-  }
-</script>
+</html>
