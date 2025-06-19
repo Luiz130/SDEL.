@@ -503,181 +503,201 @@
   </div>
 
   <!-- Firebase e Lógica JS -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+  import { getFirestore, doc, collection, addDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
-      authDomain: "sdel-b3f65.firebaseapp.com",
-      projectId: "sdel-b3f65",
-      storageBucket: "sdel-b3f65.appspot.com",
-      messagingSenderId: "297725999985",
-      appId: "1:297725999985:web:d41da68311c190ef8a54d0"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
+    authDomain: "sdel-b3f65.firebaseapp.com",
+    projectId: "sdel-b3f65",
+    storageBucket: "sdel-b3f65.appspot.com",
+    messagingSenderId: "297725999985",
+    appId: "1:297725999985:web:d41da68311c190ef8a54d0"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
 
-    let usuarioAtual = null;
-    let flashcards = [];
-    let editingIndex = null;
-    let quizMode = false;
-    let score = 0;
-    let totalAnswered = 0;
+  let usuarioAtual = null;
+  let flashcards = [];
+  let editingIndex = null;
 
-    const flashcardContainer = document.getElementById('flashcardContainer');
-    const modalBg = document.getElementById('modalBg');
-    const addBtn = document.getElementById('addBtn');
-    const themeBtn = document.getElementById('themeBtn');
-    const clearBtn = document.getElementById('clearBtn');
-    const quizToggleBtn = document.getElementById('quizToggleBtn');
-    const scoreDisplay = document.getElementById('scoreDisplay');
+  const flashcardContainer = document.getElementById('flashcardContainer');
+  const modalBg = document.getElementById('modalBg');
+  const addBtn = document.getElementById('addBtn');
+  const themeBtn = document.getElementById('themeBtn');
+  const clearBtn = document.getElementById('clearBtn');
 
-    const contentInput = document.getElementById('contentInput');
-    const answerInput = document.getElementById('answerInput');
-    const subjectInput = document.getElementById('subjectInput');
-    const flashcardForm = document.getElementById('flashcardForm');
-    const closeModalBtn = document.getElementById('closeModalBtn');
+  const contentInput = document.getElementById('contentInput');
+  const answerInput = document.getElementById('answerInput');
+  const subjectInput = document.getElementById('subjectInput');
+  const flashcardForm = document.getElementById('flashcardForm');
+  const closeModalBtn = document.getElementById('closeModalBtn');
 
-    // Firebase salvar
-    async function saveFlashcards() {
-      if (!usuarioAtual) return;
-      const uid = usuarioAtual.uid;
-      const docRef = doc(db, "flashcards", uid);
-      await setDoc(docRef, { flashcards }, { merge: true });
-    }
+  // Salvar cada flashcard como documento individual
+  async function saveFlashcards() {
+    if (!usuarioAtual) return;
+    const uid = usuarioAtual.uid;
+    const userRef = doc(db, "flashcards", uid);
+    const cardsCollection = collection(userRef, "cards");
 
-    async function loadFlashcards() {
-      if (!usuarioAtual) return;
-      const uid = usuarioAtual.uid;
-      const docRef = doc(db, "flashcards", uid);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        flashcards = docSnap.data().flashcards || [];
-      } else {
-        flashcards = [];
-      }
-    }
+    // Exclui todos os flashcards antigos
+    const snapshot = await getDocs(cardsCollection);
+    const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref));
+    await Promise.all(deletePromises);
 
-    function createFlashcardElement(card, index) {
-      const cardDiv = document.createElement('div');
-      cardDiv.className = `flashcard ${card.subject}`;
-      const innerDiv = document.createElement('div');
-      innerDiv.className = 'card-inner';
-
-      const frontDiv = document.createElement('div');
-      frontDiv.className = 'card-front';
-      frontDiv.textContent = card.content;
-
-      const backDiv = document.createElement('div');
-      backDiv.className = 'card-back';
-      backDiv.textContent = card.answer;
-
-      const buttonsDiv = document.createElement('div');
-      buttonsDiv.className = 'buttons';
-
-      const editBtn = document.createElement('button');
-      editBtn.className = 'edit';
-      editBtn.textContent = 'Editar';
-      editBtn.onclick = e => {
-        e.stopPropagation();
-        openEditModal(index);
-      };
-
-      const deleteBtn = document.createElement('button');
-      deleteBtn.className = 'delete';
-      deleteBtn.textContent = 'Excluir';
-      deleteBtn.onclick = async e => {
-        e.stopPropagation();
-        if (confirm("Excluir este flashcard?")) {
-          flashcards.splice(index, 1);
-          await saveFlashcards();
-          renderFlashcards();
-        }
-      };
-
-      buttonsDiv.append(editBtn, deleteBtn);
-      innerDiv.append(buttonsDiv, frontDiv, backDiv);
-      cardDiv.appendChild(innerDiv);
-      cardDiv.onclick = () => cardDiv.classList.toggle("flipped");
-      return cardDiv;
-    }
-
-    function renderFlashcards() {
-      flashcardContainer.innerHTML = '';
-      flashcards.forEach((card, index) => {
-        const el = createFlashcardElement(card, index);
-        flashcardContainer.appendChild(el);
+    // Salva novos
+    const savePromises = flashcards.map(card => {
+      return addDoc(cardsCollection, {
+        question: card.content,
+        answer: card.answer,
+        subject: card.subject,
+        uid,
+        timestamp: new Date()
       });
-    }
+    });
 
-    function openEditModal(index = null) {
-      editingIndex = index;
-      if (index !== null) {
-        const card = flashcards[index];
-        contentInput.value = card.content;
-        answerInput.value = card.answer;
-        subjectInput.value = card.subject;
-      } else {
-        flashcardForm.reset();
-      }
-      modalBg.classList.add('show');
-    }
+    await Promise.all(savePromises);
+  }
 
-    function closeModal() {
-      modalBg.classList.remove('show');
-      editingIndex = null;
-      flashcardForm.reset();
-    }
+  // Carregar flashcards do Firestore
+  async function loadFlashcards() {
+    if (!usuarioAtual) return;
+    const uid = usuarioAtual.uid;
+    const userRef = doc(db, "flashcards", uid);
+    const cardsCollection = collection(userRef, "cards");
+    const snapshot = await getDocs(cardsCollection);
 
-    addBtn.onclick = () => openEditModal();
-    closeModalBtn.onclick = () => closeModal();
-    modalBg.onclick = e => { if (e.target === modalBg) closeModal(); };
+    flashcards = snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        content: data.question,
+        answer: data.answer,
+        subject: data.subject
+      };
+    });
+  }
 
-    flashcardForm.onsubmit = async e => {
-      e.preventDefault();
-      const content = contentInput.value.trim();
-      const answer = answerInput.value.trim();
-      const subject = subjectInput.value;
-      if (!content || !answer || !subject) return;
+  function createFlashcardElement(card, index) {
+    const cardDiv = document.createElement('div');
+    cardDiv.className = `flashcard ${card.subject}`;
+    const innerDiv = document.createElement('div');
+    innerDiv.className = 'card-inner';
 
-      if (editingIndex !== null) {
-        flashcards[editingIndex] = { content, answer, subject };
-      } else {
-        flashcards.push({ content, answer, subject });
-      }
-      await saveFlashcards();
-      renderFlashcards();
-      closeModal();
+    const frontDiv = document.createElement('div');
+    frontDiv.className = 'card-front';
+    frontDiv.textContent = card.content;
+
+    const backDiv = document.createElement('div');
+    backDiv.className = 'card-back';
+    backDiv.textContent = card.answer;
+
+    const buttonsDiv = document.createElement('div');
+    buttonsDiv.className = 'buttons';
+
+    const editBtn = document.createElement('button');
+    editBtn.className = 'edit';
+    editBtn.textContent = 'Editar';
+    editBtn.onclick = e => {
+      e.stopPropagation();
+      openEditModal(index);
     };
 
-    clearBtn.onclick = async () => {
-      if (confirm("Deseja excluir todos os flashcards?")) {
-        flashcards = [];
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'delete';
+    deleteBtn.textContent = 'Excluir';
+    deleteBtn.onclick = async e => {
+      e.stopPropagation();
+      if (confirm("Excluir este flashcard?")) {
+        flashcards.splice(index, 1);
         await saveFlashcards();
         renderFlashcards();
       }
     };
 
-    themeBtn.onclick = () => {
-      document.body.classList.toggle("dark");
-      themeBtn.textContent = document.body.classList.contains("dark") ? "Modo Claro" : "Modo Escuro";
-    };
+    buttonsDiv.append(editBtn, deleteBtn);
+    innerDiv.append(buttonsDiv, frontDiv, backDiv);
+    cardDiv.appendChild(innerDiv);
+    cardDiv.onclick = () => cardDiv.classList.toggle("flipped");
+    return cardDiv;
+  }
 
-    onAuthStateChanged(auth, user => {
-      if (user) {
-        usuarioAtual = user;
-        loadFlashcards().then(renderFlashcards);
-      } else {
-        usuarioAtual = null;
-        flashcards = [];
-        renderFlashcards();
-      }
+  function renderFlashcards() {
+    flashcardContainer.innerHTML = '';
+    flashcards.forEach((card, index) => {
+      const el = createFlashcardElement(card, index);
+      flashcardContainer.appendChild(el);
     });
-  </script>
+  }
+
+  function openEditModal(index = null) {
+    editingIndex = index;
+    if (index !== null) {
+      const card = flashcards[index];
+      contentInput.value = card.content;
+      answerInput.value = card.answer;
+      subjectInput.value = card.subject;
+    } else {
+      flashcardForm.reset();
+    }
+    modalBg.classList.add('show');
+  }
+
+  function closeModal() {
+    modalBg.classList.remove('show');
+    editingIndex = null;
+    flashcardForm.reset();
+  }
+
+  addBtn.onclick = () => openEditModal();
+  closeModalBtn.onclick = () => closeModal();
+  modalBg.onclick = e => { if (e.target === modalBg) closeModal(); };
+
+  flashcardForm.onsubmit = async e => {
+    e.preventDefault();
+    const content = contentInput.value.trim();
+    const answer = answerInput.value.trim();
+    const subject = subjectInput.value;
+    if (!content || !answer || !subject) return;
+
+    if (editingIndex !== null) {
+      flashcards[editingIndex] = { content, answer, subject };
+    } else {
+      flashcards.push({ content, answer, subject });
+    }
+    await saveFlashcards();
+    renderFlashcards();
+    closeModal();
+  };
+
+  clearBtn.onclick = async () => {
+    if (confirm("Deseja excluir todos os flashcards?")) {
+      flashcards = [];
+      await saveFlashcards();
+      renderFlashcards();
+    }
+  };
+
+  themeBtn.onclick = () => {
+    document.body.classList.toggle("dark");
+    themeBtn.textContent = document.body.classList.contains("dark") ? "Modo Claro" : "Modo Escuro";
+  };
+
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      usuarioAtual = user;
+      loadFlashcards().then(renderFlashcards);
+    } else {
+      usuarioAtual = null;
+      flashcards = [];
+      renderFlashcards();
+    }
+  });
+</script>
+
 </body>
 </html>
 
