@@ -1,3 +1,5 @@
+
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
 * {
@@ -36,14 +38,14 @@ button {
   font-size: 15px;
   border-radius: 8px;
   border: none;
-  background-color: #3b82f6;
+  background-color: #44749D;
   color: white;
   cursor: pointer;
   transition: background 0.3s;
 }
 
 button:hover {
-  background-color: #2563eb;
+  background-color: #44749D;
 }
 
 .danger {
