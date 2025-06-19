@@ -546,14 +546,14 @@
     async function saveFlashcards() {
       if (!usuarioAtual) return;
       const uid = usuarioAtual.uid;
-      const docRef = doc(db, "flashcardsUsuario", uid);
+      const docRef = doc(db, "flashcards", uid);
       await setDoc(docRef, { flashcards }, { merge: true });
     }
 
     async function loadFlashcards() {
       if (!usuarioAtual) return;
       const uid = usuarioAtual.uid;
-      const docRef = doc(db, "flashcardsUsuario", uid);
+      const docRef = doc(db, "flashcards", uid);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         flashcards = docSnap.data().flashcards || [];
