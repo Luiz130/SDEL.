@@ -702,6 +702,127 @@
       renderFlashcards();
     }
   });
+  let quizMode = false;
+let score = 0;
+let totalAnswered = 0;
+const scoreDisplay = document.getElementById("scoreDisplay");
+const quizToggleBtn = document.getElementById("quizToggleBtn");
+
+quizToggleBtn.onclick = () => {
+  quizMode = !quizMode;
+  if (quizMode) {
+    iniciarModoQuiz();
+  } else {
+    sairModoQuiz();
+  }
+};
+
+function iniciarModoQuiz() {
+  score = 0;
+  totalAnswered = 0;
+  scoreDisplay.style.display = "inline-block";
+  quizToggleBtn.textContent = "Modo Flashcards";
+  renderQuizFlashcards();
+  addBtn.disabled = true;
+  clearBtn.disabled = true;
+}
+
+function sairModoQuiz() {
+  scoreDisplay.style.display = "none";
+  quizToggleBtn.textContent = "Modo Quiz";
+  addBtn.disabled = false;
+  clearBtn.disabled = false;
+  renderFlashcards();
+}
+
+function renderQuizFlashcards() {
+  flashcardContainer.innerHTML = '';
+  if (flashcards.length === 0) {
+    flashcardContainer.innerHTML = '<p style="color:gray;">Nenhum flashcard disponível para o quiz.</p>';
+    return;
+  }
+
+  const shuffled = [...flashcards].sort(() => 0.5 - Math.random());
+
+  shuffled.forEach((card, index) => {
+    const cardDiv = document.createElement("div");
+    cardDiv.className = `flashcard ${card.subject}`;
+    const innerDiv = document.createElement("div");
+    innerDiv.className = "card-inner";
+
+    const frontDiv = document.createElement("div");
+    frontDiv.className = "card-front";
+    frontDiv.textContent = card.content;
+
+    const backDiv = document.createElement("div");
+    backDiv.className = "card-back";
+
+    const pergunta = document.createElement("p");
+    pergunta.textContent = card.content;
+    pergunta.style.marginBottom = "10px";
+    pergunta.style.fontWeight = "bold";
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "quiz-input";
+    input.placeholder = "Digite sua resposta";
+
+    const btn = document.createElement("button");
+    btn.className = "quiz-button";
+    btn.textContent = "Verificar";
+
+    const resultado = document.createElement("div");
+    resultado.className = "quiz-result";
+
+    btn.onclick = () => {
+      const resposta = input.value.trim().toLowerCase();
+      const correta = card.answer.trim().toLowerCase();
+
+      if (resposta === '') {
+        resultado.textContent = 'Por favor, digite sua resposta.';
+        resultado.style.color = 'orange';
+        return;
+      }
+
+      if (resposta === correta) {
+        resultado.textContent = 'Correto! 🎉';
+        resultado.style.color = '#10b981';
+        score++;
+      } else {
+        resultado.textContent = `Errado. Resposta correta: ${card.answer}`;
+        resultado.style.color = '#ef4444';
+      }
+
+      totalAnswered++;
+      input.disabled = true;
+      btn.disabled = true;
+      atualizarPontuacao();
+    };
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        btn.click();
+      }
+    });
+
+    backDiv.append(pergunta, input, btn, resultado);
+    innerDiv.append(frontDiv, backDiv);
+    cardDiv.appendChild(innerDiv);
+    cardDiv.addEventListener("click", () => {
+      cardDiv.classList.add("flipped");
+      input.focus();
+    });
+
+    flashcardContainer.appendChild(cardDiv);
+  });
+
+  atualizarPontuacao();
+}
+
+function atualizarPontuacao() {
+  scoreDisplay.textContent = `Pontuação: ${score} / ${totalAnswered}`;
+}
 </script>
 </body>
 </html>
