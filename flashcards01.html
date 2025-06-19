@@ -505,7 +505,13 @@
   <!-- Firebase e Lógica JS -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
-  import { getFirestore, doc, collection, addDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    deleteDoc
+  } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
 
   const firebaseConfig = {
@@ -537,21 +543,21 @@
   const flashcardForm = document.getElementById('flashcardForm');
   const closeModalBtn = document.getElementById('closeModalBtn');
 
-  // Salvar cada flashcard como documento individual
+  // Salva todos os flashcards direto na coleção "flashcards"
   async function saveFlashcards() {
     if (!usuarioAtual) return;
     const uid = usuarioAtual.uid;
-    const userRef = doc(db, "flashcards", uid);
-    const cardsCollection = collection(userRef, "cards");
 
-    // Exclui todos os flashcards antigos
-    const snapshot = await getDocs(cardsCollection);
-    const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref));
+    // Apaga os flashcards antigos desse usuário
+    const snapshot = await getDocs(collection(db, "flashcards"));
+    const deletePromises = snapshot.docs
+      .filter(doc => doc.data().uid === uid)
+      .map(doc => deleteDoc(doc.ref));
     await Promise.all(deletePromises);
 
-    // Salva novos
+    // Salva todos os flashcards novos
     const savePromises = flashcards.map(card => {
-      return addDoc(cardsCollection, {
+      return addDoc(collection(db, "flashcards"), {
         question: card.content,
         answer: card.answer,
         subject: card.subject,
@@ -563,22 +569,22 @@
     await Promise.all(savePromises);
   }
 
-  // Carregar flashcards do Firestore
+  // Carrega flashcards da coleção "flashcards", filtrando pelo UID
   async function loadFlashcards() {
     if (!usuarioAtual) return;
     const uid = usuarioAtual.uid;
-    const userRef = doc(db, "flashcards", uid);
-    const cardsCollection = collection(userRef, "cards");
-    const snapshot = await getDocs(cardsCollection);
+    const snapshot = await getDocs(collection(db, "flashcards"));
 
-    flashcards = snapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        content: data.question,
-        answer: data.answer,
-        subject: data.subject
-      };
-    });
+    flashcards = snapshot.docs
+      .filter(doc => doc.data().uid === uid)
+      .map(doc => {
+        const data = doc.data();
+        return {
+          content: data.question,
+          answer: data.answer,
+          subject: data.subject
+        };
+      });
   }
 
   function createFlashcardElement(card, index) {
@@ -697,7 +703,6 @@
     }
   });
 </script>
-
 </body>
 </html>
 
