@@ -909,16 +909,6 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-analytics.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
-  if (user) {
-  usuarioAtual = user;
-  carregarNotas();
-  loadFlashcards().then(renderFlashcards);
-} else {
-  usuarioAtual = null;
-  flashcards = [];
-  renderFlashcards();
-}
-
   import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -1064,27 +1054,4 @@
     painel.style.left = novaLeft + "px";
     painel.style.right = "auto";
   }
-
-  // Salvar flashcards no Firestore
-async function saveFlashcards() {
-  if (!usuarioAtual) return;
-  const uid = usuarioAtual.uid;
-  const docRef = doc(db, "flashcardsUsuario", uid);
-  await setDoc(docRef, { flashcards }, { merge: true });
-}
-
-// Carregar flashcards do Firestore
-async function loadFlashcards() {
-  if (!usuarioAtual) return;
-  const uid = usuarioAtual.uid;
-  const docRef = doc(db, "flashcardsUsuario", uid);
-  const docSnap = await getDoc(docRef);
-  if (docSnap.exists()) {
-    const data = docSnap.data();
-    flashcards = data.flashcards || [];
-  } else {
-    flashcards = [];
-  }
-}
-
 </script>
