@@ -235,11 +235,9 @@
       transition: background 0.3s;
     }
 
-
-
 .home-button {
   display: flex;
-  align-items: left;
+  align-items: center;
   justify-content: center;
   width: 48px;
   height: 48px;
@@ -248,19 +246,22 @@
   text-decoration: none;
   transition: background-color 0.3s, transform 0.3s;
 
+  /* Adicionado para fixar no canto superior esquerdo */
+  position: fixed;
+  left: 20px;
+  top: 20px;
+  z-index: 1000;
 }
 
 .home-button img {
   width: 24px;
   height: 24px;
-
 }
 
 .home-button:hover {
   background-color: #ccc;
   transform: scale(1.1);
 }
-
     
 
 
