@@ -533,26 +533,7 @@
       </form>
     </div>
   </div>
-<div id="botaoPainel" title="Abrir Painel">🛠</div>
-<div id="painel">
-  <div id="cabecalhoPainel">Painel Rápido</div>
 
-  <button class="botaoSecao" onclick="alternarSecao('blocoNotas')">📘 Bloco de Notas</button>
-  <div id="blocoNotas" class="secaoPainel">
-    <label for="textareaNotas">Suas Anotações:</label>
-    <textarea id="textareaNotas" placeholder="Digite suas anotações..."></textarea>
-  </div>
-
-  <button class="botaoSecao" onclick="alternarSecao('containerCronometro')">⏱ Cronômetro</button>
-  <div id="containerCronometro" class="secaoPainel">
-    <div id="cronometro">00:00:00</div>
-    <div id="botoesCronometro">
-      <button onclick="iniciarCronometro()">Iniciar</button>
-      <button onclick="pararCronometro()">Parar</button>
-      <button onclick="resetarCronometro()">Resetar</button>
-    </div>
-  </div>
-</div>
   <!-- Firebase e Lógica JS -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
@@ -875,7 +856,7 @@ function atualizarPontuacao() {
   scoreDisplay.textContent = `Pontuação: ${score} / ${totalAnswered}`;
 }
 
-  // Elementos do painel
+// Elementos do painel
 const botaoPainel = document.getElementById("botaoPainel");
 const painel = document.getElementById("painel");
 const cabecalho = document.getElementById("cabecalhoPainel");
@@ -956,7 +937,7 @@ async function carregarNotas() {
   }
 }
 
-textareaNotas.addEventListener("input", () => {
+textareaNotas?.addEventListener("input", () => {
   salvarNotas(textareaNotas.value);
 });
 
@@ -986,7 +967,6 @@ window.resetarCronometro = () => {
   salvarTempoCronometro();
 };
 
-// Carrega notas ao logar
 onAuthStateChanged(auth, user => {
   if (user) {
     usuarioAtual = user;
@@ -995,6 +975,29 @@ onAuthStateChanged(auth, user => {
     textareaNotas.value = "Faça login para salvar suas anotações.";
   }
 });
+
 </script>
+
+<div id="botaoPainel" title="Abrir Painel">🛠</div>
+<div id="painel">
+  <div id="cabecalhoPainel">Painel Rápido</div>
+
+  <button class="botaoSecao" onclick="alternarSecao('blocoNotas')">📘 Bloco de Notas</button>
+  <div id="blocoNotas" class="secaoPainel">
+    <label for="textareaNotas">Suas Anotações:</label>
+    <textarea id="textareaNotas" placeholder="Digite suas anotações..."></textarea>
+  </div>
+
+  <button class="botaoSecao" onclick="alternarSecao('containerCronometro')">⏱ Cronômetro</button>
+  <div id="containerCronometro" class="secaoPainel">
+    <div id="cronometro">00:00:00</div>
+    <div id="botoesCronometro">
+      <button onclick="iniciarCronometro()">Iniciar</button>
+      <button onclick="pararCronometro()">Parar</button>
+      <button onclick="resetarCronometro()">Resetar</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
