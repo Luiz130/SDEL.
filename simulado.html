@@ -101,10 +101,43 @@
 
         button:focus {
             outline: none;
+
+
+            .home-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background-color: #eee;
+  border-radius: 50%;
+  text-decoration: none;
+  transition: background-color 0.3s, transform 0.3s;
+
+  /* Adicionado para fixar no canto superior esquerdo */
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  z-index: 1000;
+}
+
+.home-button img {
+  width: 24px;
+  height: 24px;
+}
+
+.home-button:hover {
+  background-color: #ccc;
+  transform: scale(1.1);
+}
+
         }
     </style>
 </head>
 <body>
+    <a href="index.html" class="home-button" title="Voltar para a página inicial">
+    <img src="https://cdn-icons-png.flaticon.com/512/25/25694.png" alt="Home" />
+  </a> 
     <div class="container">
         <header>
             <h1>Escolha sua matéria</h1>
