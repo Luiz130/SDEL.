@@ -999,5 +999,13 @@ onAuthStateChanged(auth, user => {
   </div>
 </div>
 
+
+<script>
+  window.alternarSecao = function(id) {
+    const secao = document.getElementById(id);
+    secao.style.display = secao.style.display === "block" ? "none" : "block";
+  };
+</script>
+
 </body>
 </html>
