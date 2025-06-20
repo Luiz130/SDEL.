@@ -533,7 +533,26 @@
       </form>
     </div>
   </div>
+<div id="botaoPainel" title="Abrir Painel">🛠</div>
+<div id="painel">
+  <div id="cabecalhoPainel">Painel Rápido</div>
 
+  <button class="botaoSecao" onclick="alternarSecao('blocoNotas')">📘 Bloco de Notas</button>
+  <div id="blocoNotas" class="secaoPainel">
+    <label for="textareaNotas">Suas Anotações:</label>
+    <textarea id="textareaNotas" placeholder="Digite suas anotações..."></textarea>
+  </div>
+
+  <button class="botaoSecao" onclick="alternarSecao('containerCronometro')">⏱ Cronômetro</button>
+  <div id="containerCronometro" class="secaoPainel">
+    <div id="cronometro">00:00:00</div>
+    <div id="botoesCronometro">
+      <button onclick="iniciarCronometro()">Iniciar</button>
+      <button onclick="pararCronometro()">Parar</button>
+      <button onclick="resetarCronometro()">Resetar</button>
+    </div>
+  </div>
+</div>
   <!-- Firebase e Lógica JS -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
@@ -855,6 +874,127 @@ function renderQuizFlashcards() {
 function atualizarPontuacao() {
   scoreDisplay.textContent = `Pontuação: ${score} / ${totalAnswered}`;
 }
+
+  // Elementos do painel
+const botaoPainel = document.getElementById("botaoPainel");
+const painel = document.getElementById("painel");
+const cabecalho = document.getElementById("cabecalhoPainel");
+const textareaNotas = document.getElementById("textareaNotas");
+const cronometroEl = document.getElementById("cronometro");
+
+let segundos = 0, minutos = 0, horas = 0;
+let intervaloCronometro = null;
+
+botaoPainel.onclick = () => {
+  painel.style.display = painel.style.display === "block" ? "none" : "block";
+};
+
+function alternarSecao(id) {
+  const secao = document.getElementById(id);
+  secao.style.display = secao.style.display === "block" ? "none" : "block";
+}
+
+// Drag do painel
+let posX = 0, posY = 0, posInicialX = 0, posInicialY = 0;
+
+cabecalho.onmousedown = dragMouseDown;
+
+function dragMouseDown(e) {
+  e.preventDefault();
+  posInicialX = e.clientX;
+  posInicialY = e.clientY;
+  document.onmouseup = () => { document.onmousemove = null; };
+  document.onmousemove = moverPainel;
+}
+
+function moverPainel(e) {
+  e.preventDefault();
+  const dx = e.clientX - posInicialX;
+  const dy = e.clientY - posInicialY;
+  posInicialX = e.clientX;
+  posInicialY = e.clientY;
+
+  const rect = painel.getBoundingClientRect();
+  let novaTop = rect.top + dy;
+  let novaLeft = rect.left + dx;
+  novaTop = Math.max(0, Math.min(novaTop, window.innerHeight - rect.height));
+  novaLeft = Math.max(0, Math.min(novaLeft, window.innerWidth - rect.width));
+  painel.style.top = novaTop + "px";
+  painel.style.left = novaLeft + "px";
+  painel.style.right = "auto";
+}
+
+// Firebase salvar notas e tempo
+async function salvarNotas(texto) {
+  if (!usuarioAtual) return;
+  const uid = usuarioAtual.uid;
+  const docRef = doc(db, "notasUsuario", uid);
+  await setDoc(docRef, { texto }, { merge: true });
+}
+
+async function salvarTempoCronometro() {
+  if (!usuarioAtual) return;
+  const uid = usuarioAtual.uid;
+  const tempoAtual = cronometroEl.innerText;
+  const docRef = doc(db, "notasUsuario", uid);
+  await setDoc(docRef, { tempo: tempoAtual }, { merge: true });
+}
+
+async function carregarNotas() {
+  if (!usuarioAtual) return;
+  const uid = usuarioAtual.uid;
+  const docRef = doc(db, "notasUsuario", uid);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    const data = docSnap.data();
+    textareaNotas.value = data.texto || "";
+    if (data.tempo) {
+      cronometroEl.innerText = data.tempo;
+      const [h, m, s] = data.tempo.split(":").map(Number);
+      horas = h; minutos = m; segundos = s;
+    }
+  }
+}
+
+textareaNotas.addEventListener("input", () => {
+  salvarNotas(textareaNotas.value);
+});
+
+function atualizarCronometro() {
+  segundos++;
+  if (segundos >= 60) { segundos = 0; minutos++; }
+  if (minutos >= 60) { minutos = 0; horas++; }
+  const formatar = n => n.toString().padStart(2, '0');
+  const tempo = `${formatar(horas)}:${formatar(minutos)}:${formatar(segundos)}`;
+  cronometroEl.innerText = tempo;
+  salvarTempoCronometro();
+}
+
+window.iniciarCronometro = () => {
+  if (!intervaloCronometro) intervaloCronometro = setInterval(atualizarCronometro, 1000);
+};
+
+window.pararCronometro = () => {
+  clearInterval(intervaloCronometro);
+  intervaloCronometro = null;
+};
+
+window.resetarCronometro = () => {
+  pararCronometro();
+  segundos = minutos = horas = 0;
+  cronometroEl.innerText = "00:00:00";
+  salvarTempoCronometro();
+};
+
+// Carrega notas ao logar
+onAuthStateChanged(auth, user => {
+  if (user) {
+    usuarioAtual = user;
+    carregarNotas();
+  } else {
+    textareaNotas.value = "Faça login para salvar suas anotações.";
+  }
+});
 </script>
 </body>
 </html>
