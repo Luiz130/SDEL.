@@ -604,9 +604,45 @@
 .sidebar > div:last-child {
     margin-bottom: 30px; /* você pode aumentar ou diminuir */
 }
+
+/* --- RESPONSIVE SIDEBAR FIX --- */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        left: -250px;
+        top: 0;
+        height: 100vh;
+        transition: left .3s ease;
+        z-index: 2000;
+    }
+    .sidebar.active {
+        left: 0;
+    }
+    .hamburger {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 2500;
+        width: 35px;
+        height: 28px;
+        background: var(--azul-principal);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 22px;
+    }
+    .main-content {
+        margin-left: 0 !important;
+        padding-top: 60px;
+    }
+}
+
 </style>
 </head>
 <body>
+<div class='hamburger' id='hamburguer-btn'>☰</div>
 
     <svg width="0" height="0" style="position:absolute;">
         <symbol id="i-home" viewBox="0 0 24 24"><path fill="currentColor" d="M12 5.69l5.66 5.66L18.71 11.29 12 4.59 5.29 11.29l1.05 1.06L12 5.69zM12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/></symbol>
@@ -919,7 +955,16 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const tabs = document.querySelectorAll('.nav-tab');
+            
+// --- MOBILE SIDEBAR TOGGLE ---
+const btn = document.getElementById("hamburguer-btn");
+const sidebar = document.querySelector(".sidebar");
+if (btn){
+    btn.addEventListener("click", ()=> sidebar.classList.toggle("active"));
+}
+
+
+const tabs = document.querySelectorAll('.nav-tab');
             const mainTitle = document.getElementById('main-title');
             const mainSubtitle = document.getElementById('main-subtitle');
             const body = document.body; 
