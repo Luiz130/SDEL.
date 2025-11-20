@@ -1,3 +1,49 @@
+/* ============================================== */
+/* == 1. VARIÁVEIS DE TEMA (PARA SIDEBAR)        == */
+/* ============================================== */
+/* Define as variáveis de cores para os componentes e o tema Dark Mode (padrão) */
+:root {
+    --bg-sidebar: #1f2937; /* Fundo Sidebar (Escuro) */
+    --bg-main: #121212; /* Fundo Principal (Escuro) */
+    --bg-card-hover: #374151;
+    --bg-active: #4a5568; /* Cor de fundo do item ativo */
+    --border-color: #4b5563;
+    --text-primary: #f0f0f0;
+    --text-secondary: #9ca3af;
+    --accent-blue: #3b82f6; /* Usado no texto "Estudante Premium" */
+
+    /* Variáveis padrão para outros componentes (Dark Mode) */
+    --header-bg: #1f2937;
+    --retangulo-bg: #374151;
+    --subheader-bg: #374151;
+    --text-color: #f0f0f0;
+    --shadow-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Modo Claro (Sobrescreve as variáveis quando a classe .dark NÃO está presente no body) */
+body:not(.dark) {
+    --bg-sidebar: #C6D4E1; /* Fundo Sidebar (Claro) */
+    --bg-main: #f9f9f9; /* Fundo Principal (Claro) */
+    --bg-card-hover: #d1d5db;
+    --bg-active: #a1aec1;
+    --border-color: #9ca3af;
+    --text-primary: #1f2937;
+    --text-secondary: #4b5563;
+    --accent-blue: #1e3a8a;
+
+    /* Variáveis padrão para outros componentes (Light Mode) */
+    --header-bg: #44749D;
+    --retangulo-bg: #C6D4E1;
+    --subheader-bg: #C6D4E1;
+    --text-color: #333;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+
+/* ============================================== */
+/* == 2. LAYOUT PRINCIPAL (HTML/BODY/GRATE)      == */
+/* ============================================== */
+
 .grade {
     display: grid;
     grid-template-rows: auto auto auto;
@@ -6,17 +52,48 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
+    
+    /* Novo layout e cores baseadas em variáveis */
+    display: flex;
+    min-height: 100vh; 
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease; 
 }
 
+/* O conteúdo principal se ajusta ao lado da sidebar */
+.grate {
+    flex-grow: 1; /* Permite que o conteúdo principal ocupe o espaço restante */
+    margin-left: 250px; /* Cria espaço para a sidebar */
+    transition: margin-left 0.3s ease;
+    width: calc(100% - 250px); /* Garante que o conteúdo não transborde */
+}
+
+/* Ajuste o padding para o conteúdo dentro do .grate, exceto o header */
+.grate > :not(header) {
+    padding-left: 30px;
+    padding-right: 30px;
+}
+.grate header {
+    padding-left: 30px;
+    padding-right: 30px;
+}
+/* FIM DAS ALTERAÇÕES DE LAYOUT PRINCIPAL */
+/* -------------------------------------- */
+
+
+/* == 3. ESTILOS DE ELEMENTOS EXISTENTES (AJUSTADOS PARA VARS) == */
+
 header {
-    background-color: #44749D;
+    background-color: var(--header-bg);
     color: white;
     padding: 15px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: background-color 0.3s ease;
 }
+
 /*imagem inicial*/
 .centralizador {
   width: 100%;
@@ -32,7 +109,7 @@ header {
     
     text-decoration: none;
 
-    color:#000;
+    color:var(--text-color); /* Usando variável */
     border-radius: 12px;
   
 }
@@ -40,14 +117,15 @@ header {
 .retangulo {
   width: 1300px;
   height: 230px;
-  background-color: #C6D4E1;
+  background-color: var(--retangulo-bg); /* Usando variável */
   border-radius: 40px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px var(--shadow-color); /* Usando variável */
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
   box-sizing: border-box;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .seta {
@@ -70,13 +148,15 @@ header {
 .texto h1 {
   margin: 0;
   font-size: 26px;
-  color: #333;
+  color: var(--text-color); /* Usando variável */
+  transition: color 0.3s ease;
 }
 
 .texto p {
   margin-top: 10px;
   font-size: 18px;
-  color: #555;
+  color: var(--text-color); /* Usando variável */
+  transition: color 0.3s ease;
 }
 
 .imagem {
@@ -166,12 +246,13 @@ h1 {
 }
 
 .subheader-right{
-    background-color: #C6D4E1;
+    background-color: var(--subheader-bg); /* Usando variável */
     color: white;
     padding: 12px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: background-color 0.3s ease;
 }
  .Matérias-slc{
  
@@ -249,6 +330,7 @@ h1 {
       height:40px;
       z-index: 10;
       animation: fadeIn 0.3s ease;
+      transition: background-color 0.3s ease;
     }
 
     .perfil-options a {
@@ -259,7 +341,7 @@ h1 {
       font-weight: bold;
       font-size: 15px;   
       text-decoration: none;
-      transition: background 0.2s;
+      transition: background 0.2s, color 0.3s ease;
     }
 
     .perfil-options a:hover {
@@ -389,8 +471,9 @@ h1 {
   .card p {
     margin-top: 5px;
     font-size: 14px;
-    color: #000;
+    color: var(--text-color); /* Usando variável */
     font-family: sans-serif;
+    transition: color 0.3s ease;
   }
   
   /* Setas de navegação */
@@ -430,18 +513,20 @@ h1 {
   }
   .bloco-questoes {
     width: 200px;
-    background-color: #C6D4E1;
+    background-color: var(--retangulo-bg); /* Usando variável */
     border-radius: 30px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px var(--shadow-color); /* Usando variável */
     padding:10px;
     text-align: center;
     font-family: Arial, sans-serif;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
   }
 
   .bloco-questoes h2 {
     margin: 0;
     font-size: 24px;
-    color: #333;
+    color: var(--text-color); /* Usando variável */
+    transition: color 0.3s ease;
   }
 
   .bloco-questoes img {
@@ -450,18 +535,20 @@ h1 {
   }  
   .bloco-flashcards {
     width: 200px;
-    background-color: #C6D4E1;
+    background-color: var(--retangulo-bg); /* Usando variável */
     border-radius: 30px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px var(--shadow-color); /* Usando variável */
     padding: 10px;
     text-align: center;
     font-family: Arial, sans-serif;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
   }
   
   .bloco-flashcards h2 {
     margin: 0;
     font-size: 24px;
-    color: #333;
+    color: var(--text-color); /* Usando variável */
+    transition: color 0.3s ease;
   }
   
   .bloco-flashcards img {
@@ -470,18 +557,20 @@ h1 {
   }  
   .bloco-cronograma {
     width: 200px;
-    background-color: #C6D4E1;
+    background-color: var(--retangulo-bg); /* Usando variável */
     border-radius: 30px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px var(--shadow-color); /* Usando variável */
     padding: 10px;
     text-align: center;
     font-family: Arial, sans-serif;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
   }
   
   .bloco-cronograma h2 {
     margin: 0;
     font-size: 24px;
-    color: #333;
+    color: var(--text-color); /* Usando variável */
+    transition: color 0.3s ease;
   }
   
   .bloco-cronograma img {
@@ -491,18 +580,20 @@ h1 {
 
    .bloco-analise-resultado {
     width: 200px;
-    background-color: #C6D4E1;
+    background-color: var(--retangulo-bg); /* Usando variável */
     border-radius: 30px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px var(--shadow-color); /* Usando variável */
     padding: 10px;
     text-align: center;
     font-family: Arial, sans-serif;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
   }
   
   .bloco-analise-resultado h2 {
     margin: 0;
     font-size: 24px;
-    color: #333;
+    color: var(--text-color); /* Usando variável */
+    transition: color 0.3s ease;
   }
   
   .bloco-analise-resultado img {
@@ -513,19 +604,21 @@ h1 {
 /*--------------------------------------------------------*/
   .redacao {
     width: 200px;
-    background-color: #C6D4E1;
+    background-color: var(--retangulo-bg); /* Usando variável */
     border-radius: 30px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px var(--shadow-color); /* Usando variável */
     padding: 10px;
     text-align: center;
     font-family: Arial, sans-serif;
     margin-right:100px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
   }
   
   .redacao h2 {
     margin: 0;
     font-size: 24px;
-    color: #333;
+    color: var(--text-color); /* Usando variável */
+    transition: color 0.3s ease;
   }
   
   .redacao img {
@@ -540,11 +633,12 @@ h1 {
     }
 
     footer {
-      background-color: #C6D4E1;
-      color: #2c3e50;
+      background-color: var(--subheader-bg); /* Usando variável */
+      color: var(--text-secondary); /* Usando variável */
       padding: 30px 20px 20px; /* menor padding */
-      box-shadow: 0 -3px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 -3px 8px var(--shadow-color); /* Usando variável */
       font-size: 14px; /* fonte um pouco menor */
+      transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
     }
 
     .footer-wrapper {
@@ -567,24 +661,26 @@ h1 {
       font-size: 18px; /* título menor */
       margin-bottom: 12px; /* menos margem */
       font-weight: 600;
-      color: #1a2935;
+      color: var(--text-primary); /* Usando variável */
       letter-spacing: 0.05em;
       border-bottom: 3px solid #557a95;
       padding-bottom: 4px;
+      transition: color 0.3s ease, border-bottom-color 0.3s ease;
     }
 
     .footer-column p {
       line-height: 1.5;
-      color: #34495e;
+      color: var(--text-secondary); /* Usando variável */
       margin: 0;
       text-align: justify;
       font-size: 14px;
+      transition: color 0.3s ease;
     }
 
     .footer-column a {
       margin: 6px 0;
       font-size: 14px;
-      color: #1a2935;
+      color: var(--text-primary); /* Usando variável */
       text-decoration: none;
       transition: color 0.3s ease;
       font-weight: 500;
@@ -626,13 +722,14 @@ h1 {
 
     .footer-bottom {
       margin-top: 30px; /* menos espaço */
-      border-top: 1px solid rgba(0,0,0,0.1);
+      border-top: 1px solid var(--border-color); /* Usando variável */
       padding-top: 12px;
       font-size: 13px;
-      color: #557a95;
+      color: var(--text-secondary); /* Usando variável */
       text-align: center;
       letter-spacing: 0.05em;
       font-weight: 500;
+      transition: color 0.3s ease, border-top-color 0.3s ease;
     }
 
     @media (max-width: 720px) {
@@ -688,27 +785,29 @@ h1 {
       right: 0;
   
       width: 340px;
-      background: white;
-      border-left: 4px solid #2563eb;
+      background: var(--bg-sidebar); /* Usando variável */
+      border-left: 4px solid var(--accent-blue); /* Usando variável */
       border-radius: 16px 0 0 16px;
       padding: 16px 24px 24px 24px;
-      box-shadow: -4px 0 16px rgba(0,0,0,0.1);
+      box-shadow: -4px 0 16px var(--shadow-color); /* Usando variável */
       display: none;
       z-index: 9999;
       cursor: default;
       user-select: none;
+      transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
     /* Cabeçalho do painel (área para arrastar) */
     #cabecalhoPainel {
       cursor: grab;
       padding-bottom: 12px;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid var(--border-color); /* Usando variável */
       margin-bottom: 16px;
       font-weight: 700;
       font-size: 20px;
-      color: #111827;
+      color: var(--text-primary); /* Usando variável */
       user-select: none;
+      transition: color 0.3s ease, border-bottom-color 0.3s ease;
     }
 
     #cabecalhoPainel:active {
@@ -719,7 +818,7 @@ h1 {
       width: 100%;
       padding: 12px;
       margin-bottom: 14px;
-      background-color: #2563eb;
+      background-color: var(--accent-blue); /* Usando variável */
       color: white;
       border: none;
       border-radius: 10px;
@@ -744,7 +843,8 @@ h1 {
       display: block;
       margin-bottom: 8px;
       font-weight: 600;
-      color: #374151;
+      color: var(--text-primary); /* Usando variável */
+      transition: color 0.3s ease;
     }
 
     textarea {
@@ -754,13 +854,14 @@ h1 {
       padding: 14px 16px;
       font-size: 15px;
       border-radius: 10px;
-      border: 1.5px solid #cbd5e1;
+      border: 1.5px solid var(--border-color); /* Usando variável */
       box-shadow: inset 0 1px 4px rgba(0,0,0,0.08);
       outline-offset: 2px;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: #111827;
+      color: var(--text-primary); /* Usando variável */
+      background-color: var(--bg-sidebar); /* Usando variável */
       box-sizing: border-box;
-      transition: border-color 0.3s ease;
+      transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
     }
 
     textarea:focus {
@@ -774,7 +875,8 @@ h1 {
       font-weight: bold;
       margin-bottom: 16px;
       text-align: center;
-      color: #111827;
+      color: var(--text-primary); /* Usando variável */
+      transition: color 0.3s ease;
     }
 
     #botoesCronometro {
@@ -783,7 +885,7 @@ h1 {
     }
 
     #botoesCronometro button {
-      background: #4b5563;
+      background: var(--border-color); /* Usando variável */
       color: white;
       border: none;
       padding: 8px 14px;
@@ -795,15 +897,16 @@ h1 {
 
 .pagina-enem {
   font-family: Arial, sans-serif;
-  background-color: #fafafa;
+  background-color: var(--bg-main); /* Usando variável */
   padding: 40px 20px; /* padding lateral menor para mobile */
   margin: 0;
+  transition: background-color 0.3s ease;
 }
 
 .pagina-enem h2 {
   font-size: 20px;
   margin-bottom: 20px;
-  color: #111;
+  color: var(--text-primary); /* Usando variável */
   text-align: center; /* opcional para centralizar título */
 }
 
@@ -817,19 +920,19 @@ h1 {
 .cartao-enem {
   display: flex;
   flex-direction: column; /* muda para coluna no mobile */
-  background-color: #fff;
+  background-color: var(--retangulo-bg); /* Usando variável */
   border-radius: 10px;
   padding: 20px;
   width: 100%;
   max-width: 1250px;
   box-sizing: border-box;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px var(--shadow-color); /* Usando variável */
   cursor: pointer;
-  transition: box-shadow 0.2s ease;
+  transition: box-shadow 0.2s ease, background-color 0.3s ease;
 }
 
 .cartao-enem:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px var(--shadow-color); /* Usando variável */
 }
 
 .imagem-enem {
@@ -857,19 +960,21 @@ h1 {
   margin: 0;
   font-size: 20px;
   font-weight: bold;
-  color: #111;
+  color: var(--text-primary); /* Usando variável */
+  transition: color 0.3s ease;
 }
 
 .info-enem p {
   margin: 10px 0 0;
   font-size: 16px;
-  color: #444;
+  color: var(--text-secondary); /* Usando variável */
+  transition: color 0.3s ease;
 }
 
 .Vestibular-enem {
   text-align: center;
   margin: 0 auto 20px auto;
-margin-right:1000px;
+  margin-right:1000px;
 }
 
 /* Responsivo para telas menores */
@@ -889,30 +994,13 @@ margin-right:1000px;
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     #botoesCronometro button:hover {
       background: #374151;
     }
-@media (max-width: 768px) {
-  header {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 15px;
-  }
-
+    
+/* ---------------------------------------------------- */
+/* CORREÇÃO DE RESPONSIVIDADE (MEDIA QUERIES UNIFICADAS) */
+/* ---------------------------------------------------- */
 @media (max-width: 768px) {
   header {
     display: flex;             /* garante flex */
@@ -1039,8 +1127,7 @@ margin-right:1000px;
     width: 120px;
     height: auto;
   }
-}
-@media (max-width: 768px) {
+
   .cartao-enem {
     flex-direction: column; /* empilha verticalmente no mobile */
     height: auto;           /* altura ajustável */
@@ -1060,55 +1147,198 @@ margin-right:1000px;
   }
 }
 
-.toggle-btn {
-  padding: 10px 20px;
-  background-color: #333;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
+/* ---------------------------------------------------- */
+/* == NOVOS ESTILOS SIDEBAR == */
+/* ---------------------------------------------------- */
+/* ============================ */
+/* == 3. ESTILOS DA SIDEBAR == */
+/* ============================ */
+.sidebar {
+    width: 250px;
+    background-color: var(--bg-sidebar);
+    color: var(--text-primary);
+    padding: 20px 0;
+    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.1);
+    position: fixed; /* Fixa a barra lateral */
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Espaça o topo (nav) do rodapé (perfil) */
+    transition: background-color 0.3s ease;
 }
 
-body.light-mode {
-  background-color: white;
-  color: black;
+.sidebar-header {
+    padding: 0 20px 20px;
+    border-bottom: 1px solid var(--border-color);
 }
 
-body.dark-mode {
-  background-color: #121212;
-  color: white;
+.sidebar-header h1 {
+    font-size: 24px;
+    margin: 0;
+    font-weight: 700;
+    color: var(--text-primary);
 }
 
-#botao-tema {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  padding: 10px 20px;
-  border-radius: 8px;
-  background-color: #333;
-  color: white;
-  border: none;
-  cursor: pointer;
-  z-index: 1000;
+/* Navegação */
+.sidebar-nav {
+    list-style: none;
+    padding: 10px 0;
+    margin: 0;
+}
+
+.nav-item a {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-item a:hover {
+    background-color: var(--bg-card-hover);
+    color: var(--text-primary);
+}
+
+.nav-item.active a {
+    background-color: var(--bg-active);
+    color: var(--text-primary);
+    font-weight: 600;
+    border-right: 4px solid var(--accent-blue);
+}
+
+.sidebar-nav svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+    fill: currentColor;
+}
+
+.separator {
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 8px 20px;
+}
+
+/* Perfil do Usuário */
+.user-profile {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    border-top: 1px solid var(--border-color);
+    margin-top: 16px;
+    cursor: pointer;
+}
+
+.user-profile img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 12px;
+}
+
+.user-info h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.user-info span {
+    font-size: 12px;
+    color: var(--accent-blue);
+    font-weight: 500;
+}
+
+/* ============================ */
+/* == 4. THEME SWITCHER        == */
+/* ============================ */
+.theme-switcher {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+/* Estilos para o Switch (Toggle) */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--border-color); /* Fundo do switch */
+    transition: 0.4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+/* Quando o input está checado (Modo Claro) */
+input:checked + .slider {
+    background-color: var(--accent-blue);
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+/* ============================ */
+/* == 5. RESPONSIVIDADE SIDEBAR == */
+/* ============================ */
+
+/* Remove o botão flutuante de tema antigo que foi substituído */
+#theme-toggle-btn {
+    display: none !important; 
 }
 
 
-
-
-
- body {
-      background-color: white;
-      color: black;
-      transition: 0.3s;
+@media (max-width: 900px) {
+    /* Em telas menores, esconde a sidebar e ajusta o conteúdo principal */
+    .sidebar {
+        width: 0;
+        overflow: hidden;
     }
-
-    body.dark {
-      background-color: black;
-      color: white;
+    .grate {
+        margin-left: 0;
+        width: 100%;
     }
+}
 
-    button {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-    }
+
+/* ------------------------------------------- */
+/* MODO ESCURO (DARK MODE) - REMOVIDO / COMENTADO PARA USAR VARIÁVEIS CSS */
+/* ------------------------------------------- */
+/* A seção anterior de Dark Mode foi removida e substituída pelas variáveis CSS (:root e body:not(.dark)) para uma gestão de tema mais limpa e eficiente. */
