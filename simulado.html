@@ -437,6 +437,21 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
     }
     
+    /* ESTILO PARA A IMAGEM DA QUESTÃO (Explícito para Imgur ou qualquer URL) */
+    .question-body img {
+        max-width: 100%; 
+        height: auto; 
+        margin: 15px 0; 
+        border-radius: 8px; 
+        border: 1px solid var(--cinza-medio);
+        display: block; /* Garante que ocupe a própria linha */
+    }
+    
+    body.dark .question-body img {
+        border-color: var(--cinza-medio); /* Garante borda visível no dark mode */
+    }
+    /* FIM DO ESTILO PARA IMAGEM */
+    
     .question-body h2 { color: var(--cinza-texto); }
     .answer-option { 
         padding: 15px; 
@@ -955,7 +970,7 @@
         const db = getFirestore(app);
         const auth = getAuth(app); 
         
-        // 2. Função para Renderizar as Questões (MANTIDA)
+        // 2. Função para Renderizar as Questões (ATUALIZADA PARA O CAMPO DE IMAGEM)
         async function fetchAndRenderQuestions() {
             const questionSection = document.querySelector('.question-section');
             if (!questionSection) return;
@@ -974,7 +989,6 @@
                      return;
                 }
                  
-                // ... (Resto da lógica de renderização e criação dos cards) ...
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
                     
@@ -982,6 +996,15 @@
                         console.warn("Documento sem alternativas válidas, pulando:", doc.id);
                         return; 
                     }
+                    
+                    // --- NOVO/ATUALIZADO: Lógica para incluir a imagem. Verifica imagemUrl ou imageUrl ---
+                    let imageHtml = '';
+                    const url = data.imagemUrl || data.imageUrl; // Tenta 'imagemUrl' primeiro, depois 'imageUrl'
+                    
+                    if (url) {
+                        imageHtml = `<img src="${url}" alt="Imagem da Questão">`;
+                    }
+                    // --------------------------------------------------------------------------------------
 
                     const optionsHtml = Object.keys(data.alternativas).sort().map(key => {
                         const letterCode = 65 + parseInt(key); 
@@ -1016,8 +1039,8 @@
                             <div class="question-body">
                                 <h2>Questão ${questionCounter} de ${totalQuestions}</h2>
                                 <p>${data.enunciado || 'Enunciado não disponível.'}</p>
-
-                                <div class="options">
+                                
+                                ${imageHtml} <div class="options">
                                     ${optionsHtml}
                                 </div>
 
@@ -1048,7 +1071,6 @@
 
         // 3. Lógica de Interação da Questão (MANTIDA)
         function addQuestionInteractionListeners() {
-            // ... (O código desta função é o mesmo da sua implementação anterior)
             document.querySelectorAll('.question-card').forEach(card => {
                 const options = card.querySelectorAll('.answer-option');
                 const confirmButton = card.querySelector('.confirm-button');
@@ -1109,7 +1131,7 @@
                 } else {
                     // Usuário NÃO logado: Redireciona para a página de login
                     console.log("Usuário não autenticado. Redirecionando para a página de login.");
-                  window.location.href = "/login.html";
+                  window.location.href = LOGIN_PAGE_URL;
                 }
             });
             
@@ -1239,4 +1261,3 @@
 
 </body>
 </html>
-
