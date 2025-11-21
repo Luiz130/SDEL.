@@ -132,7 +132,47 @@
         background-color: var(--cinza-claro); /* Fundo Geral */
         margin: 0;
         min-height: 100vh;
+        /* Adicionado para esconder o conteúdo até a verificação do login */
+        opacity: 0; 
+        transition: opacity 0.5s;
     }
+    
+    body.loaded {
+        opacity: 1;
+    }
+    
+    /* Loader/Spinner para quando o conteúdo ainda não carregou */
+    .initial-loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--cinza-claro);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 3000;
+        transition: opacity 0.3s, visibility 0.3s;
+    }
+    body.dark .initial-loading-overlay {
+        background-color: var(--cinza-claro);
+    }
+
+    .spinner {
+        border: 4px solid var(--cinza-medio);
+        border-top: 4px solid var(--azul-principal);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
 
     /* ------------------------------------------------ */
     /* SIDEBAR (NOVO BLOCO) */
@@ -680,7 +720,12 @@
 </style>
 </head>
 <body>
-<div class='hamburger' id='hamburguer-btn'>☰</div>
+    
+    <div class="initial-loading-overlay" id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+    
+    <div class='hamburger' id='hamburguer-btn'>☰</div>
 
     <svg width="0" height="0" style="position:absolute;">
         <symbol id="i-home" viewBox="0 0 24 24"><path fill="currentColor" d="M10 20v-6h4v6h5v-8h3L12 3L2 12h3v8h5z"/></symbol>
@@ -738,7 +783,6 @@
             </ul>
         </div>
     </aside>
-    <div class='hamburger' id='hamburguer-btn'>☰</div>
 
     <div class="main-content">
         <div class="container">
@@ -935,7 +979,7 @@
 
 
         // ** 🔑 IMPORTANTE: AJUSTE ESTA URL para a sua página de login **
-        const LOGIN_PAGE_URL = "/login.html"; 
+        const LOGIN_PAGE_URL = "login.html"; 
 
 
         // Sua configuração do Firebase (MANTIDA)
@@ -962,6 +1006,7 @@
 
             questionSection.innerHTML = '';
             
+            // Aqui você pode adicionar lógica de filtros antes de criar a query
             const q = query(collection(db, "questoes"), limit(5)); 
 
             try {
@@ -985,6 +1030,7 @@
                     }
 
                     const optionsHtml = Object.keys(data.alternativas).sort().map(key => {
+                        // Converte o índice 0, 1, 2... para as letras A, B, C...
                         const letterCode = 65 + parseInt(key); 
                         const letter = String.fromCharCode(letterCode); 
                         const text = data.alternativas[key];
@@ -1049,7 +1095,6 @@
 
         // 3. Lógica de Interação da Questão (MANTIDA)
         function addQuestionInteractionListeners() {
-            // ... (O código desta função é o mesmo da sua implementação anterior)
             document.querySelectorAll('.question-card').forEach(card => {
                 const options = card.querySelectorAll('.answer-option');
                 const confirmButton = card.querySelector('.confirm-button');
@@ -1058,6 +1103,9 @@
 
                 options.forEach(option => {
                     option.addEventListener('click', () => {
+                        // Se a resposta já foi dada, ignora o clique
+                        if (confirmButton.disabled) return; 
+
                         if (selectedOption) {
                             selectedOption.classList.remove('selected');
                         }
@@ -1094,23 +1142,38 @@
                     
                     feedbackMessage.style.display = 'block';
                     
-                    options.forEach(opt => opt.style.pointerEvents = 'none');
+                    // Desabilita interação com todas as opções após a resposta
+                    options.forEach(opt => opt.style.pointerEvents = 'none'); 
                 });
             });
         }
 
 
         document.addEventListener('DOMContentLoaded', () => {
+            const body = document.body; 
+            const loadingOverlay = document.getElementById('loading-overlay');
+            
             // VERIFICAÇÃO DE AUTENTICAÇÃO AO CARREGAR A PÁGINA
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     // Usuário logado: Carrega o conteúdo
                     console.log("Usuário autenticado. Carregando questões.");
                     fetchAndRenderQuestions();
+                    
+                    // Remove o overlay e mostra o conteúdo principal
+                    if (loadingOverlay) {
+                        loadingOverlay.style.opacity = '0';
+                        setTimeout(() => {
+                            loadingOverlay.style.display = 'none';
+                            body.classList.add('loaded'); // Adiciona classe para exibir o body
+                        }, 300); // Tempo igual ao transition do overlay
+                    }
+                    
                 } else {
                     // Usuário NÃO logado: Redireciona para a página de login
                     console.log("Usuário não autenticado. Redirecionando para a página de login.");
-                    window.location.href = "login.html";
+                    // Redireciona *imediatamente*
+                    window.location.href = LOGIN_PAGE_URL;
                 }
             });
             
@@ -1124,13 +1187,10 @@
             const tabs = document.querySelectorAll('.nav-tab');
             const mainTitle = document.getElementById('main-title');
             const mainSubtitle = document.getElementById('main-subtitle');
-            const body = document.body; 
             
             const themeToggle = document.getElementById('theme-toggle');
             const navItems = document.querySelectorAll('.sidebar-nav .nav-item a');
-            const questaoTabInHeader = document.querySelector('.nav-tab[data-target="questoes"]');
-            const simuladosTabInHeader = document.querySelector('.nav-tab[data-target="simulados"]');
-
+            
             const titles = {
                 'questoes': {
                     title: 'Banco de Questões',
@@ -1153,12 +1213,14 @@
                     activeTab.classList.add('active');
                 }
                 
+                // Ativa o item correspondente na sidebar
                 let sidebarItem = document.querySelector(`.sidebar-nav a[data-nav-target="${targetTab}-tab"]`);
                 if (targetTab === 'questoes' || targetTab === 'simulados') {
                     if (sidebarItem) {
                         sidebarItem.closest('.nav-item').classList.add('active-nav');
                     }
                 } else {
+                    // Mantém 'Início' ativo se não for 'questoes' ou 'simulados'
                     document.querySelector('.sidebar-nav .nav-item:first-child').classList.add('active-nav');
                 }
                 
@@ -1211,9 +1273,7 @@
                         switchTab('simulados');
                     });
                 } else if (!target) {
-                    // Item 'Início' já tem href="index.html"
-                    // Item 'Flashcards' agora tem href="flashcards01.html"
-                    // Mantendo a lógica para outros itens sem 'data-nav-target'
+                    // Para os links que não são 'questoes' ou 'simulados'
                     item.addEventListener('click', () => {
                         document.querySelectorAll('.sidebar-nav .nav-item').forEach(li => li.classList.remove('active-nav'));
                         item.closest('.nav-item').classList.add('active-nav');
@@ -1221,23 +1281,20 @@
                         if (mainTitle && mainSubtitle) {
                              tabs.forEach(tab => tab.classList.remove('active'));
                              document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-                             mainTitle.textContent = "Painel Inicial";
-                             mainSubtitle.textContent = "Seu centro de estudos e progresso";
+                             // Se for para index.html (Início), use o título padrão
+                             if (item.getAttribute('href') === 'index.html') {
+                                mainTitle.textContent = "Painel Inicial";
+                                mainSubtitle.textContent = "Seu centro de estudos e progresso";
+                             }
                         }
                     });
                 }
             });
             
-            if (questaoTabInHeader) {
-                questaoTabInHeader.setAttribute('data-target', 'questoes');
-            }
-            if (simuladosTabInHeader) {
-                simuladosTabInHeader.setAttribute('data-target', 'simulados');
-            }
+            // Inicializa na aba 'questoes' por padrão, mas só depois da autenticação
             switchTab('questoes'); 
         });
     </script>
 
 </body>
 </html>
-
