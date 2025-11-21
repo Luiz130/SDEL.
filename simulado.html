@@ -758,8 +758,19 @@
                 <div class="content-grid">
                     <section class="filters-section">
                         <div class="filters-title">
-                            <svg width="24" height="24" style="margin-right: 8px;"><use href="#i-filters"></use></svg>
+                            <svg width="24" height="24" style="margin-right: 8px;"><use href="#i-questions"></use></svg>
                             Filtros
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="quantidade">Quantidade</label>
+                            <select id="quantidade">
+                                <option value="5">5 Questões</option>
+                                <option value="10">10 Questões</option>
+                                <option value="20">20 Questões</option>
+                                <option value="30">30 Questões</option>
+                                <option value="45">45 Questões (Simulado Parcial)</option>
+                            </select>
                         </div>
                         <div class="filter-group">
                             <label for="materia">Matéria</label>
@@ -790,11 +801,11 @@
                             </select>
                         </div>
                         
-                        <button class="apply-button">Aplicar Filtros</button>
+                        <button class="apply-button" id="apply-filters-btn">Aplicar Filtros</button>
                         
                         <div class="tip-card">
                             <strong>Dica de Estudo</strong>
-                            <p>Comece com questões "Fáceis" e vá progredindo gradualmente para as "Difíceis". A consistência é a chave.</p>
+                            <p>Comece com 10 questões e vá aumentando o volume gradualmente para construir resistência.</p>
                         </div>
                     </section>
 
@@ -935,7 +946,7 @@
 
 
         // ** 🔑 IMPORTANTE: AJUSTE ESTA URL para a sua página de login **
-        const LOGIN_PAGE_URL = "/login.html"; 
+        const LOGIN_PAGE_URL = "login.html"; 
 
 
         // Sua configuração do Firebase (MANTIDA)
@@ -955,14 +966,35 @@
         const db = getFirestore(app);
         const auth = getAuth(app); 
         
-        // 2. Função para Renderizar as Questões (MANTIDA)
+        // NOVO: Função para obter os filtros
+        function getFilters() {
+            const quantidade = document.getElementById('quantidade')?.value || '5'; // Padrão 5
+            const materia = document.getElementById('materia')?.value || '';
+            const topico = document.getElementById('topico')?.value || '';
+            const dificuldade = document.getElementById('dificuldade')?.value || '';
+            
+            return {
+                quantidade: parseInt(quantidade),
+                materia,
+                topico,
+                dificuldade
+            };
+        }
+
+        // 2. Função para Renderizar as Questões (AGORA USA O FILTRO DE QUANTIDADE)
         async function fetchAndRenderQuestions() {
             const questionSection = document.querySelector('.question-section');
             if (!questionSection) return;
 
-            questionSection.innerHTML = '';
+            questionSection.innerHTML = '<p style="text-align: center; color: var(--cinza-texto);">Buscando questões no banco...</p>';
             
-            const q = query(collection(db, "questoes"), limit(5)); 
+            const filters = getFilters();
+            
+            // OBTÉM A QUANTIDADE SELECIONADA
+            const questionsLimit = filters.quantidade; 
+            
+            // Cria a consulta (query) usando o limite de questões
+            const q = query(collection(db, "questoes"), limit(questionsLimit)); 
 
             try {
                 const querySnapshot = await getDocs(q);
@@ -974,7 +1006,8 @@
                      return;
                 }
                  
-                // ... (Resto da lógica de renderização e criação dos cards) ...
+                questionSection.innerHTML = ''; // Limpa a mensagem de carregamento
+                
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
                     
@@ -983,7 +1016,12 @@
                         return; 
                     }
 
+                    // A letra correta vem do campo 'correta' que é a letra (A, B, C, D, E)
+                    const correctLetter = data.correta || '';
+
+                    // Cria as opções de resposta
                     const optionsHtml = Object.keys(data.alternativas).sort().map(key => {
+                        // Assumindo que as chaves são 0, 1, 2, 3, 4
                         const letterCode = 65 + parseInt(key); 
                         const letter = String.fromCharCode(letterCode); 
                         const text = data.alternativas[key];
@@ -1000,7 +1038,7 @@
                     const formattedTime = `${minutes}:${seconds}`;
 
                     const questionCardHtml = `
-                        <div class="question-card" data-question-id="${doc.id}" data-correct-answer="${data.correta || ''}">
+                        <div class="question-card" data-question-id="${doc.id}" data-correct-answer="${correctLetter}">
                             <div class="question-header">
                                 <div class="question-tags">
                                     <span>${data.materia || 'N/A'}</span>
@@ -1048,7 +1086,6 @@
 
         // 3. Lógica de Interação da Questão (MANTIDA)
         function addQuestionInteractionListeners() {
-            // ... (O código desta função é o mesmo da sua implementação anterior)
             document.querySelectorAll('.question-card').forEach(card => {
                 const options = card.querySelectorAll('.answer-option');
                 const confirmButton = card.querySelector('.confirm-button');
@@ -1057,6 +1094,9 @@
 
                 options.forEach(option => {
                     option.addEventListener('click', () => {
+                        // Verifica se a questão já foi respondida
+                        if (confirmButton.disabled && feedbackMessage.style.display === 'block') return;
+
                         if (selectedOption) {
                             selectedOption.classList.remove('selected');
                         }
@@ -1113,6 +1153,12 @@
                 }
             });
             
+            // NOVO: Adiciona o evento de clique ao botão "Aplicar Filtros"
+            const applyButton = document.getElementById('apply-filters-btn');
+            if (applyButton) {
+                applyButton.addEventListener('click', fetchAndRenderQuestions);
+            }
+            
             // --- Lógica de UI (MANTIDA) ---
             const btn = document.getElementById("hamburguer-btn");
             const sidebar = document.querySelector(".sidebar");
@@ -1158,6 +1204,7 @@
                         sidebarItem.closest('.nav-item').classList.add('active-nav');
                     }
                 } else {
+                    // Adiciona a classe active-nav ao item 'Início' se não for questão ou simulado
                     document.querySelector('.sidebar-nav .nav-item:first-child').classList.add('active-nav');
                 }
                 
