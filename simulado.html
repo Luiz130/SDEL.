@@ -132,47 +132,7 @@
         background-color: var(--cinza-claro); /* Fundo Geral */
         margin: 0;
         min-height: 100vh;
-        /* Adicionado para esconder o conteúdo até a verificação do login */
-        opacity: 0; 
-        transition: opacity 0.5s;
     }
-    
-    body.loaded {
-        opacity: 1;
-    }
-    
-    /* Loader/Spinner para quando o conteúdo ainda não carregou */
-    .initial-loading-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: var(--cinza-claro);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 3000;
-        transition: opacity 0.3s, visibility 0.3s;
-    }
-    body.dark .initial-loading-overlay {
-        background-color: var(--cinza-claro);
-    }
-
-    .spinner {
-        border: 4px solid var(--cinza-medio);
-        border-top: 4px solid var(--azul-principal);
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
 
     /* ------------------------------------------------ */
     /* SIDEBAR (NOVO BLOCO) */
@@ -720,12 +680,7 @@
 </style>
 </head>
 <body>
-    
-    <div class="initial-loading-overlay" id="loading-overlay">
-        <div class="spinner"></div>
-    </div>
-    
-    <div class='hamburger' id='hamburguer-btn'>☰</div>
+<div class='hamburger' id='hamburguer-btn'>☰</div>
 
     <svg width="0" height="0" style="position:absolute;">
         <symbol id="i-home" viewBox="0 0 24 24"><path fill="currentColor" d="M10 20v-6h4v6h5v-8h3L12 3L2 12h3v8h5z"/></symbol>
@@ -783,6 +738,7 @@
             </ul>
         </div>
     </aside>
+    <div class='hamburger' id='hamburguer-btn'>☰</div>
 
     <div class="main-content">
         <div class="container">
@@ -972,332 +928,314 @@
 
 
     <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, limit, query } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"; 
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, limit, query } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        // Importa apenas o necessário para checar o estado de autenticação
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"; 
 
 
-    // ** 🔑 IMPORTANTE: AJUSTE ESTA URL para a sua página de login **
-    const LOGIN_PAGE_URL = "login.html"; 
+        // ** 🔑 IMPORTANTE: AJUSTE ESTA URL para a sua página de login **
+        const LOGIN_PAGE_URL = "/login.html"; 
 
 
-    // Sua configuração do Firebase (MANTIDA)
-    const firebaseConfig = {
-        apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
-        authDomain: "sdel-b3f65.firebaseapp.com",
-        databaseURL: "https://sdel-b3f65-default-rtdb.firebaseio.com",
-        projectId: "sdel-b3f65",
-        storageBucket: "sdel-b3f65.firebasestorage.app",
-        messagingSenderId: "297725999985",
-        appId: "1:297725999985:web:d41da68311c190ef8a54d0",
-        measurementId: "G-PT92VECJ2H"
-    };
+        // Sua configuração do Firebase (MANTIDA)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
+            authDomain: "sdel-b3f65.firebaseapp.com",
+            databaseURL: "https://sdel-b3f65-default-rtdb.firebaseio.com",
+            projectId: "sdel-b3f65",
+            storageBucket: "sdel-b3f65.firebasestorage.app",
+            messagingSenderId: "297725999985",
+            appId: "1:297725999985:web:d41da68311c190ef8a54d0",
+            measurementId: "G-PT92VECJ2H"
+        };
 
-    // 1. Inicializa o Firebase, Firestore e Auth
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app); 
-    
-    // 2. Função para Renderizar as Questões
-    async function fetchAndRenderQuestions() {
-        const questionSection = document.querySelector('.question-section');
-        if (!questionSection) return;
-
-        questionSection.innerHTML = '<p style="text-align: center; color: var(--cinza-texto);">Buscando questões no banco de dados...</p>';
+        // 1. Inicializa o Firebase, Firestore e Auth
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app); 
         
-        // Limita a 5 questões para teste
-        const q = query(collection(db, "questoes"), limit(5)); 
+        // 2. Função para Renderizar as Questões (MANTIDA)
+        async function fetchAndRenderQuestions() {
+            const questionSection = document.querySelector('.question-section');
+            if (!questionSection) return;
 
-        try {
-            const querySnapshot = await getDocs(q);
-            let questionCounter = 1;
-            const totalQuestions = querySnapshot.size;
-
-            if (totalQuestions === 0) {
-                 questionSection.innerHTML = '<p style="text-align: center; color: var(--cinza-texto);">Nenhuma questão encontrada no banco de dados.</p>';
-                 return;
-            }
+            questionSection.innerHTML = '';
             
-            questionSection.innerHTML = ''; // Limpa a mensagem de loading se encontrou algo
+            const q = query(collection(db, "questoes"), limit(5)); 
 
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                
-                if (!data.alternativas || typeof data.alternativas !== 'object') {
-                    console.warn("Documento sem alternativas válidas, pulando:", doc.id);
-                    return; 
+            try {
+                const querySnapshot = await getDocs(q);
+                let questionCounter = 1;
+                const totalQuestions = querySnapshot.size;
+
+                if (totalQuestions === 0) {
+                     questionSection.innerHTML = '<p style="text-align: center; color: var(--cinza-texto);">Nenhuma questão encontrada no banco de dados.</p>';
+                     return;
                 }
-
-                const optionsHtml = Object.keys(data.alternativas).sort((a, b) => parseInt(a) - parseInt(b)).map(key => {
-                    const letterCode = 65 + parseInt(key); 
-                    const letter = String.fromCharCode(letterCode); 
-                    const text = data.alternativas[key];
+                 
+                // ... (Resto da lógica de renderização e criação dos cards) ...
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
                     
-                    return `
-                        <div class="answer-option" data-option="${letter}">
-                            <span class="answer-letter">${letter})</span> ${text}
-                        </div>
-                    `;
-                }).join('');
-                
-                const minutes = Math.floor((data.tempo || 0) / 60);
-                const seconds = ((data.tempo || 0) % 60).toString().padStart(2, '0');
-                const formattedTime = `${minutes}:${seconds}`;
+                    if (!data.alternativas || typeof data.alternativas !== 'object') {
+                        console.warn("Documento sem alternativas válidas, pulando:", doc.id);
+                        return; 
+                    }
 
-                const questionCardHtml = `
-                    <div class="question-card" data-question-id="${doc.id}" data-correct-answer="${data.correta || ''}">
-                        <div class="question-header">
-                            <div class="question-tags">
-                                <span>${data.materia || 'N/A'}</span>
-                                <span>${data.topico || 'N/A'}</span>
-                                <span>${data.dificuldade || 'N/A'}</span>
+                    const optionsHtml = Object.keys(data.alternativas).sort().map(key => {
+                        const letterCode = 65 + parseInt(key); 
+                        const letter = String.fromCharCode(letterCode); 
+                        const text = data.alternativas[key];
+                        
+                        return `
+                            <div class="answer-option" data-option="${letter}">
+                                <span class="answer-letter">${letter})</span> ${text}
                             </div>
-                            <div class="question-info">
-                                <div class="time">🕒 ${formattedTime}</div>
-                                <div class="level">Nível ${data.dificuldade || 'N/A'}</div>
-                            </div>
-                        </div>
+                        `;
+                    }).join('');
+                    
+                    const minutes = Math.floor((data.tempo || 0) / 60);
+                    const seconds = ((data.tempo || 0) % 60).toString().padStart(2, '0');
+                    const formattedTime = `${minutes}:${seconds}`;
 
-                        <div class="question-body">
-                            <h2>Questão ${questionCounter} de ${totalQuestions}</h2>
-                            <p>${data.enunciado || 'Enunciado não disponível.'}</p>
-
-                            <div class="options">
-                                ${optionsHtml}
-                            </div>
-
-                            <div class="confirm-actions">
-                                <button class="confirm-button" disabled>Confirmar Resposta</button>
-                                <div class="action-button-group">
-                                    <button class="action-button">Favoritar</button>
-                                    <button class="action-button">Comentários</button>
+                    const questionCardHtml = `
+                        <div class="question-card" data-question-id="${doc.id}" data-correct-answer="${data.correta || ''}">
+                            <div class="question-header">
+                                <div class="question-tags">
+                                    <span>${data.materia || 'N/A'}</span>
+                                    <span>${data.topico || 'N/A'}</span>
+                                    <span>${data.dificuldade || 'N/A'}</span>
+                                </div>
+                                <div class="question-info">
+                                    <div class="time">🕒 ${formattedTime}</div>
+                                    <div class="level">Nível ${data.dificuldade || 'N/A'}</div>
                                 </div>
                             </div>
-                            <div class="feedback-message" style="margin-top: 15px; font-size: 0.9em; display: none;"></div>
+
+                            <div class="question-body">
+                                <h2>Questão ${questionCounter} de ${totalQuestions}</h2>
+                                <p>${data.enunciado || 'Enunciado não disponível.'}</p>
+
+                                <div class="options">
+                                    ${optionsHtml}
+                                </div>
+
+                                <div class="confirm-actions">
+                                    <button class="confirm-button" disabled>Confirmar Resposta</button>
+                                    <div class="action-button-group">
+                                        <button class="action-button">Favoritar</button>
+                                        <button class="action-button">Comentários</button>
+                                    </div>
+                                </div>
+                                <div class="feedback-message" style="margin-top: 15px; font-size: 0.9em; display: none;"></div>
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
 
-                questionSection.insertAdjacentHTML('beforeend', questionCardHtml);
-                questionCounter++;
-            });
-            
-            addQuestionInteractionListeners();
-            
-        } catch (error) {
-            console.error("Erro ao buscar questões:", error);
-            questionSection.innerHTML = '<p style="text-align: center; color: red;">Erro ao carregar as questões. Verifique as permissões do Firestore.</p>';
+                    questionSection.insertAdjacentHTML('beforeend', questionCardHtml);
+                    questionCounter++;
+                });
+                
+                addQuestionInteractionListeners();
+                
+            } catch (error) {
+                console.error("Erro ao buscar questões:", error);
+                // Exibe uma mensagem de erro na tela de questões
+                questionSection.innerHTML = '<p style="text-align: center; color: red;">Erro ao carregar as questões. Verifique as permissões do Firestore.</p>';
+            }
         }
-    }
 
-    // 3. Lógica de Interação da Questão (Ajustada para Debug)
-    function addQuestionInteractionListeners() {
-        document.querySelectorAll('.question-card').forEach(card => {
-            const options = card.querySelectorAll('.answer-option');
-            const confirmButton = card.querySelector('.confirm-button');
-            const feedbackMessage = card.querySelector('.feedback-message');
-            let selectedOption = null;
+        // 3. Lógica de Interação da Questão (MANTIDA)
+        function addQuestionInteractionListeners() {
+            // ... (O código desta função é o mesmo da sua implementação anterior)
+            document.querySelectorAll('.question-card').forEach(card => {
+                const options = card.querySelectorAll('.answer-option');
+                const confirmButton = card.querySelector('.confirm-button');
+                const feedbackMessage = card.querySelector('.feedback-message');
+                let selectedOption = null;
 
-            options.forEach(option => {
-                option.addEventListener('click', () => {
-                    // *** PONTO DE VERIFICAÇÃO ***
-                    console.log('Opção clicada:', option.getAttribute('data-option'), 'na questão', card.getAttribute('data-question-id')); 
+                options.forEach(option => {
+                    option.addEventListener('click', () => {
+                        if (selectedOption) {
+                            selectedOption.classList.remove('selected');
+                        }
+                        
+                        selectedOption = option;
+                        selectedOption.classList.add('selected');
+                        confirmButton.disabled = false;
+                    });
+                });
+
+                confirmButton.addEventListener('click', () => {
+                    if (!selectedOption || confirmButton.disabled) return;
+
+                    const correctAnswer = card.getAttribute('data-correct-answer');
+                    const selectedAnswer = selectedOption.getAttribute('data-option');
                     
-                    // Se a resposta já foi dada, ignora o clique
-                    if (confirmButton.disabled) return; 
-
-                    if (selectedOption) {
-                        selectedOption.classList.remove('selected');
+                    confirmButton.disabled = true;
+                    
+                    if (selectedAnswer === correctAnswer) {
+                        selectedOption.classList.add('correct');
+                        feedbackMessage.textContent = '✅ Resposta Correta! Parabéns!';
+                        feedbackMessage.style.color = 'var(--verde-progresso)';
+                    } else {
+                        selectedOption.classList.add('incorrect');
+                        
+                        const correctElement = card.querySelector(`.answer-option[data-option="${correctAnswer}"]`);
+                        if (correctElement) {
+                            correctElement.classList.add('correct');
+                        }
+                        
+                        feedbackMessage.textContent = `❌ Resposta Incorreta. A resposta certa era a letra ${correctAnswer}.`;
+                        feedbackMessage.style.color = 'crimson';
                     }
                     
-                    selectedOption = option;
-                    selectedOption.classList.add('selected');
-                    confirmButton.disabled = false;
+                    feedbackMessage.style.display = 'block';
+                    
+                    options.forEach(opt => opt.style.pointerEvents = 'none');
                 });
             });
+        }
 
-            confirmButton.addEventListener('click', () => {
-                // *** PONTO DE VERIFICAÇÃO ***
-                console.log('Botão Confirmar clicado na questão', card.getAttribute('data-question-id'));
 
-                if (!selectedOption || confirmButton.disabled) return;
-
-                const correctAnswer = card.getAttribute('data-correct-answer');
-                const selectedAnswer = selectedOption.getAttribute('data-option');
-                
-                confirmButton.disabled = true;
-                
-                if (selectedAnswer === correctAnswer) {
-                    selectedOption.classList.add('correct');
-                    feedbackMessage.textContent = '✅ Resposta Correta! Parabéns!';
-                    feedbackMessage.style.color = 'var(--verde-progresso)';
+        document.addEventListener('DOMContentLoaded', () => {
+            // VERIFICAÇÃO DE AUTENTICAÇÃO AO CARREGAR A PÁGINA
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    // Usuário logado: Carrega o conteúdo
+                    console.log("Usuário autenticado. Carregando questões.");
+                    fetchAndRenderQuestions();
                 } else {
-                    selectedOption.classList.add('incorrect');
-                    
-                    const correctElement = card.querySelector(`.answer-option[data-option="${correctAnswer}"]`);
-                    if (correctElement) {
-                        correctElement.classList.add('correct');
-                    }
-                    
-                    feedbackMessage.textContent = `❌ Resposta Incorreta. A resposta certa era a letra ${correctAnswer}.`;
-                    feedbackMessage.style.color = 'crimson';
-                }
-                
-                feedbackMessage.style.display = 'block';
-                
-                // Desabilita interação com todas as opções após a resposta
-                options.forEach(opt => opt.style.pointerEvents = 'none'); 
-            });
-        });
-    }
-
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const body = document.body; 
-        const loadingOverlay = document.getElementById('loading-overlay');
-        
-        // VERIFICAÇÃO DE AUTENTICAÇÃO AO CARREGAR A PÁGINA
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // Usuário logado: Carrega o conteúdo
-                console.log("Usuário autenticado. Carregando questões.");
-                fetchAndRenderQuestions();
-                
-                // Remove o overlay e mostra o conteúdo principal
-                if (loadingOverlay) {
-                    loadingOverlay.style.opacity = '0';
-                    setTimeout(() => {
-                        loadingOverlay.style.display = 'none';
-                        body.classList.add('loaded'); // Adiciona classe para exibir o body
-                    }, 300); // Tempo igual ao transition do overlay
-                }
-                
-            } else {
-                // Usuário NÃO logado: Redireciona para a página de login
-                console.log("Usuário não autenticado. Redirecionando para a página de login.");
-                // Redireciona *imediatamente*
-                window.location.href = LOGIN_PAGE_URL;
-            }
-        });
-        
-        // --- Lógica de UI (MANTIDA) ---
-        const btn = document.getElementById("hamburguer-btn");
-        const sidebar = document.querySelector(".sidebar");
-        if (btn){
-            btn.addEventListener("click", ()=> sidebar.classList.toggle("active"));
-        }
-
-        const tabs = document.querySelectorAll('.nav-tab');
-        const mainTitle = document.getElementById('main-title');
-        const mainSubtitle = document.getElementById('main-subtitle');
-        
-        const themeToggle = document.getElementById('theme-toggle');
-        const navItems = document.querySelectorAll('.sidebar-nav .nav-item a');
-        
-        const titles = {
-            'questoes': {
-                title: 'Banco de Questões',
-                subtitle: 'Pratique com milhares de questões do ENEM com explicações detalhadas'
-            },
-            'simulados': {
-                title: 'Banco de Simulados',
-                subtitle: 'Selecione um simulado para iniciar a sua prática'
-            }
-        };
-
-        const switchTab = (targetTab) => {
-            tabs.forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => item.classList.remove('active-nav'));
-            
-            const activeTab = document.querySelector(`.nav-tab[data-target="${targetTab}"]`);
-            if (activeTab) {
-                activeTab.classList.add('active');
-            }
-            
-            // Ativa o item correspondente na sidebar
-            let sidebarItem = document.querySelector(`.sidebar-nav a[data-nav-target="${targetTab}-tab"]`);
-            if (targetTab === 'questoes' || targetTab === 'simulados') {
-                if (sidebarItem) {
-                    sidebarItem.closest('.nav-item').classList.add('active-nav');
-                }
-            } else {
-                // Mantém 'Início' ativo se não for 'questoes' ou 'simulados'
-                document.querySelector('.sidebar-nav .nav-item:first-child').classList.add('active-nav');
-            }
-            
-
-            const activeContent = document.getElementById(`content-${targetTab}`);
-            if (activeContent) {
-                activeContent.classList.add('active');
-            }
-
-            if (mainTitle && mainSubtitle && titles[targetTab]) {
-                mainTitle.textContent = titles[targetTab].title;
-                mainSubtitle.textContent = titles[targetTab].subtitle;
-            }
-        };
-
-        function toggleThemeVisual() {
-            const isDarkMode = body.classList.toggle('dark');
-            localStorage.setItem('tema', isDarkMode ? 'dark' : 'light');
-        }
-
-        if (themeToggle) {
-             themeToggle.addEventListener('change', toggleThemeVisual);
-        }
-        
-        const savedTheme = localStorage.getItem('tema');
-        if (savedTheme === 'dark') {
-            body.classList.add('dark');
-            if (themeToggle) { themeToggle.checked = true; }
-        }
-        
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                const target = tab.getAttribute('data-target');
-                if (target) {
-                    switchTab(target);
+                    // Usuário NÃO logado: Redireciona para a página de login
+                    console.log("Usuário não autenticado. Redirecionando para a página de login.");
+                    window.location.href = "login.html";
                 }
             });
-        });
+            
+            // --- Lógica de UI (MANTIDA) ---
+            const btn = document.getElementById("hamburguer-btn");
+            const sidebar = document.querySelector(".sidebar");
+            if (btn){
+                btn.addEventListener("click", ()=> sidebar.classList.toggle("active"));
+            }
 
-        navItems.forEach(item => {
-            const target = item.getAttribute('data-nav-target');
-            if (target === 'questoes-tab') {
-                 item.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    switchTab('questoes');
-                });
-            } else if (target === 'simulados-tab') {
-                item.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    switchTab('simulados');
-                });
-            } else if (!target) {
-                // Para os links que não são 'questoes' ou 'simulados'
-                item.addEventListener('click', () => {
-                    document.querySelectorAll('.sidebar-nav .nav-item').forEach(li => li.classList.remove('active-nav'));
-                    item.closest('.nav-item').classList.add('active-nav');
-                    
-                    if (mainTitle && mainSubtitle) {
-                         tabs.forEach(tab => tab.classList.remove('active'));
-                         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-                         // Se for para index.html (Início), use o título padrão
-                         if (item.getAttribute('href') === 'index.html') {
-                            mainTitle.textContent = "Painel Inicial";
-                            mainSubtitle.textContent = "Seu centro de estudos e progresso";
-                         }
+            const tabs = document.querySelectorAll('.nav-tab');
+            const mainTitle = document.getElementById('main-title');
+            const mainSubtitle = document.getElementById('main-subtitle');
+            const body = document.body; 
+            
+            const themeToggle = document.getElementById('theme-toggle');
+            const navItems = document.querySelectorAll('.sidebar-nav .nav-item a');
+            const questaoTabInHeader = document.querySelector('.nav-tab[data-target="questoes"]');
+            const simuladosTabInHeader = document.querySelector('.nav-tab[data-target="simulados"]');
+
+            const titles = {
+                'questoes': {
+                    title: 'Banco de Questões',
+                    subtitle: 'Pratique com milhares de questões do ENEM com explicações detalhadas'
+                },
+                'simulados': {
+                    title: 'Banco de Simulados',
+                    subtitle: 'Selecione um simulado para iniciar a sua prática'
+                }
+            };
+
+            const switchTab = (targetTab) => {
+                tabs.forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => item.classList.remove('active-nav'));
+                
+                const activeTab = document.querySelector(`.nav-tab[data-target="${targetTab}"]`);
+                if (activeTab) {
+                    activeTab.classList.add('active');
+                }
+                
+                let sidebarItem = document.querySelector(`.sidebar-nav a[data-nav-target="${targetTab}-tab"]`);
+                if (targetTab === 'questoes' || targetTab === 'simulados') {
+                    if (sidebarItem) {
+                        sidebarItem.closest('.nav-item').classList.add('active-nav');
+                    }
+                } else {
+                    document.querySelector('.sidebar-nav .nav-item:first-child').classList.add('active-nav');
+                }
+                
+
+                const activeContent = document.getElementById(`content-${targetTab}`);
+                if (activeContent) {
+                    activeContent.classList.add('active');
+                }
+
+                if (mainTitle && mainSubtitle && titles[targetTab]) {
+                    mainTitle.textContent = titles[targetTab].title;
+                    mainSubtitle.textContent = titles[targetTab].subtitle;
+                }
+            };
+
+            function toggleThemeVisual() {
+                const isDarkMode = body.classList.toggle('dark');
+                localStorage.setItem('tema', isDarkMode ? 'dark' : 'light');
+            }
+
+            if (themeToggle) {
+                 themeToggle.addEventListener('change', toggleThemeVisual);
+            }
+            
+            const savedTheme = localStorage.getItem('tema');
+            if (savedTheme === 'dark') {
+                body.classList.add('dark');
+                if (themeToggle) { themeToggle.checked = true; }
+            }
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.getAttribute('data-target');
+                    if (target) {
+                        switchTab(target);
                     }
                 });
+            });
+
+            navItems.forEach(item => {
+                const target = item.getAttribute('data-nav-target');
+                if (target === 'questoes-tab') {
+                     item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        switchTab('questoes');
+                    });
+                } else if (target === 'simulados-tab') {
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        switchTab('simulados');
+                    });
+                } else if (!target) {
+                    // Item 'Início' já tem href="index.html"
+                    // Item 'Flashcards' agora tem href="flashcards01.html"
+                    // Mantendo a lógica para outros itens sem 'data-nav-target'
+                    item.addEventListener('click', () => {
+                        document.querySelectorAll('.sidebar-nav .nav-item').forEach(li => li.classList.remove('active-nav'));
+                        item.closest('.nav-item').classList.add('active-nav');
+                        
+                        if (mainTitle && mainSubtitle) {
+                             tabs.forEach(tab => tab.classList.remove('active'));
+                             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                             mainTitle.textContent = "Painel Inicial";
+                             mainSubtitle.textContent = "Seu centro de estudos e progresso";
+                        }
+                    });
+                }
+            });
+            
+            if (questaoTabInHeader) {
+                questaoTabInHeader.setAttribute('data-target', 'questoes');
             }
+            if (simuladosTabInHeader) {
+                simuladosTabInHeader.setAttribute('data-target', 'simulados');
+            }
+            switchTab('questoes'); 
         });
-        
-        // Inicializa na aba 'questoes' por padrão, mas só depois da autenticação
-        switchTab('questoes'); 
-    });
-</script>
+    </script>
 
 </body>
 </html>
