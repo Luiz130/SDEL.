@@ -955,7 +955,7 @@
         const db = getFirestore(app);
         const auth = getAuth(app); 
         
-        // 2. Função para Renderizar as Questões (MANTIDA)
+        // 2. Função para Renderizar as Questões (CORRIGIDA)
         async function fetchAndRenderQuestions() {
             const questionSection = document.querySelector('.question-section');
             if (!questionSection) return;
@@ -967,6 +967,7 @@
             try {
                 const querySnapshot = await getDocs(q);
                 let questionCounter = 1;
+                // Total de documentos retornados
                 const totalQuestions = querySnapshot.size;
 
                 if (totalQuestions === 0) {
@@ -1109,7 +1110,7 @@
                 } else {
                     // Usuário NÃO logado: Redireciona para a página de login
                     console.log("Usuário não autenticado. Redirecionando para a página de login.");
-                    window.location.href = "login.html";
+                    window.location.href = "/login.html";
                 }
             });
             
