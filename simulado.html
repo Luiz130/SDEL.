@@ -914,15 +914,14 @@
         </div>
     </main>
 
-    <script type="module">
-        // Importa as funções do Firebase App e do Cloud Firestore
+  <script type="module">
+        // Importa as funções do Firebase App, Cloud Firestore e Autenticação
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getFirestore, collection, getDocs, limit, query } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-        
-        // Se precisar do Analytics no futuro, importe também:
-        // import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-        // Sua configuração do Firebase
+
+        // Sua configuração do Firebase (MANTIDA)
         const firebaseConfig = {
             apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
             authDomain: "sdel-b3f65.firebaseapp.com",
@@ -934,20 +933,41 @@
             measurementId: "G-PT92VECJ2H"
         };
 
-        // 1. Inicializa o Firebase e o Firestore
+        // 1. Inicializa o Firebase, Firestore e Auth
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        // const analytics = getAnalytics(app); // Se necessário, descomente
+        const auth = getAuth(app); // Inicializa a autenticação
+        
 
-        // 2. Função para Renderizar as Questões buscando do Firestore
+        // 2. Função para Autenticar e Iniciar a Busca
+        async function authenticateAndFetch() {
+            try {
+                // Tenta logar o usuário anonimamente para satisfazer a regra 'if request.auth != null'
+                await signInAnonymously(auth);
+                console.log("Usuário autenticado anonimamente com sucesso.");
+                
+                // Se a autenticação for bem-sucedida, inicia a busca de questões
+                fetchAndRenderQuestions();
+            } catch (error) {
+                const questionSection = document.querySelector('.question-section');
+                console.error("Erro na autenticação Firebase:", error);
+                
+                let errorMessage = 'Não foi possível autenticar. Verifique se o login anônimo está habilitado no seu console Firebase (Authentication -> Sign-in method).';
+                
+                if (questionSection) {
+                    questionSection.innerHTML = `<p style="text-align: center; color: red; padding: 20px;">❌ ERRO DE AUTENTICAÇÃO: ${errorMessage}</p>`;
+                }
+            }
+        }
+
+        // 3. Função para Renderizar as Questões buscando do Firestore (sem alteração na lógica)
         async function fetchAndRenderQuestions() {
             const questionSection = document.querySelector('.question-section');
             if (!questionSection) return;
 
-            // Limpa o conteúdo estático (se houver)
             questionSection.innerHTML = '';
             
-            // Cria uma query para buscar os documentos da coleção 'questoes' (limitado a 5)
+            // Query para buscar as primeiras 5 questões da coleção 'questoes'
             const q = query(collection(db, "questoes"), limit(5)); 
 
             try {
@@ -974,7 +994,6 @@
                         const letter = String.fromCharCode(letterCode); 
                         const text = data.alternativas[key];
                         
-                        // data-option armazena a letra da alternativa para checagem
                         return `
                             <div class="answer-option" data-option="${letter}">
                                 <span class="answer-letter">${letter})</span> ${text}
@@ -1026,16 +1045,16 @@
                     questionCounter++;
                 });
                 
-                // 3. Adiciona Lógica de Seleção e Confirmação após a renderização
+                // Adiciona Lógica de Seleção e Confirmação após a renderização
                 addQuestionInteractionListeners();
                 
             } catch (error) {
                 console.error("Erro ao buscar questões:", error);
-                questionSection.innerHTML = '<p style="text-align: center; color: red;">Não foi possível carregar as questões. Verifique o console para mais detalhes.</p>';
+                questionSection.innerHTML = '<p style="text-align: center; color: red;">Não foi possível carregar as questões. Verifique a conexão com o Firebase e as regras de segurança.</p>';
             }
         }
 
-        // 4. Lógica de Interação da Questão
+        // 4. Lógica de Interação da Questão (MANTIDA)
         function addQuestionInteractionListeners() {
             document.querySelectorAll('.question-card').forEach(card => {
                 const options = card.querySelectorAll('.answer-option');
@@ -1097,8 +1116,8 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             
-            // Chama a função de busca e renderização ao carregar a página
-            fetchAndRenderQuestions(); 
+            // Chama a função de autenticação, que por sua vez chama a busca de questões
+            authenticateAndFetch(); 
             
 // --- MOBILE SIDEBAR TOGGLE ---
 const btn = document.getElementById("hamburguer-btn");
@@ -1242,3 +1261,4 @@ const tabs = document.querySelectorAll('.nav-tab');
 
 </body>
 </html>
+
