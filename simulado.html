@@ -530,9 +530,10 @@
     .xp-value { font-weight: 700; font-size: 1.1em; }
     .xp-level { font-size: 0.8em; color: var(--cinza-texto); }
     
+    /* APRIMORAMENTO NO CSS PARA OS ÍCONES DE DETALHES DO SIMULADO */
     .card-details { 
         display: flex; 
-        justify-content: space-between; 
+        gap: 20px; /* Adiciona espaçamento entre os detalhes */
         font-size: 0.9em; 
         color: var(--cinza-texto); 
         margin-bottom: 20px; 
@@ -541,19 +542,26 @@
         border-top: 1px solid var(--cinza-claro);
     }
     body.dark .card-details {
-        border-top: 1px solid var(--cinza-medio); /* Borda mais clara no dark mode */
+        border-top: 1px solid var(--cinza-medio); 
     }
 
-    .card-details span { display: flex; align-items: center; }
-    /* Ajuste para usar ícones de tempo e questões no lugar de emojis */
-    .card-details span:nth-child(1)::before, 
-    .card-details span:nth-child(2)::before { 
-        content: none; 
-    } 
-    /* Podemos usar SVGs ou um ícone de fonte para esses, mas manterei o layout sem emoji */
-    .card-details span:nth-child(1)::before { content: '🕒'; margin-right: 5px; }
-    .card-details span:nth-child(2)::before { content: '📝'; margin-right: 5px; }
+    .card-details span { 
+        display: flex; 
+        align-items: center; 
+        color: var(--cinza-texto); /* Garante cor do texto dos detalhes */
+    }
+    .card-details span svg {
+        width: 16px; 
+        height: 16px; 
+        margin-right: 5px; 
+        fill: currentColor; /* Usa a cor do texto para o ícone */
+        color: var(--azul-principal); /* Destaca o ícone com a cor principal */
+    }
+    body.dark .card-details span svg {
+        color: var(--azul-principal);
+    }
 
+    /* FIM DO APRIMORAMENTO */
     
     .progress-bar { height: 8px; background-color: var(--cinza-medio); border-radius: 4px; margin-bottom: 10px; }
     .progress-bar-fill { height: 100%; background-color: var(--verde-progresso); border-radius: 4px; }
@@ -675,9 +683,26 @@
 <div class='hamburger' id='hamburguer-btn'>☰</div>
 
     <svg width="0" height="0" style="position:absolute;">
-        <symbol id="i-home" viewBox="0 0 24 24"><path fill="currentColor" d="M12 5.69l5.66 5.66L18.71 11.29 12 4.59 5.29 11.29l1.05 1.06L12 5.69zM12 3L2 12...
-
-        <symbol id="sc-pen" viewBox="0 0 24 24"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></symbol> 
+        <symbol id="i-home" viewBox="0 0 24 24"><path fill="currentColor" d="M10 20v-6h4v6h5v-8h3L12 3L2 12h3v8h5z"/></symbol>
+        <symbol id="i-flashcards" viewBox="0 0 24 24"><path fill="currentColor" d="M20 2H4C2.9 2 2 2.9 2 4v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 10H6V6h12v6z"/></symbol>
+        <symbol id="i-questions" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.43 12.56 13 13.5 13 14h-2v-.5c0-1.1.45-2.11 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.42 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></symbol>
+        <symbol id="i-simulados" viewBox="0 0 24 24"><path fill="currentColor" d="M12 4c-4.42 0-8 3.58-8 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm4.25 10.25l-4.5-4.5V7h2v4H9.75l3.5 3.5 3.5-3.5V14h-2v-4H10.5v-.5z"/></symbol>
+        <symbol id="i-games" viewBox="0 0 24 24"><path fill="currentColor" d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM3 16V8h18l.01 8H3zm8-6H9v2h2v-2zm-3 2H6v-2h2v2zm8 0h-2v-2h2v2zm3-2h-2v-2h2v2z"/></symbol>
+        <symbol id="i-desempenho" viewBox="0 0 24 24"><path fill="currentColor" d="M16 11V3H8v8H2v10h20V11h-6zm-6 8H4v-8h6v8zm10 0h-6v-8h6v8z"/></symbol>
+        <symbol id="i-ranking" viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27l6.18 3.73-1.64-7.03 5.46-4.71-7.19-.61L12 2.5 9.19 9.65l-7.19.61 5.46 4.71-1.64 7.03L12 17.27z"/></symbol>
+        <symbol id="i-calendario" viewBox="0 0 24 24"><path fill="currentColor" d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM5 7V6h14v1H5z"/></symbol>
+        <symbol id="i-perfil" viewBox="0 0 24 24"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
+        <symbol id="i-config" viewBox="0 0 24 24"><path fill="currentColor" d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.2-.15.25-.43.12-.67l-2-3.46c-.12-.25-.4-.32-.61-.22l-2.49 1.01c-.52-.39-1.09-.72-1.71-.96L14 2h-4L9.43 4.35c-.62.24-1.19.57-1.71.96l-2.49-1.01c-.2-.08-.48-.03-.61.22l-2 3.46c-.13.24-.08.52.12.67l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.2.15-.25.43-.12.67l2 3.46c.13.25.41.32.61.22l2.49-1.01c.52.39 1.09.72 1.71.96L9.43 22h4l.57-2.35c.62-.24 1.19-.57 1.71-.96l2.49 1.01c.2.08.48.03.61-.22l2-3.46c.12-.25.08-.52-.12-.67l-2.11-1.65zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></symbol>
+        
+        <symbol id="sc-document" viewBox="0 0 24 24"><path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></symbol>
+        <symbol id="sc-calculator" viewBox="0 0 24 24"><path fill="currentColor" d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 4h2v2h-2V7zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zM8 7h2v2H8V7zm0 4h2v2H8v-2zm0 4h2v2H8v-2zm7 4h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/></symbol>
+        <symbol id="sc-book" viewBox="0 0 24 24"><path fill="currentColor" d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 15H7v-2h10v2zm0-4H7v-2h10v2zm0-4H7V7h10v2z"/></symbol>
+        <symbol id="sc-flask" viewBox="0 0 24 24"><path fill="currentColor" d="M15.5 2H8.5c-.39 0-.74.23-.9.59L3 17.58C3 18.35 3.65 19 4.42 19H19.58c.77 0 1.42-.65 1.42-1.42L16.4 2.59c-.16-.36-.51-.59-.9-.59zm.79 17H7.71l-1.63-8h13.84l-1.63 8zM12 4c.31 0 .59.13.78.36L14 5.5l-2 2-2-2 .88-1.14c.19-.23.47-.36.78-.36zM13 14h-2v-2h2v2zm-2-3h2V9h-2v2z"/></symbol>
+        <symbol id="sc-globe" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.83-7-7.93 0-.61.08-1.21.21-1.79l5.44 5.44-1.65 4.28zm2 0V14.75l4.31-4.31c.14.49.21 1.02.21 1.56 0 4.1-3.05 7.44-7 7.93zm4.72-7.83l-5.44-5.44c.58-.13 1.18-.21 1.79-.21 4.1 0 7.44 3.05 7.93 7h-4.28zM12 4.07V9.25l4.31 4.31c.49-.14 1.02-.21 1.56-.21 4.1 0 7.44 3.05 7.93 7h-4.28zM16.93 7.28l-5.44 5.44c-.58-.13-1.18-.21-1.79-.21-4.1 0-7.44 3.05-7.93 7h4.28z"/></symbol>
+        <symbol id="sc-pen" viewBox="0 0 24 24"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></symbol>
+        
+        <symbol id="det-clock" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.75 13H11V7h1.75v8z"/></symbol>
+        <symbol id="det-tasks" viewBox="0 0 24 24"><path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 14H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></symbol>
     </svg>
     <aside class="sidebar">
         <div>
@@ -713,6 +738,7 @@
             </ul>
         </div>
     </aside>
+    <div class='hamburger' id='hamburguer-btn'>☰</div>
 
     <div class="main-content">
         <div class="container">
@@ -789,7 +815,10 @@
                         <div class="card-content">
                             <h3>Simulado ENEM - Dia 1</h3>
                             <p>Linguagens (45), Humanas (45) e Redação</p>
-                            <div class="card-details"><span>🕒 5h 30m</span><span>90 questões + Redação</span></div>
+                            <div class="card-details">
+                                <span><svg><use href="#det-clock"></use></svg> 5h 30m</span>
+                                <span><svg><use href="#det-tasks"></use></svg> 90 questões + Redação</span>
+                            </div>
                             <a href="#" class="card-button btn-primary">▷ Iniciar</a>
                         </div>
                     </div>
@@ -802,7 +831,10 @@
                         <div class="card-content">
                             <h3>Simulado ENEM - Dia 2</h3>
                             <p>Matemática (45) e Ciências da Natureza (45)</p>
-                            <div class="card-details"><span>🕒 5h 00m</span><span>90 questões</span></div>
+                            <div class="card-details">
+                                <span><svg><use href="#det-clock"></use></svg> 5h 00m</span>
+                                <span><svg><use href="#det-tasks"></use></svg> 90 questões</span>
+                            </div>
                             <a href="#" class="card-button btn-primary">▷ Iniciar</a>
                         </div>
                     </div>
@@ -815,7 +847,10 @@
                         <div class="card-content">
                             <h3>Matemática Intensiva</h3>
                             <p>45 questões focadas em matemática e suas tecnologias</p>
-                            <div class="card-details"><span>🕒 1h 30m</span><span>45 questões</span></div>
+                            <div class="card-details">
+                                <span><svg><use href="#det-clock"></use></svg> 1h 30m</span>
+                                <span><svg><use href="#det-tasks"></use></svg> 45 questões</span>
+                            </div>
                             <a href="#" class="card-button btn-primary">▷ Iniciar</a>
                         </div>
                     </div>
@@ -828,7 +863,10 @@
                         <div class="card-content">
                             <h3>Linguagens Express</h3>
                             <p>Revisão rápida com 30 questões de linguagens</p>
-                            <div class="card-details"><span>🕒 45m</span><span>30 questões</span></div>
+                            <div class="card-details">
+                                <span><svg><use href="#det-clock"></use></svg> 45m</span>
+                                <span><svg><use href="#det-tasks"></use></svg> 30 questões</span>
+                            </div>
                             
                             <a href="#" class="card-button btn-primary">▷ Iniciar</a>
                         </div>
@@ -842,7 +880,10 @@
                         <div class="card-content">
                             <h3>Ciências da Natureza</h3>
                             <p>Física, Química e Biologia em 45 questões desafiadoras</p>
-                            <div class="card-details"><span>🕒 1h 30m</span><span>45 questões</span></div>
+                            <div class="card-details">
+                                <span><svg><use href="#det-clock"></use></svg> 1h 30m</span>
+                                <span><svg><use href="#det-tasks"></use></svg> 45 questões</span>
+                            </div>
                             <a href="#" class="card-button btn-primary">▷ Iniciar</a>
                         </div>
                     </div>
@@ -855,7 +896,10 @@
                         <div class="card-content">
                             <h3>Ciências Humanas</h3>
                             <p>História, Geografia, Filosofia e Sociologia</p>
-                            <div class="card-details"><span>🕒 1h 30m</span><span>45 questões</span></div>
+                            <div class="card-details">
+                                <span><svg><use href="#det-clock"></use></svg> 1h 30m</span>
+                                <span><svg><use href="#det-tasks"></use></svg> 45 questões</span>
+                            </div>
                             <a href="#" class="card-button btn-primary">▷ Iniciar</a>
                         </div>
                     </div>
@@ -869,7 +913,10 @@
                             <h3>Redação Temática
                             </h3>
                             <p>Prática de redação com temas atuais e relevantes</p>
-                            <div class="card-details"><span>🕒 1h 30m</span><span>1 questões</span></div>
+                            <div class="card-details">
+                                <span><svg><use href="#det-clock"></use></svg> 1h 30m</span>
+                                <span><svg><use href="#det-tasks"></use></svg> 1 questões</span>
+                            </div>
                             <a href="#" class="card-button btn-primary">▷ Iniciar</a>
                         </div>
                     </div>
