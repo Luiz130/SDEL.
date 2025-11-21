@@ -446,9 +446,41 @@
         border-radius: 8px; 
         margin-bottom: 12px; 
         cursor: pointer; 
-        transition: border-color 0.2s; 
+        transition: border-color 0.2s, background-color 0.2s; /* Adicionado transition para background-color */
     }
     .answer-option:hover { border-color: var(--azul-principal); } 
+    
+    /* Estilos para Resposta Selecionada, Correta e Incorreta */
+    .answer-option.selected {
+        border-color: var(--azul-principal);
+        background-color: rgba(58, 109, 137, 0.1); /* Azul claro sutil */
+    }
+    body.dark .answer-option.selected {
+        background-color: rgba(116, 167, 224, 0.1); /* Azul claro sutil no dark mode */
+    }
+    
+    .answer-option.correct {
+        background-color: rgba(76, 180, 82, 0.2); /* Verde claro */
+        border-color: var(--verde-progresso);
+        font-weight: 600;
+        pointer-events: none !important; /* Desabilita clique após resposta */
+    }
+    
+    .answer-option.incorrect {
+        background-color: rgba(220, 20, 60, 0.2); /* Vermelho claro */
+        border-color: crimson;
+        font-weight: 600;
+        pointer-events: none !important; /* Desabilita clique após resposta */
+    }
+
+    /* Otimização visual para o estado final de correção no dark mode */
+    body.dark .answer-option.correct {
+        background-color: rgba(129, 199, 132, 0.2);
+    }
+    body.dark .answer-option.incorrect {
+        background-color: rgba(255, 99, 71, 0.2);
+    }
+    
     
     .simulados-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; }
     
@@ -774,78 +806,7 @@
                     </aside>
 
                     <main class="question-section">
-                        
-                        <div class="question-card">
-                            <div class="question-header">
-                                <div class="question-tags">
-                                    <span>Matemática</span>
-                                    <span>Regra de Três</span>
-                                    <span>Médio</span>
-                                </div>
-                                <div class="question-info">
-                                    <div class="time">🕒 05:00</div>
-                                    <div class="level">Nível Médio</div>
-                                </div>
-                            </div>
-
-                            <div class="question-body">
-                                <h2>Questão 1 de 2</h2>
-                                <p>Uma empresa de logística precisa otimizar suas rotas de entrega. Considerando que um caminhão percorre **350 km com 70 litros de combustível**, quantos litros serão necessários para percorrer **525 km**?</p>
-
-                                <div class="options">
-                                    <div class="answer-option"><span class="answer-letter">A)</span> 95 litros</div>
-                                    <div class="answer-option"><span class="answer-letter">B)</span> 105 litros</div>
-                                    <div class="answer-option"><span class="answer-letter">C)</span> 115 litros</div>
-                                    <div class="answer-option"><span class="answer-letter">D)</span> 125 litros</div>
-                                    <div class="answer-option"><span class="answer-letter">E)</span> 135 litros</div>
-                                </div>
-
-                                <div class="confirm-actions">
-                                    <button class="confirm-button">Confirmar Resposta</button>
-                                    <div class="action-button-group">
-                                        <button class="action-button">Favoritar</button>
-                                        <button class="action-button">Comentários</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="question-card" style="margin-top: 30px;">
-                            <div class="question-header">
-                                <div class="question-tags">
-                                    <span>Linguagens</span>
-                                    <span>Interpretação</span>
-                                    <span>Fácil</span>
-                                </div>
-                                <div class="question-info">
-                                    <div class="time">🕒 03:00</div>
-                                    <div class="level">Nível Fácil</div>
-                                </div>
-                            </div>
-
-                            <div class="question-body">
-                                <h2>Questão 2 de 2</h2>
-                                <p>Qual é o papel principal da linguagem figurada em textos literários, como em um poema?</p>
-
-                                <div class="options">
-                                    <div class="answer-option"><span class="answer-letter">A)</span> Fornecer dados objetivos e concretos.</div>
-                                    <div class="answer-option"><span class="answer-letter">B)</span> Simplificar a leitura para o público menos experiente.</div>
-                                    <div class="answer-option"><span class="answer-letter">C)</span> Criar imagens sensoriais e evocar sentimentos.</div>
-                                    <div class="answer-option"><span class="answer-letter">D)</span> Diminuir a ambiguidade da mensagem principal.</div>
-                                    <div class="answer-option"><span class="answer-letter">E)</span> Padronizar o estilo de escrita da época.</div>
-                                </div>
-
-                                <div class="confirm-actions">
-                                    <button class="confirm-button">Confirmar Resposta</button>
-                                    <div class="action-button-group">
-                                        <button class="action-button">Favoritar</button>
-                                        <button class="action-button">Comentários</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </main>
+                        </main>
                 </div>
                 
             </div>
@@ -953,8 +914,191 @@
         </div>
     </main>
 
-    <script>
+    <script type="module">
+        // Importa as funções do Firebase App e do Cloud Firestore
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, limit, query } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        
+        // Se precisar do Analytics no futuro, importe também:
+        // import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
+
+        // Sua configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
+            authDomain: "sdel-b3f65.firebaseapp.com",
+            databaseURL: "https://sdel-b3f65-default-rtdb.firebaseio.com",
+            projectId: "sdel-b3f65",
+            storageBucket: "sdel-b3f65.firebasestorage.app",
+            messagingSenderId: "297725999985",
+            appId: "1:297725999985:web:d41da68311c190ef8a54d0",
+            measurementId: "G-PT92VECJ2H"
+        };
+
+        // 1. Inicializa o Firebase e o Firestore
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        // const analytics = getAnalytics(app); // Se necessário, descomente
+
+        // 2. Função para Renderizar as Questões buscando do Firestore
+        async function fetchAndRenderQuestions() {
+            const questionSection = document.querySelector('.question-section');
+            if (!questionSection) return;
+
+            // Limpa o conteúdo estático (se houver)
+            questionSection.innerHTML = '';
+            
+            // Cria uma query para buscar os documentos da coleção 'questoes' (limitado a 5)
+            const q = query(collection(db, "questoes"), limit(5)); 
+
+            try {
+                const querySnapshot = await getDocs(q);
+                let questionCounter = 1;
+                const totalQuestions = querySnapshot.size;
+
+                if (totalQuestions === 0) {
+                     questionSection.innerHTML = '<p style="text-align: center; color: var(--cinza-texto);">Nenhuma questão encontrada no banco de dados.</p>';
+                     return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    
+                    if (!data.alternativas || typeof data.alternativas !== 'object') {
+                        console.warn("Documento sem alternativas válidas, pulando:", doc.id);
+                        return; 
+                    }
+
+                    // Mapeia as alternativas (keys são 0, 1, 2, 3, 4, etc.) para letras (A, B, C, D, E)
+                    const optionsHtml = Object.keys(data.alternativas).sort().map(key => {
+                        const letterCode = 65 + parseInt(key); 
+                        const letter = String.fromCharCode(letterCode); 
+                        const text = data.alternativas[key];
+                        
+                        // data-option armazena a letra da alternativa para checagem
+                        return `
+                            <div class="answer-option" data-option="${letter}">
+                                <span class="answer-letter">${letter})</span> ${text}
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    // Formatação do tempo (assumindo que o campo 'tempo' é em segundos)
+                    const minutes = Math.floor((data.tempo || 0) / 60);
+                    const seconds = ((data.tempo || 0) % 60).toString().padStart(2, '0');
+                    const formattedTime = `${minutes}:${seconds}`;
+
+                    // Cria o HTML da questão com os dados do Firestore
+                    const questionCardHtml = `
+                        <div class="question-card" data-question-id="${doc.id}" data-correct-answer="${data.correta || ''}">
+                            <div class="question-header">
+                                <div class="question-tags">
+                                    <span>${data.materia || 'N/A'}</span>
+                                    <span>${data.topico || 'N/A'}</span>
+                                    <span>${data.dificuldade || 'N/A'}</span>
+                                </div>
+                                <div class="question-info">
+                                    <div class="time">🕒 ${formattedTime}</div>
+                                    <div class="level">Nível ${data.dificuldade || 'N/A'}</div>
+                                </div>
+                            </div>
+
+                            <div class="question-body">
+                                <h2>Questão ${questionCounter} de ${totalQuestions}</h2>
+                                <p>${data.enunciado || 'Enunciado não disponível.'}</p>
+
+                                <div class="options">
+                                    ${optionsHtml}
+                                </div>
+
+                                <div class="confirm-actions">
+                                    <button class="confirm-button" disabled>Confirmar Resposta</button>
+                                    <div class="action-button-group">
+                                        <button class="action-button">Favoritar</button>
+                                        <button class="action-button">Comentários</button>
+                                    </div>
+                                </div>
+                                <div class="feedback-message" style="margin-top: 15px; font-size: 0.9em; display: none;"></div>
+                            </div>
+                        </div>
+                    `;
+
+                    questionSection.insertAdjacentHTML('beforeend', questionCardHtml);
+                    questionCounter++;
+                });
+                
+                // 3. Adiciona Lógica de Seleção e Confirmação após a renderização
+                addQuestionInteractionListeners();
+                
+            } catch (error) {
+                console.error("Erro ao buscar questões:", error);
+                questionSection.innerHTML = '<p style="text-align: center; color: red;">Não foi possível carregar as questões. Verifique o console para mais detalhes.</p>';
+            }
+        }
+
+        // 4. Lógica de Interação da Questão
+        function addQuestionInteractionListeners() {
+            document.querySelectorAll('.question-card').forEach(card => {
+                const options = card.querySelectorAll('.answer-option');
+                const confirmButton = card.querySelector('.confirm-button');
+                const feedbackMessage = card.querySelector('.feedback-message');
+                let selectedOption = null;
+
+                // Lógica de Seleção
+                options.forEach(option => {
+                    option.addEventListener('click', () => {
+                        // Deseleciona a opção anterior
+                        if (selectedOption) {
+                            selectedOption.classList.remove('selected');
+                        }
+                        
+                        // Seleciona a nova opção
+                        selectedOption = option;
+                        selectedOption.classList.add('selected');
+                        confirmButton.disabled = false; // Habilita o botão
+                    });
+                });
+
+                // Lógica de Confirmação
+                confirmButton.addEventListener('click', () => {
+                    if (!selectedOption || confirmButton.disabled) return;
+
+                    const correctAnswer = card.getAttribute('data-correct-answer');
+                    const selectedAnswer = selectedOption.getAttribute('data-option');
+                    
+                    // Desativa o botão de confirmação após a resposta
+                    confirmButton.disabled = true;
+                    
+                    // Verifica a resposta
+                    if (selectedAnswer === correctAnswer) {
+                        selectedOption.classList.add('correct');
+                        feedbackMessage.textContent = '✅ Resposta Correta! Parabéns!';
+                        feedbackMessage.style.color = 'var(--verde-progresso)';
+                    } else {
+                        selectedOption.classList.add('incorrect');
+                        
+                        // Marca a resposta correta para feedback visual (se existir)
+                        const correctElement = card.querySelector(`.answer-option[data-option="${correctAnswer}"]`);
+                        if (correctElement) {
+                            correctElement.classList.add('correct');
+                        }
+                        
+                        feedbackMessage.textContent = `❌ Resposta Incorreta. A resposta certa era a letra ${correctAnswer}.`;
+                        feedbackMessage.style.color = 'crimson';
+                    }
+                    
+                    feedbackMessage.style.display = 'block';
+                    
+                    // Desativa a seleção de outras opções após a resposta
+                    options.forEach(opt => opt.style.pointerEvents = 'none');
+                });
+            });
+        }
+
+
         document.addEventListener('DOMContentLoaded', () => {
+            
+            // Chama a função de busca e renderização ao carregar a página
+            fetchAndRenderQuestions(); 
             
 // --- MOBILE SIDEBAR TOGGLE ---
 const btn = document.getElementById("hamburguer-btn");
