@@ -437,7 +437,7 @@
         box-shadow: none;
     }
 
-    /* Tags Arredondadas (Matéria, Tópico, Dificuldade) */
+    /* Tags Arredondadas (Matéria, Tópico) */
     .question-tags {
         display: flex;
         gap: 8px; /* Espaçamento entre as tags */
@@ -677,7 +677,6 @@
     .btn-locked { 
         background-color: var(--cinza-medio); 
         color: var(--cinza-texto); 
-        border: none; 
         cursor: not-allowed; 
     }
     
@@ -694,8 +693,8 @@
     .simulado-card:nth-child(1) .card-icon { background-color: #3776ab; color: white; } 
     .simulado-card:nth-child(2) .card-icon { background-color: var(--verde-progresso); color: white; } 
     .simulado-card:nth-child(3) .card-icon { background-color: #FFD700; color: #444; } 
-    .simulado-card:nth-child(4) .card-icon { background-color: #F8A771; color: white; } 
-    .simulado-card:nth-child(5) .card-icon { background-color: #9370DB; color: white; } 
+    .simulado-card:nth-child(4) .card-icon { background-color: #9370DB; color: white; } 
+    .simulado-card:nth-child(5) .card-icon { background-color: #F8A771; color: white; } 
     .simulado-card:nth-child(6) .card-icon { background-color: #c9519c; color: white; } 
     .simulado-card:nth-child(7) .card-icon { background-color: #FF69B4; color: white; } 
     
@@ -1077,8 +1076,7 @@
                                 <div class="question-tags">
                                     <span>${data.materia || 'N/A'}</span>
                                     <span>${data.topico || 'N/A'}</span>
-                                    <span>${data.dificuldade || 'N/A'}</span>
-                                </div>
+                                    </div>
                                 <div class="question-info">
                                     <div class="time">🕒 ${formattedTime}</div>
                                     <div class="level">Nível ${data.dificuldade || 'N/A'}</div>
