@@ -420,15 +420,64 @@
 
     .question-card { margin-bottom: 30px; border-radius: 12px; overflow: hidden; }
     .question-section { flex: 1; }
+    
+    /* ESTILO DO CABEÇALHO DA QUESTÃO (AJUSTADO CONFORME SOLICITADO) */
     .question-header { 
-        background-color: var(--azul-principal);
+        background-color: #1D2B3C; /* Fundo escuro */
         color: white; 
-        padding: 20px 25px; 
+        padding: 15px 25px; 
         border-radius: 12px 12px 0 0; 
         display: flex; 
         justify-content: space-between; 
         align-items: center; 
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
+    body:not(.dark) .question-header {
+        background-color: var(--azul-principal); /* Reverte para o original no modo claro */
+        box-shadow: none;
+    }
+
+    /* Tags Arredondadas (Matéria, Tópico, Dificuldade) */
+    .question-tags {
+        display: flex;
+        gap: 8px; /* Espaçamento entre as tags */
+        align-items: center;
+    }
+    .question-tags span {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white; 
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        font-weight: 500;
+        display: inline-block;
+    }
+
+    /* Bloco de Informações (Tempo e Nível) */
+    .question-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        text-align: right;
+        gap: 3px;
+    }
+    .question-info .time {
+        color: white;
+        font-size: 1.1em;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+    .question-info .level {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 15px;
+        font-size: 0.85em;
+        font-weight: 500;
+    }
+    /* FIM DOS ESTILOS DO CABEÇALHO */
+    
     .question-body { 
         background-color: var(--bg-sidebar); 
         color: var(--cinza-texto);
@@ -707,7 +756,7 @@
         <symbol id="i-ranking" viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27l6.18 3.73-1.64-7.03 5.46-4.71-7.19-.61L12 2.5 9.19 9.65l-7.19.61 5.46 4.71-1.64 7.03L12 17.27z"/></symbol>
         <symbol id="i-calendario" viewBox="0 0 24 24"><path fill="currentColor" d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM5 7V6h14v1H5z"/></symbol>
         <symbol id="i-perfil" viewBox="0 0 24 24"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
-        <symbol id="i-config" viewBox="0 0 24 24"><path fill="currentColor" d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.2-.15.25-.43.12-.67l-2-3.46c-.12-.25-.4-.32-.61-.22l-2.49 1.01c-.52-.39-1.09-.72-1.71-.96L14 2h-4L9.43 4.35c-.62.24-1.19.57-1.71.96l-2.49-1.01c-.2-.08-.48-.03-.61.22l-2 3.46c-.13.24-.08.52-.12.67l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.2.15-.25.43-.12.67l2 3.46c.13.25.41.32.61.22l2.49-1.01c.52.39 1.09.72 1.71.96L9.43 22h4l.57-2.35c.62-.24 1.19-.57 1.71-.96l2.49 1.01c.2.08.48.03.61-.22l2-3.46c.12-.25.08-.52-.12-.67l-2.11-1.65zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></symbol>
+        <symbol id="i-config" viewBox="0 0 24 24"><path fill="currentColor" d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.2-.15.25-.43.12-.67l-2-3.46c-.12-.25-.4-.32-.61-.22l-2.49 1.01c-.52-.39-1.09-.72-1.71-.96L14 2h-4L9.43 4.35c-.62.24-1.19.57-1.71.96l-2.49-1.01c-.2-.08-.48-.03-.61.22l-2 3.46c-.13.24-.08.52.12.67l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.2.15-.25.43-.12.67l2 3.46c.13.25.41.32.61.22l2.49-1.01c.52.39 1.09.72 1.71.96L9.43 22h4l.57-2.35c.62-.24 1.19-.57 1.71-.96l2.49 1.01c.2.08.48.03.61-.22l2-3.46c.12-.25.08-.52-.12-.67l-2.11-1.65zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></symbol>
         
         <symbol id="sc-document" viewBox="0 0 24 24"><path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></symbol>
         <symbol id="sc-calculator" viewBox="0 0 24 24"><path fill="currentColor" d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 4h2v2h-2V7zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zM8 7h2v2H8V7zm0 4h2v2H8v-2zm0 4h2v2H8v-2zm7 4h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/></symbol>
@@ -870,7 +919,7 @@
                         </div>
                     </div>
                     
-                    <div class="simulado-card">
+                    <div class="simulado-card active-card">
                         <div class="card-header">
                             <span class="card-icon"><svg width="24" height="24"><use href="#sc-book"></use></svg></span>
                             <div class="card-xp"><div class="xp-value">+100 XP</div><div class="xp-level">Médio</div></div>
@@ -1028,7 +1077,8 @@
                                 <div class="question-tags">
                                     <span>${data.materia || 'N/A'}</span>
                                     <span>${data.topico || 'N/A'}</span>
-                                    <span>${data.dificuldade || 'N/A'}</span> </div>
+                                    <span>${data.dificuldade || 'N/A'}</span>
+                                </div>
                                 <div class="question-info">
                                     <div class="time">🕒 ${formattedTime}</div>
                                     <div class="level">Nível ${data.dificuldade || 'N/A'}</div>
