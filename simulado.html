@@ -1,1 +1,1372 @@
-.
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco de Questões e Simulados - ENEM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    /* ------------------------------------------------ */
+    /* CORES BASE ORIGINAIS (MANTIDAS) */
+    /* ------------------------------------------------ */
+    :root {
+        /* Cores Padrão do Tema Claro */
+        --azul-principal: #3A6D89;
+        --cinza-claro: #EEF2F5; /* Fundo Secundário */
+        --cinza-medio: #D9E0E5; /* Cinza para Bordas e Fundo da Aba */
+        --cinza-texto: #4B5563; /* Cor comum de texto para melhor contraste */
+        --verde-progresso: #4CB452; 
+
+        /* Cores para Dificuldade */
+        --cor-facil: #4CB452;    /* Verde */
+        --cor-medio: #FF8C00;    /* Laranja (DarkOrange, um bom tom) */
+        --cor-dificil: #DC143C;  /* Vermelho (Crimson, forte) */
+
+        /* Novas Variáveis da Sidebar, usando cores existentes */
+        --bg-sidebar: #FFFFFF;
+        --sidebar-text: var(--cinza-texto);
+        --sidebar-active-bg: var(--azul-principal);
+        --sidebar-active-text: #FFFFFF;
+        --sidebar-border: #E2E8F0;
+
+        /* VARIÁVEIS DO NOVO SIDEBAR - MODO ESCURO */
+        --bg-sidebar-nav: #1f2937;
+        --bg-card-hover: #374151;
+        --bg-active-nav: #4a5568;
+        --border-color-nav: #4b5563;
+        --text-primary-nav: #f0f0f0;
+        --text-secondary-nav: #9ca3af;
+        --accent-blue-nav: #3b82f6;
+    }
+
+    /* ------------------------------------------------ */
+    /* MODO CLARO DO SIDEBAR (INTEGRAÇÃO DE CORES) */
+    /* ------------------------------------------------ */
+    body:not(.dark) {
+        --bg-sidebar-nav: #c6d4e1;
+        --bg-card-hover: #d1d5db;
+        --bg-active-nav: #a1aec1;
+        --border-color-nav: #9ca3af;
+        --text-primary-nav: #1f2937;
+        --text-secondary-nav: #4b5563;
+        --accent-blue-nav: #1e3a8a;
+    }
+
+    /* ------------------------------------------------ */
+    /* MODO ESCURO (NOVA TONALIDADE DA FOTO) */
+    /* ------------------------------------------------ */
+    body.dark {
+        /* Cores baseadas na tonalidade azul-acinzentada escura da foto: #1D2B3C */
+        
+        --cinza-claro: #1D2B3C; /* Fundo Geral Principal (Tom mais escuro da foto) */
+        --bg-sidebar: #2C3E50; /* Fundo da Sidebar, Cards e Abas (Tom ligeiramente mais claro para contraste) */
+        --cinza-medio: #4B607A; /* Fundo Secundário (bordas, separadores, sliders) */
+        
+        /* Texto e Acentos */
+        --cinza-texto: #E0E0E0; /* Texto Claro */
+        --sidebar-text: #E0E0E0;
+        --azul-principal: #74A7E0; /* Azul principal mais sutil (destaque) */
+        --sidebar-active-text: #1D2B3C; /* Texto escuro no botão azul */
+        --sidebar-border: #4B607A; /* Borda mais escura */
+        --verde-progresso: #81C784; /* Verde mais claro */
+
+        /* Cores para Dificuldade (Ajuste para Dark Mode) */
+        --cor-facil: #81C784; 
+        --cor-medio: #FFB347; /* Laranja mais claro */
+        --cor-dificil: #EF5350; /* Vermelho mais claro */
+        
+        /* VARIÁVEIS DO NOVO SIDEBAR - MODO ESCURO (Ajustadas para a nova paleta) */
+        --bg-sidebar-nav: var(--bg-sidebar);
+        --bg-card-hover: #3D536B; /* Um pouco mais claro que o sidebar para o hover */
+        --bg-active-nav: #4B607A;
+        --border-color-nav: #6B7C93;
+        --text-primary-nav: #F0F0F0;
+        --text-secondary-nav: #B0BEC5;
+        --accent-blue-nav: var(--azul-principal); /* Usa a nova cor de destaque */
+    }
+
+    /* Estilos específicos para o Dark Mode (Ajustados) */
+    
+    body.dark .nav-tabs {
+        background-color: var(--cinza-medio); 
+    }
+
+    body.dark .nav-tab[data-target="questoes"].active,
+    body.dark .nav-tab[data-target="simulados"].active {
+        background-color: var(--bg-sidebar); 
+        color: var(--azul-principal); 
+        box-shadow: none; 
+    }
+
+    body.dark .filters-section,
+    body.dark .question-body,
+    body.dark .simulado-card {
+        background-color: var(--bg-sidebar);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); /* Sombra mais visível no escuro */
+    }
+    
+    body.dark .slider {
+        background-color: var(--cinza-medio); 
+    }
+    body.dark input:checked + .slider {
+        background-color: var(--accent-blue-nav);
+    }
+    body.dark .slider:before {
+        background-color: #E0E0E0;
+    }
+
+    body.dark .answer-option { 
+        border: 2px solid var(--cinza-medio); 
+    }
+    body.dark .answer-option:hover { 
+        border-color: var(--azul-principal); 
+    }
+    
+    body.dark .btn-secondary { 
+        background-color: transparent; /* Fundo transparente ou muito sutil */
+        color: var(--azul-principal); 
+        border: 1px solid var(--azul-principal); 
+    } 
+    body.dark .btn-secondary:hover { 
+        background-color: var(--cinza-medio); 
+    }
+    body.dark .btn-locked { 
+        background-color: var(--cinza-medio); 
+    }
+
+    /* Estilos Globais e Reset Básico */
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background-color: var(--cinza-claro); /* Fundo Geral */
+        margin: 0;
+        min-height: 100vh;
+    }
+
+    /* ------------------------------------------------ */
+    /* SIDEBAR (NOVO BLOCO) */
+    /* ------------------------------------------------ */
+    .sidebar {
+        width: 250px;
+        height: 100vh;
+        background: var(--bg-sidebar-nav);
+        color: var(--text-primary-nav);
+        padding: 20px 0;
+        position: fixed;
+        left: 0;
+        top: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-shadow: 4px 0 8px rgba(0,0,0,0.15);
+        z-index: 1000; /* Garante que fique acima do main content */
+    }
+    body.dark .sidebar {
+         box-shadow: 4px 0 8px rgba(0,0,0,0.5); 
+    }
+
+    .sidebar-header h1 {
+        margin: 0 20px;
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .theme-switcher {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        color: var(--text-secondary-nav);
+        font-size: 14px;
+    }
+
+    /* Toggle Switch (Interruptor de Tema) - Reutilizando classes do toggle switch original */
+    .toggle-switch {
+        position: relative;
+        width: 45px;
+        height: 22px;
+    }
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    .slider {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--border-color-nav);
+        border-radius: 20px;
+        cursor: pointer;
+        transition: .3s;
+    }
+    .slider:before {
+        content: "";
+        width: 16px;
+        height: 16px;
+        background: white;
+        border-radius: 50%;
+        position: absolute;
+        left: 3px;
+        top: 3px;
+        transition: .3s;
+    }
+    input:checked + .slider {
+        background: var(--accent-blue-nav);
+    }
+    input:checked + .slider:before {
+        transform: translateX(22px);
+    }
+    body.dark .slider:before {
+        background: #1D2B3C; /* Bola do slider mais escura para contraste */
+    }
+
+
+    .sidebar-nav {
+        list-style: none;
+        padding: 0;
+        margin: 10px 0;
+    }
+
+    .nav-item a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 20px;
+        color: var(--text-secondary-nav);
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 500;
+        transition: .2s;
+    }
+
+    .nav-item a:hover {
+        background: var(--bg-card-hover);
+        color: var(--text-primary-nav);
+    }
+
+    .nav-item.active-nav a {
+        background: var(--bg-active-nav);
+        color: var(--text-primary-nav);
+        border-right: 4px solid var(--accent-blue-nav);
+    }
+
+    .separator {
+        height: 1px;
+        background: var(--border-color-nav);
+        margin: 15px 20px;
+    }
+
+    /* Ajuste de SVG para Sidebar */
+    .sidebar svg {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+    }
+    
+    /* ------------------------------------------------ */
+    /* LAYOUT PRINCIPAL (Conteúdo) - CORRIGIDO PARA BARRA LATERAL */
+    /* ------------------------------------------------ */
+    .main-content {
+        margin-left: 250px; /* Adiciona margem para a sidebar */
+        flex-grow: 1; 
+        overflow-y: auto;
+        padding: 20px; 
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto; 
+        padding: 0; 
+    }
+    
+    /* ---------------------- */
+    /* ESTILOS DE CONTEÚDO (ORIGINAIS) */
+    /* ---------------------- */
+    
+    .header {
+        text-align: center;
+        margin-bottom: 30px;
+        color: var(--cinza-texto); /* Garante que o texto do header mude de cor no dark mode */
+    }
+
+    .nav-tabs-container {
+        display: flex;
+        justify-content: center;
+    }
+
+    .nav-tabs {
+        display: inline-flex;
+        background-color: var(--cinza-medio); 
+        padding: 5px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+    }
+
+    .nav-tab {
+        padding: 10px 20px;
+        color: var(--cinza-texto); 
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        transition: background-color 0.2s, color 0.2s;
+    }
+
+    .nav-tab:hover {
+        background-color: var(--cinza-medio);
+    }
+    
+    .nav-tab[data-target="questoes"].active {
+        background-color: var(--bg-sidebar); /* Cor do card/sidebar para contraste */
+        color: var(--azul-principal);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .nav-tab[data-target="simulados"].active {
+        background-color: var(--bg-sidebar); 
+        color: var(--azul-principal); 
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .nav-tab span {
+        margin-right: 5px; 
+        font-size: 1.1em; 
+        line-height: 1; 
+    }
+
+    .tab-content {
+        display: none; 
+    }
+
+    .tab-content.active {
+        display: block; 
+    }
+    
+    .content-grid { display: flex; gap: 30px; }
+    .filters-section {
+        flex: 0 0 300px; 
+        background-color: var(--bg-sidebar);
+        padding: 25px; 
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        position: sticky;
+        top: 20px; 
+        align-self: flex-start;
+    }
+    
+    .filters-title { font-size: 1.1em; font-weight: 600; color: var(--cinza-texto); margin-bottom: 20px; display: flex; align-items: center; }
+    .filter-group { margin-bottom: 20px; }
+    .filter-group label { display: block; margin-bottom: 5px; color: var(--cinza-texto); font-size: 0.9em; font-weight: 600; }
+    .filter-group select { 
+        width: 100%; 
+        padding: 10px; 
+        border: 1px solid var(--cinza-medio); 
+        border-radius: 8px; 
+        background-color: var(--cinza-claro); 
+        appearance: none; 
+        -webkit-appearance: none; 
+        -moz-appearance: none; 
+        font-size: 1em; 
+        cursor: pointer; 
+        color: var(--cinza-texto); /* Garante que o texto dentro do select mude de cor */
+    }
+    body.dark .filter-group select {
+        background-color: var(--cinza-claro); /* Fundo mais escuro para inputs */
+        border-color: var(--cinza-medio);
+    }
+
+
+    .apply-button {
+        width: 100%;
+        padding: 12px;
+        background-color: var(--azul-principal);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.05em;
+        font-weight: 600;
+        margin-top: 25px; 
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .apply-button:hover { background-color: #30586e; }
+    body.dark .apply-button:hover { background-color: #6197D8; } /* Ajuste de hover no dark mode */
+
+
+    .tip-card { margin-top: 30px; padding: 0; border-radius: 0; font-size: 0.9em; color: var(--cinza-texto); background-color: transparent; }
+    .tip-card strong { display: block; margin-bottom: 5px; color: var(--azul-principal); font-size: 1em; font-weight: 600; }
+
+    .confirm-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--cinza-medio); }
+    .confirm-button { padding: 12px 25px; background-color: var(--azul-principal); color: white; border: none; border-radius: 8px; font-size: 1.05em; font-weight: 600; cursor: pointer; flex-grow: 1; margin-right: 15px; transition: background-color 0.2s; }
+    .action-button-group { display: flex; }
+    
+    .action-button { 
+        padding: 10px 15px; 
+        background-color: var(--cinza-claro); 
+        color: var(--azul-principal); 
+        border: none; 
+        border-radius: 8px; 
+        font-weight: 600; 
+        cursor: pointer; 
+        font-size: 0.9em; 
+        transition: background-color 0.2s; 
+        margin-left: 10px; 
+    }
+    
+    .confirm-button:hover { background-color: #30586e; }
+    body.dark .confirm-button:hover { background-color: #6197D8; }
+    .action-button:hover { background-color: #c9d2d8; }
+    body.dark .action-button {
+        background-color: var(--cinza-medio);
+        color: var(--azul-principal);
+    }
+    body.dark .action-button:hover { background-color: #556D88; }
+
+
+    .question-card { margin-bottom: 30px; border-radius: 12px; overflow: hidden; }
+    .question-section { flex: 1; }
+    
+    /* ESTILO DO CABEÇALHO DA QUESTÃO */
+    .question-header { 
+        background-color: #1D2B3C; /* Fundo escuro */
+        color: white; 
+        padding: 15px 25px; 
+        border-radius: 12px 12px 0 0; 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    body:not(.dark) .question-header {
+        background-color: var(--azul-principal); /* Reverte para o original no modo claro */
+        box-shadow: none;
+    }
+
+    /* Tags Arredondadas (Matéria, Tópico) */
+    .question-tags {
+        display: flex;
+        gap: 8px; /* Espaçamento entre as tags */
+        align-items: center;
+    }
+    .question-tags span {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white; 
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        font-weight: 500;
+        display: inline-block;
+    }
+
+    /* Bloco de Informações (Nível) */
+    .question-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        text-align: right;
+        gap: 3px;
+    }
+    
+    /* Estilo BASE para o nível (dificuldade) */
+    .question-info .level {
+        padding: 4px 10px;
+        border-radius: 15px;
+        font-size: 0.85em;
+        font-weight: 600; /* Aumenta o peso para destaque */
+        
+        /* Estilo base para tags sem nível definido ou tags padrão no Header Escuro */
+        background-color: rgba(255, 255, 255, 0.2); 
+        color: white;
+        border: 2px solid transparent; 
+        transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+    }
+
+    /* --- ESTILOS DE DIFICULDADE PERSONALIZADOS (QUESTÕES) --- */
+    /* ESTES SÃO OS ESTILOS QUE DÃO COR À DIFICULDADE DAS QUESTÕES */
+    .question-info .level.level-facil {
+        background-color: var(--cor-facil);
+        border: 2px solid var(--cor-facil);
+        color: white; 
+    }
+    .question-info .level.level-medio {
+        background-color: var(--cor-medio);
+        border: 2px solid var(--cor-medio);
+        color: white; 
+    }
+    .question-info .level.level-dificil {
+        background-color: var(--cor-dificil);
+        border: 2px solid var(--cor-dificil);
+        color: white; 
+    }
+    /* FIM DOS ESTILOS DO CABEÇALHO */
+    
+    
+    /* --- ESTILOS DE DIFICULDADE PARA SIMULADOS (NEUTROS) --- */
+    .simulado-card .xp-level {
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.75em; 
+        font-weight: 600;
+        margin-top: 3px;
+        display: inline-block; 
+        line-height: 1.5; 
+    }
+
+    /* Apenas "Oficial" e "Especial" terão cor nos Simulados */
+    .simulado-card .xp-level.level-oficial { background-color: var(--azul-principal); color: white; }
+    .simulado-card .xp-level.level-especial { background-color: #9370DB; color: white; } 
+    
+    /* FIM DOS ESTILOS DE SIMULADOS */
+
+    
+    .question-body { 
+        background-color: var(--bg-sidebar); 
+        color: var(--cinza-texto);
+        padding: 25px; 
+        border-radius: 0 0 12px 12px; 
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
+    }
+    
+    /* ESTILO PARA A IMAGEM DA QUESTÃO (Explícito para Imgur ou qualquer URL) */
+    .question-body img {
+        max-width: 100%; 
+        height: auto; 
+        margin: 15px 0; 
+        border-radius: 8px; 
+        border: 1px solid var(--cinza-medio);
+        display: block; /* Garante que ocupe a própria linha */
+    }
+    
+    body.dark .question-body img {
+        border-color: var(--cinza-medio); /* Garante borda visível no dark mode */
+    }
+    /* FIM DO ESTILO PARA IMAGEM */
+    
+    .question-body h2 { color: var(--cinza-texto); }
+    .answer-option { 
+        padding: 15px; 
+        border: 2px solid var(--cinza-medio); 
+        border-radius: 8px; 
+        margin-bottom: 12px; 
+        cursor: pointer; 
+        transition: border-color 0.2s, background-color 0.2s; /* Adicionado transition para background-color */
+    }
+    .answer-option:hover { border-color: var(--azul-principal); } 
+    
+    /* Estilos para Resposta Selecionada, Correta e Incorreta */
+    .answer-option.selected {
+        border-color: var(--azul-principal);
+        background-color: rgba(58, 109, 137, 0.1); /* Azul claro sutil */
+    }
+    body.dark .answer-option.selected {
+        background-color: rgba(116, 167, 224, 0.1); /* Azul claro sutil no dark mode */
+    }
+    
+    .answer-option.correct {
+        background-color: rgba(76, 180, 82, 0.2); /* Verde claro */
+        border-color: var(--verde-progresso);
+        font-weight: 600;
+        pointer-events: none !important; /* Desabilita clique após resposta */
+    }
+    
+    .answer-option.incorrect {
+        background-color: rgba(220, 20, 60, 0.2); /* Vermelho claro */
+        border-color: crimson;
+        font-weight: 600;
+        pointer-events: none !important; /* Desabilita clique após resposta */
+    }
+
+    /* Otimização visual para o estado final de correção no dark mode */
+    body.dark .answer-option.correct {
+        background-color: rgba(129, 199, 132, 0.2);
+    }
+    body.dark .answer-option.incorrect {
+        background-color: rgba(255, 99, 71, 0.2);
+    }
+    
+    
+    .simulados-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; }
+    
+    .simulado-card { 
+        background-color: var(--bg-sidebar); 
+        padding: 25px; 
+        border-radius: 12px; 
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
+        display: flex; 
+        flex-direction: column; 
+        border: 2px solid transparent; 
+        box-sizing: border-box; 
+    }
+    .simulado-card h3 { color: var(--cinza-texto); }
+    .simulado-card.active-card { border-color: var(--verde-progresso); } 
+    
+    .card-header { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: flex-start; 
+        margin-bottom: 15px; 
+    }
+    
+    .card-icon { 
+        font-size: 1.5em; 
+        width: 40px; 
+        height: 40px; 
+        border-radius: 8px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        color: white; 
+        margin-right: 15px; 
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
+        position: relative; 
+        top: -10px; 
+        left: -10px;
+        font-weight: bold;
+    }
+    
+    /* Ajuste para o novo SVG dentro do card-icon */
+    .card-icon svg {
+        width: 24px;
+        height: 24px;
+        fill: currentColor;
+    }
+
+    .card-xp { text-align: right; color: var(--cinza-texto); }
+    .xp-value { font-weight: 700; font-size: 1.1em; }
+    
+    /* APRIMORAMENTO NO CSS PARA OS ÍCONES DE DETALHES DO SIMULADO */
+    .card-details { 
+        display: flex; 
+        gap: 20px; /* Adiciona espaçamento entre os detalhes */
+        font-size: 0.9em; 
+        color: var(--cinza-texto); 
+        margin-bottom: 20px; 
+        align-items: center;
+        padding-top: 5px; 
+        border-top: 1px solid var(--cinza-claro);
+    }
+    body.dark .card-details {
+        border-top: 1px solid var(--cinza-medio); 
+    }
+
+    .card-details span { 
+        display: flex; 
+        align-items: center; 
+        color: var(--cinza-texto); /* Garante cor do texto dos detalhes */
+    }
+    .card-details span svg {
+        width: 16px; 
+        height: 16px; 
+        margin-right: 5px; 
+        fill: currentColor; /* Usa a cor do texto para o ícone */
+        color: var(--azul-principal); /* Destaca o ícone com a cor principal */
+    }
+    body.dark .card-details span svg {
+        color: var(--azul-principal);
+    }
+
+    /* FIM DO APRIMORAMENTO */
+    
+    .progress-bar { height: 8px; background-color: var(--cinza-medio); border-radius: 4px; margin-bottom: 10px; }
+    .progress-bar-fill { height: 100%; background-color: var(--verde-progresso); border-radius: 4px; }
+    .progress-label { font-size: 0.85em; color: var(--cinza-texto); margin-bottom: 15px; }
+    
+    .card-button { 
+        padding: 12px; 
+        border-radius: 8px; 
+        text-align: center; 
+        font-weight: 600; 
+        font-size: 1.05em; 
+        text-decoration: none; 
+        margin-top: auto; 
+        transition: background-color 0.2s; 
+        cursor: pointer; 
+        display: flex; 
+        justify-content: center;
+        align-items: center;
+    }
+    
+    /* ========================================================================= */
+    /* ESTILO REVERTIDO: Voltando à cor original (--azul-principal) */
+    /* ========================================================================= */
+    .btn-primary { 
+        background-color: var(--azul-principal); 
+        color: white; 
+        border: none; 
+    } 
+    .btn-primary:hover { 
+        background-color: #30586e; 
+    }
+    body.dark .btn-primary {
+        background-color: var(--azul-principal);
+    }
+    body.dark .btn-primary:hover { 
+        background-color: #6197D8; 
+    }
+
+    /* Estilos SECUNDARY e LOCKED originais (usados no HTML, que agora usa apenas .btn-primary) */
+    .btn-secondary { 
+        background-color: var(--cinza-claro); 
+        color: var(--azul-principal); 
+        border: 1px solid var(--azul-principal); 
+    } 
+    .btn-secondary:hover { 
+        background-color: #c9d2d8; 
+    }
+
+    .btn-locked { 
+        background-color: var(--cinza-medio); 
+        color: var(--cinza-texto); 
+        cursor: not-allowed; 
+    }
+    
+    /* Como todos os cards agora usam 'btn-primary', os estilos acima servirão como fallback */
+    
+    .btn-success {
+        background-color: var(--verde-progresso);
+        color: white;
+        border: none;
+    }
+    .btn-success:hover { background-color: #3b9040; }
+
+    /* CORES DOS ÍCONES DOS CARDS (MANTIDAS POR POSIÇÃO) */
+    .simulado-card:nth-child(1) .card-icon { background-color: #3776ab; color: white; } 
+    .simulado-card:nth-child(2) .card-icon { background-color: var(--verde-progresso); color: white; } 
+    .simulado-card:nth-child(3) .card-icon { background-color: #FFD700; color: #444; } 
+    .simulado-card:nth-child(4) .card-icon { background-color: #9370DB; color: white; } 
+    .simulado-card:nth-child(5) .card-icon { background-color: #F8A771; color: white; } 
+    .simulado-card:nth-child(6) .card-icon { background-color: #9370DB; color: white; } /* Cor roxa para Humanas */
+    .simulado-card:nth-child(7) .card-icon { background-color: #c9519c; color: white; } /* Cor nova para Redação */
+
+    /* Cores dos ícones no Dark Mode (ajustado para melhor contraste) */
+    body.dark .simulado-card:nth-child(3) .card-icon { background-color: #FFD700; color: #1D2B3C; } 
+
+    /* Ajuste para mover PERFIL e CONFIGURAÇÕES um pouco para cima */
+    .sidebar > div:last-child {
+        margin-bottom: 30px; 
+    }
+
+    /* --- RESPONSIVE SIDEBAR FIX --- */
+    @media (max-width: 768px) {
+        .sidebar {
+            position: fixed;
+            left: -250px;
+            top: 0;
+            height: 100vh;
+            transition: left .3s ease;
+            z-index: 2000;
+        }
+        .sidebar.active {
+            left: 0;
+        }
+        .hamburger {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 2500;
+            width: 35px;
+            height: 28px;
+            background: var(--azul-principal);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+        }
+        .main-content {
+            margin-left: 0 !important;
+            padding-top: 60px;
+        }
+    }
+
+</style>
+</head>
+<body>
+<div class='hamburger' id='hamburguer-btn'>☰</div>
+
+    <svg width="0" height="0" style="position:absolute;">
+        <symbol id="i-home" viewBox="0 0 24 24"><path fill="currentColor" d="M10 20v-6h4v6h5v-8h3L12 3L2 12h3v8h5z"/></symbol>
+        <symbol id="i-flashcards" viewBox="0 0 24 24"><path fill="currentColor" d="M20 2H4C2.9 2 2 2.9 2 4v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 10H6V6h12v6z"/></symbol>
+        <symbol id="i-questions" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.43 12.56 13 13.5 13 14h-2v-.5c0-1.1.45-2.11 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.42 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></symbol>
+        <symbol id="i-simulados" viewBox="0 0 24 24"><path fill="currentColor" d="M12 4c-4.42 0-8 3.58-8 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm4.25 10.25l-4.5-4.5V7h2v4H9.75l3.5 3.5 3.5-3.5V14h-2v-4H10.5v-.5z"/></symbol>
+        <symbol id="i-games" viewBox="0 0 24 24"><path fill="currentColor" d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM3 16V8h18l.01 8H3zm8-6H9v2h2v-2zm-3 2H6v-2h2v2zm8 0h-2v-2h2v2zm3-2h-2v-2h2v2z"/></symbol>
+        <symbol id="i-desempenho" viewBox="0 0 24 24"><path fill="currentColor" d="M16 11V3H8v8H2v10h20V11h-6zm-6 8H4v-8h6v8zm10 0h-6v-8h6v8z"/></symbol>
+        <symbol id="i-ranking" viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27l6.18 3.73-1.64-7.03 5.46-4.71-7.19-.61L12 2.5 9.19 9.65l-7.19.61 5.46 4.71-1.64 7.03L12 17.27z"/></symbol>
+        <symbol id="i-calendario" viewBox="0 0 24 24"><path fill="currentColor" d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM5 7V6h14v1H5z"/></symbol>
+        <symbol id="i-perfil" viewBox="0 0 24 24"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
+        <symbol id="i-config" viewBox="0 0 24 24"><path fill="currentColor" d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.2-.15.25-.43.12-.67l-2-3.46c-.12-.25-.4-.32-.61-.22l-2.49 1.01c-.52-.39-1.09-.72-1.71-.96L14 2h-4L9.43 4.35c-.62.24-1.19.57-1.71.96l-2.49-1.01c-.2-.08-.48-.03-.61.22l-2 3.46c-.13.24-.08.52-.12.67l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.2.15-.25.43-.12.67l2 3.46c.13.25.41.32.61.22l2.49-1.01c.52.39 1.09.72 1.71.96L9.43 22h4l.57-2.35c.62-.24 1.19-.57 1.71-.96l2.49 1.01c.2.08.48.03.61-.22l2-3.46c.12-.25.08-.52-.12-.67l-2.11-1.65zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></symbol>
+        
+        <symbol id="sc-document" viewBox="0 0 24 24"><path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></symbol>
+        <symbol id="sc-calculator" viewBox="0 0 24 24"><path fill="currentColor" d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 4h2v2h-2V7zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zM8 7h2v2H8V7zm0 4h2v2H8v-2zm0 4h2v2H8v-2zm7 4h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/></symbol>
+        <symbol id="sc-book" viewBox="0 0 24 24"><path fill="currentColor" d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 15H7v-2h10v2zm0-4H7v-2h10v2zm0-4H7V7h10v2z"/></symbol>
+        <symbol id="sc-flask" viewBox="0 0 24 24"><path fill="currentColor" d="M15.5 2H8.5c-.39 0-.74.23-.9.59L3 17.58C3 18.35 3.65 19 4.42 19H19.58c.77 0 1.42-.65 1.42-1.42L16.4 2.59c-.16-.36-.51-.59-.9-.59zm.79 17H7.71l-1.63-8h13.84l-1.63 8zM12 4c.31 0 .59.13.78.36L14 5.5l-2 2-2-2 .88-1.14c.19-.23.47-.36.78-.36zM13 14h-2v-2h2v2zm-2-3h2V9h-2v2z"/></symbol>
+        <symbol id="sc-globe" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.83-7-7.93 0-.61.08-1.21.21-1.79l5.44 5.44-1.65 4.28zm2 0V14.75l4.31-4.31c.14.49.21 1.02.21 1.56 0 4.1-3.05 7.44-7 7.93zm4.72-7.83l-5.44-5.44c.58-.13 1.18-.21 1.79-.21 4.1 0 7.44 3.05 7.93 7h-4.28zM12 4.07V9.25l4.31 4.31c.49-.14 1.02-.21 1.56-.21 4.1 0 7.44 3.05 7.93 7h-4.28zM16.93 7.28l-5.44 5.44c-.58-.13-1.18-.21-1.79-.21-4.1 0-7.44 3.05-7.93 7h4.28z"/></symbol>
+        <symbol id="sc-pen" viewBox="0 0 24 24"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></symbol>
+        
+        <symbol id="det-clock" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.75 13H11V7h1.75v8z"/></symbol>
+        <symbol id="det-tasks" viewBox="0 0 24 24"><path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 14H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></symbol>
+    </svg>
+    <aside class="sidebar">
+        <div>
+            <div class="sidebar-header">
+                <h1>Painel</h1>
+                <div class="separator"></div>
+            </div>
+            
+            <div class="theme-switcher">
+                <span>Tema</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <ul class="sidebar-nav">
+                <li class="nav-item active-nav"><a href="index.html"><svg><use href="#i-home"></use></svg> Início</a></li>
+                <li class="nav-item"><a href="flashcards01.html"><svg><use href="#i-flashcards"></use></svg> Flashcards</a></li>
+                <li class="nav-item"><a href="#" data-nav-target="questoes-tab"><svg><use href="#i-questions"></use></svg> Questões</a></li>
+                <li class="nav-item"><a href="#" data-nav-target="simulados-tab"><svg><use href="#i-simulados"></use></svg> Simulados</a></li>
+                <li class="nav-item"><a href="#"><svg><use href="#i-games"></use></svg> Jogos</a></li>
+                <li class="nav-item"><a href="#"><svg><use href="#i-desempenho"></use></svg> Desempenho</a></li>
+                <li class="nav-item"><a href="#"><svg><use href="#i-ranking"></use></svg> Ranking</a></li>
+                <li class="nav-item"><a href="#"><svg><use href="#i-calendario"></use></svg> Calendário</a></li>
+            </ul>
+        </div>
+        <div>
+            <div class="separator"></div>
+            <ul class="sidebar-nav">
+                <li class="nav-item"><a href="#"><svg><use href="#i-perfil"></use></svg> Perfil</a></li>
+                <li class="nav-item"><a href="#"><svg><use href="#i-config"></use></svg> Configurações</a></li>
+            </ul>
+        </div>
+    </aside>
+    <div class='hamburger' id='hamburguer-btn'>☰</div>
+
+    <div class="main-content">
+        <div class="container">
+            <header class="header">
+                <h1 id="main-title">Banco de Questões</h1>
+                <p id="main-subtitle">Pratique com milhares de questões do ENEM com explicações detalhadas</p>
+            </header>
+
+            <div class="nav-tabs-container">
+                <div class="nav-tabs">
+                    <div class="nav-tab active" data-target="questoes"><span>📝</span> Questões</div>
+                    <div class="nav-tab" data-target="simulados"><span>⏱️</span> Simulados</div>
+                </div>
+            </div>
+
+            <div id="content-questoes" class="tab-content active">
+                <div class="content-grid">
+                    <section class="filters-section">
+                        <div class="filters-title">
+                            <svg width="24" height="24" style="margin-right: 8px;"><use href="#i-filters"></use></svg>
+                            Filtros
+                        </div>
+                        <div class="filter-group">
+                            <label for="materia">Matéria</label>
+                            <select id="materia">
+                                <option value="">Todas as Matérias</option>
+                                <option value="matematica">Matemática</option>
+                                <option value="linguagens">Linguagens</option>
+                                <option value="natureza">Ciências da Natureza</option>
+                                <option value="humanas">Ciências Humanas</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="topico">Tópico</label>
+                            <select id="topico">
+                                <option value="">Todos os Tópicos</option>
+                                <option value="algebra">Álgebra</option>
+                                <option value="geometria">Geometria</option>
+                                <option value="interpretacao">Interpretação</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="dificuldade">Dificuldade</label>
+                            <select id="dificuldade">
+                                <option value="">Qualquer Dificuldade</option>
+                                <option value="facil">Fácil</option>
+                                <option value="medio">Médio</option>
+                                <option value="dificil">Difícil</option>
+                            </select>
+                        </div>
+                        
+                        <button class="apply-button">Aplicar Filtros</button>
+                        
+                        <div class="tip-card">
+                            <strong>Dica de Estudo</strong>
+                            <p>Comece com questões "Fáceis" e vá progredindo gradualmente para as "Difíceis". A consistência é a chave.</p>
+                        </div>
+                    </section>
+
+                    <section class="question-section">
+                        <p style="text-align: center; color: var(--cinza-texto);">Carregando questões...</p>
+                    </section>
+                </div>
+            </div>
+
+            <div id="content-simulados" class="tab-content">
+                <div class="simulados-grid">
+                    
+                    <div class="simulado-card">
+                        <div class="card-header">
+                            <span class="card-icon"><svg width="24" height="24"><use href="#sc-document"></use></svg></span> 
+                            <div class="card-xp"><div class="xp-value">+250 XP</div><div class="xp-level level-oficial">Oficial</div></div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Simulado ENEM - Dia 1</h3>
+                            <p>Linguagens (45), Humanas (45) e Redação</p>
+                            <div class="card-details">
+                                <span><svg><use href="#det-clock"></use></svg> 5h 30m</span>
+                                <span><svg><use href="#det-tasks"></use></svg> 90 questões + Redação</span>
+                            </div>
+                            <a href="#" class="card-button btn-primary">▷ Iniciar</a>
+                        </div>
+                    </div>
+                    
+                    <div class="simulado-card">
+                        <div class="card-header">
+                            <span class="card-icon"><svg width="24" height="24"><use href="#sc-calculator"></use></svg></span>
+                            <div class="card-xp"><div class="xp-value">+250 XP</div><div class="xp-level level-oficial">Oficial</div></div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Simulado ENEM - Dia 2</h3>
+                            <p>Matemática (45) e Ciências da Natureza (45)</p>
+                            <div class="card-details">
+                                <span><svg><use href="#det-clock"></use></svg> 5h 00m</span>
+                                <span><svg><use href="#det-tasks"></use></svg> 90 questões</span>
+                            </div>
+                            <a href="#" class="card-button btn-primary">▷ Iniciar</a>
+                        </div>
+                    </div>
+
+                    <div class="simulado-card">
+                        <div class="card-header">
+                            <span class="card-icon"><svg width="24" height="24"><use href="#sc-calculator"></use></svg></span>
+                            <div class="card-xp"><div class="xp-value">+150 XP</div><div class="xp-level level-dificil">Difícil</div></div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Matemática Intensiva</h3>
+                            <p>45 questões focadas em matemática e suas tecnologias</p>
+                            <div class="card-details">
+                                <span><svg><use href="#det-clock"></use></svg> 1h 30m</span>
+                                <span><svg><use href="#det-tasks"></use></svg> 45 questões</span>
+                            </div>
+                            <a href="#" class="card-button btn-primary">▷ Iniciar</a>
+                        </div>
+                    </div>
+                    
+                    <div class="simulado-card active-card">
+                        <div class="card-header">
+                            <span class="card-icon"><svg width="24" height="24"><use href="#sc-book"></use></svg></span>
+                            <div class="card-xp"><div class="xp-value">+100 XP</div><div class="xp-level level-medio">Médio</div></div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Linguagens Express</h3>
+                            <p>Revisão rápida com 30 questões de linguagens</p>
+                            <div class="card-details">
+                                <span><svg><use href="#det-clock"></use></svg> 45m</span>
+                                <span><svg><use href="#det-tasks"></use></svg> 30 questões</span>
+                            </div>
+                            
+                            <a href="#" class="card-button btn-primary">▷ Iniciar</a>
+                        </div>
+                    </div>
+                    
+                    <div class="simulado-card">
+                        <div class="card-header">
+                            <span class="card-icon"><svg width="24" height="24"><use href="#sc-flask"></use></svg></span>
+                            <div class="card-xp"><div class="xp-value">+150 XP</div><div class="xp-level level-dificil">Difícil</div></div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Ciências da Natureza</h3>
+                            <p>Física, Química e Biologia em 45 questões desafiadoras</p>
+                            <div class="card-details">
+                                <span><svg><use href="#det-clock"></use></svg> 1h 30m</span>
+                                <span><svg><use href="#det-tasks"></use></svg> 45 questões</span>
+                            </div>
+                            <a href="#" class="card-button btn-primary">▷ Iniciar</a>
+                        </div>
+                    </div>
+                    
+                    <div class="simulado-card">
+                        <div class="card-header">
+                            <span class="card-icon"><svg width="24" height="24"><use href="#sc-globe"></use></svg></span>
+                            <div class="card-xp"><div class="xp-value">+120 XP</div><div class="xp-level level-medio">Médio</div></div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Ciências Humanas</h3>
+                            <p>História, Geografia, Filosofia e Sociologia</p>
+                            <div class="card-details">
+                                <span><svg><use href="#det-clock"></use></svg> 1h 30m</span>
+                                <span><svg><use href="#det-tasks"></use></svg> 45 questões</span>
+                            </div>
+                            <a href="#" class="card-button btn-primary">▷ Iniciar</a>
+                        </div>
+                    </div>
+                    
+                    <div class="simulado-card">
+                        <div class="card-header">
+                            <span class="card-icon"><svg width="24" height="24"><use href="#sc-pen"></use></svg></span>
+                            <div class="card-xp"><div class="xp-value">+200 XP</div><div class="xp-level level-especial">Especial</div></div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Redação Temática
+                            </h3>
+                            <p>Prática de redação com temas atuais e relevantes</p>
+                            <div class="card-details">
+                                <span><svg><use href="#det-clock"></use></svg> 1h 30m</span>
+                                <span><svg><use href="#det-tasks"></use></svg> 1 questões</span>
+                            </div>
+                            <a href="#" class="card-button btn-primary">▷ Iniciar</a>
+                        </div>
+                    </div>
+                
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, limit, query } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        // Importa apenas o necessário para checar o estado de autenticação
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"; 
+
+
+        // ** 🔑 IMPORTANTE: AJUSTE ESTA URL para a sua página de login **
+        const LOGIN_PAGE_URL = "/login.html"; 
+
+
+        // Sua configuração do Firebase (MANTIDA)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCj8i37JYNigvbhXfqP4HVzjAEOzcXf_i0",
+            authDomain: "sdel-b3f65.firebaseapp.com",
+            databaseURL: "https://sdel-b3f65-default-rtdb.firebaseio.com",
+            projectId: "sdel-b3f65",
+            storageBucket: "sdel-b3f65.firebasestorage.app",
+            messagingSenderId: "297725999985",
+            appId: "1:297725999985:web:d41da68311c190ef8a54d0",
+            measurementId: "G-PT92VECJ2H"
+        };
+
+        // 1. Inicializa o Firebase, Firestore e Auth
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app); 
+        
+        // 2. Função para Renderizar as Questões (ATUALIZADA)
+        async function fetchAndRenderQuestions() {
+            const questionSection = document.querySelector('.question-section');
+            if (!questionSection) return;
+
+            questionSection.innerHTML = '';
+            
+            const q = query(collection(db, "questoes"), limit(5)); 
+
+            try {
+                const querySnapshot = await getDocs(q);
+                let questionCounter = 1;
+                const totalQuestions = querySnapshot.size;
+
+                if (totalQuestions === 0) {
+                     questionSection.innerHTML = '<p style="text-align: center; color: var(--cinza-texto);">Nenhuma questão encontrada no banco de dados.</p>';
+                     return;
+                }
+                 
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    
+                    if (!data.alternativas || typeof data.alternativas !== 'object') {
+                        console.warn("Documento sem alternativas válidas, pulando:", doc.id);
+                        return; 
+                    }
+                    
+                    // --- NOVO/ATUALIZADO: Lógica para incluir a imagem. Verifica imagemUrl ou imageUrl ---
+                    let imageHtml = '';
+                    const url = data.imagemUrl || data.imageUrl; // Tenta 'imagemUrl' primeiro, depois 'imageUrl'
+                    
+                    if (url) {
+                        imageHtml = `<img src="${url}" alt="Imagem da Questão">`;
+                    }
+                    // --------------------------------------------------------------------------------------
+
+                    const optionsHtml = Object.keys(data.alternativas).sort().map(key => {
+                        const letterCode = 65 + parseInt(key); 
+                        const letter = String.fromCharCode(letterCode); 
+                        const text = data.alternativas[key];
+                        
+                        return `
+                            <div class="answer-option" data-option="${letter}">
+                                <span class="answer-letter">${letter})</span> ${text}
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    // Lógica para determinar a classe de cor da dificuldade (CORRIGIDO)
+                    const dificuldade = data.dificuldade ? data.dificuldade.toLowerCase() : 'n/a';
+                    let levelClass = '';
+                    switch (dificuldade) {
+                        case 'fácil': // Alterado de 'facil' para 'fácil' caso o valor do Firebase seja acentuado
+                        case 'facil': 
+                            levelClass = 'level-facil';
+                            break;
+                        case 'médio': // Alterado de 'medio' para 'médio'
+                        case 'medio':
+                            levelClass = 'level-medio';
+                            break;
+                        case 'difícil': // Alterado de 'dificil' para 'difícil'
+                        case 'dificil':
+                            levelClass = 'level-dificil';
+                            break;
+                        default:
+                            levelClass = ''; // Usa o estilo base
+                    }
+
+                    const questionCardHtml = `
+                        <div class="question-card" data-question-id="${doc.id}" data-correct-answer="${data.correta || ''}">
+                            <div class="question-header">
+                                <div class="question-tags">
+                                    <span>${data.materia || 'N/A'}</span>
+                                    <span>${data.topico || 'N/A'}</span>
+                                    </div>
+                                <div class="question-info">
+                                    <div class="level ${levelClass}">${data.dificuldade || 'N/A'}</div>
+                                </div>
+                            </div>
+
+                            <div class="question-body">
+                                <h2>Questão ${questionCounter} de ${totalQuestions}</h2>
+                                <p>${data.enunciado || 'Enunciado não disponível.'}</p>
+                                
+                                ${imageHtml} <div class="options">
+                                    ${optionsHtml}
+                                </div>
+
+                                <div class="confirm-actions">
+                                    <button class="confirm-button" disabled>Confirmar Resposta</button>
+                                    <div class="action-button-group">
+                                        <button class="action-button">Favoritar</button>
+                                        <button class="action-button">Comentários</button>
+                                    </div>
+                                </div>
+                                <div class="feedback-message" style="margin-top: 15px; font-size: 0.9em; display: none;"></div>
+                            </div>
+                        </div>
+                    `;
+
+                    questionSection.insertAdjacentHTML('beforeend', questionCardHtml);
+                    questionCounter++;
+                });
+                
+                addQuestionInteractionListeners();
+                
+            } catch (error) {
+                console.error("Erro ao buscar questões:", error);
+                // Exibe uma mensagem de erro na tela de questões
+                questionSection.innerHTML = '<p style="text-align: center; color: red;">Erro ao carregar as questões. Verifique as permissões do Firestore.</p>';
+            }
+        }
+
+        // 3. Lógica de Interação da Questão (MANTIDA)
+        function addQuestionInteractionListeners() {
+            document.querySelectorAll('.question-card').forEach(card => {
+                const options = card.querySelectorAll('.answer-option');
+                const confirmButton = card.querySelector('.confirm-button');
+                const feedbackMessage = card.querySelector('.feedback-message');
+                let selectedOption = null;
+
+                options.forEach(option => {
+                    option.addEventListener('click', () => {
+                        if (selectedOption) {
+                            selectedOption.classList.remove('selected');
+                        }
+                        
+                        selectedOption = option;
+                        selectedOption.classList.add('selected');
+                        confirmButton.disabled = false;
+                    });
+                });
+
+                confirmButton.addEventListener('click', () => {
+                    if (!selectedOption || confirmButton.disabled) return;
+
+                    const correctAnswer = card.getAttribute('data-correct-answer');
+                    const selectedAnswer = selectedOption.getAttribute('data-option');
+                    
+                    confirmButton.disabled = true;
+                    
+                    if (selectedAnswer === correctAnswer) {
+                        selectedOption.classList.add('correct');
+                        feedbackMessage.textContent = '✅ Resposta Correta! Parabéns!';
+                        feedbackMessage.style.color = 'var(--verde-progresso)';
+                    } else {
+                        selectedOption.classList.add('incorrect');
+                        
+                        const correctElement = card.querySelector(`.answer-option[data-option="${correctAnswer}"]`);
+                        if (correctElement) {
+                            correctElement.classList.add('correct');
+                        }
+                        
+                        feedbackMessage.textContent = `❌ Resposta Incorreta. A resposta certa era a letra ${correctAnswer}.`;
+                        feedbackMessage.style.color = 'crimson';
+                    }
+                    
+                    feedbackMessage.style.display = 'block';
+                    
+                    options.forEach(opt => opt.style.pointerEvents = 'none');
+                });
+            });
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // VERIFICAÇÃO DE AUTENTICAÇÃO AO CARREGAR A PÁGINA
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    // Usuário logado: Carrega o conteúdo
+                    console.log("Usuário autenticado. Carregando questões.");
+                    fetchAndRenderQuestions();
+                } else {
+                    // Usuário NÃO logado: Redireciona para a página de login
+                    console.log("Usuário não autenticado. Redirecionando para a página de login.");
+                  window.location.href = LOGIN_PAGE_URL;
+                }
+            });
+            
+            // --- Lógica de UI (MANTIDA) ---
+            const btn = document.getElementById("hamburguer-btn");
+            const sidebar = document.querySelector(".sidebar");
+            if (btn){
+                btn.addEventListener("click", ()=> sidebar.classList.toggle("active"));
+            }
+
+            const tabs = document.querySelectorAll('.nav-tab');
+            const mainTitle = document.getElementById('main-title');
+            const mainSubtitle = document.getElementById('main-subtitle');
+            const body = document.body; 
+            
+            const themeToggle = document.getElementById('theme-toggle');
+            const navItems = document.querySelectorAll('.sidebar-nav .nav-item a');
+            const questaoTabInHeader = document.querySelector('.nav-tab[data-target="questoes"]');
+            const simuladosTabInHeader = document.querySelector('.nav-tab[data-target="simulados"]');
+
+            const titles = {
+                'questoes': {
+                    title: 'Banco de Questões',
+                    subtitle: 'Pratique com milhares de questões do ENEM com explicações detalhadas'
+                },
+                'simulados': {
+                    title: 'Banco de Simulados',
+                    subtitle: 'Selecione um simulado para iniciar a sua prática'
+                }
+            };
+
+            const switchTab = (targetTab) => {
+                tabs.forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => item.classList.remove('active-nav'));
+                
+                const activeTab = document.querySelector(`.nav-tab[data-target="${targetTab}"]`);
+                if (activeTab) {
+                    activeTab.classList.add('active');
+                }
+                
+                let sidebarItem = document.querySelector(`.sidebar-nav a[data-nav-target="${targetTab}-tab"]`);
+                if (targetTab === 'questoes' || targetTab === 'simulados') {
+                    if (sidebarItem) {
+                        sidebarItem.closest('.nav-item').classList.add('active-nav');
+                    }
+                } else {
+                    document.querySelector('.sidebar-nav .nav-item:first-child').classList.add('active-nav');
+                }
+                
+
+                const activeContent = document.getElementById(`content-${targetTab}`);
+                if (activeContent) {
+                    activeContent.classList.add('active');
+                }
+
+                if (mainTitle && mainSubtitle && titles[targetTab]) {
+                    mainTitle.textContent = titles[targetTab].title;
+                    mainSubtitle.textContent = titles[targetTab].subtitle;
+                }
+            };
+
+            function toggleThemeVisual() {
+                const isDarkMode = body.classList.toggle('dark');
+                localStorage.setItem('tema', isDarkMode ? 'dark' : 'light');
+            }
+
+            if (themeToggle) {
+                 themeToggle.addEventListener('change', toggleThemeVisual);
+            }
+            
+            const savedTheme = localStorage.getItem('tema');
+            if (savedTheme === 'dark') {
+                body.classList.add('dark');
+                if (themeToggle) { themeToggle.checked = true; }
+            }
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.getAttribute('data-target');
+                    if (target) {
+                        switchTab(target);
+                    }
+                });
+            });
+
+            navItems.forEach(item => {
+                const target = item.getAttribute('data-nav-target');
+                if (target === 'questoes-tab') {
+                     item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        switchTab('questoes');
+                    });
+                } else if (target === 'simulados-tab') {
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        switchTab('simulados');
+                    });
+                } else if (!target) {
+                    // Item 'Início' já tem href="index.html"
+                    // Item 'Flashcards' agora tem href="flashcards01.html"
+                    // Mantendo a lógica para outros itens sem 'data-nav-target'
+                    item.addEventListener('click', () => {
+                        document.querySelectorAll('.sidebar-nav .nav-item').forEach(li => li.classList.remove('active-nav'));
+                        item.closest('.nav-item').classList.add('active-nav');
+                        
+                        if (mainTitle && mainSubtitle) {
+                             tabs.forEach(tab => tab.classList.remove('active'));
+                             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                             mainTitle.textContent = "Painel Inicial";
+                             mainSubtitle.textContent = "Seu centro de estudos e progresso";
+                        }
+                    });
+                }
+            });
+            
+            if (questaoTabInHeader) {
+                questaoTabInHeader.setAttribute('data-target', 'questoes');
+            }
+            if (simuladosTabInHeader) {
+                simuladosTabInHeader.setAttribute('data-target', 'simulados');
+            }
+            switchTab('questoes'); 
+        });
+    </script>
+
+</body>
+</html>
+
