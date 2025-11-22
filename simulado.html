@@ -427,6 +427,16 @@
     }
     body.dark .action-button:hover { background-color: #556D88; }
 
+    /* Estilo para questões favoritas */
+    .question-card.favorited .favoritar-btn {
+        background-color: #FFD700; /* Dourado */
+        color: #1D2B3C;
+    }
+    body.dark .question-card.favorited .favoritar-btn {
+        background-color: #FFD700;
+        color: #1D2B3C;
+    }
+
 
     .question-card { margin-bottom: 30px; border-radius: 12px; overflow: hidden; }
     .question-section { flex: 1; }
@@ -487,7 +497,6 @@
     }
 
     /* --- ESTILOS DE DIFICULDADE PERSONALIZADOS (QUESTÕES) --- */
-    /* ESTES SÃO OS ESTILOS QUE DÃO COR À DIFICULDADE DAS QUESTÕES */
     .question-info .level.level-facil {
         background-color: var(--cor-facil);
         border: 2px solid var(--cor-facil);
@@ -506,7 +515,7 @@
     /* FIM DOS ESTILOS DO CABEÇALHO */
     
     
-    /* --- ESTILOS DE DIFICULDADE PARA SIMULADOS (NEUTROS) --- */
+    /* --- NOVO: ESTILOS DE DIFICULDADE PARA SIMULADOS --- */
     .simulado-card .xp-level {
         padding: 2px 8px;
         border-radius: 12px;
@@ -514,10 +523,12 @@
         font-weight: 600;
         margin-top: 3px;
         display: inline-block; 
-        line-height: 1.5; 
+        line-height: 1.5; /* Ajusta a altura da linha para o padding */
     }
 
-    /* Apenas "Oficial" e "Especial" terão cor nos Simulados */
+    .simulado-card .xp-level.level-facil { background-color: var(--cor-facil); color: white; }
+    .simulado-card .xp-level.level-medio { background-color: var(--cor-medio); color: white; }
+    .simulado-card .xp-level.level-dificil { background-color: var(--cor-dificil); color: white; }
     .simulado-card .xp-level.level-oficial { background-color: var(--azul-principal); color: white; }
     .simulado-card .xp-level.level-especial { background-color: #9370DB; color: white; } 
     
@@ -638,6 +649,7 @@
 
     .card-xp { text-align: right; color: var(--cinza-texto); }
     .xp-value { font-weight: 700; font-size: 1.1em; }
+    /* REMOVIDO: .xp-level { font-size: 0.8em; color: var(--cinza-texto); } */
     
     /* APRIMORAMENTO NO CSS PARA OS ÍCONES DE DETALHES DO SIMULADO */
     .card-details { 
@@ -801,52 +813,51 @@
         <symbol id="i-calendario" viewBox="0 0 24 24"><path fill="currentColor" d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM5 7V6h14v1H5z"/></symbol>
         <symbol id="i-perfil" viewBox="0 0 24 24"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
         <symbol id="i-config" viewBox="0 0 24 24"><path fill="currentColor" d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.2-.15.25-.43.12-.67l-2-3.46c-.12-.25-.4-.32-.61-.22l-2.49 1.01c-.52-.39-1.09-.72-1.71-.96L14 2h-4L9.43 4.35c-.62.24-1.19.57-1.71.96l-2.49-1.01c-.2-.08-.48-.03-.61.22l-2 3.46c-.13.24-.08.52-.12.67l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.2.15-.25.43-.12.67l2 3.46c.13.25.41.32.61.22l2.49-1.01c.52.39 1.09.72 1.71.96L9.43 22h4l.57-2.35c.62-.24 1.19-.57 1.71-.96l2.49 1.01c.2.08.48.03.61-.22l2-3.46c.12-.25.08-.52-.12-.67l-2.11-1.65zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></symbol>
-        
         <symbol id="sc-document" viewBox="0 0 24 24"><path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></symbol>
         <symbol id="sc-calculator" viewBox="0 0 24 24"><path fill="currentColor" d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 4h2v2h-2V7zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zM8 7h2v2H8V7zm0 4h2v2H8v-2zm0 4h2v2H8v-2zm7 4h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/></symbol>
         <symbol id="sc-book" viewBox="0 0 24 24"><path fill="currentColor" d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 15H7v-2h10v2zm0-4H7v-2h10v2zm0-4H7V7h10v2z"/></symbol>
-        <symbol id="sc-flask" viewBox="0 0 24 24"><path fill="currentColor" d="M15.5 2H8.5c-.39 0-.74.23-.9.59L3 17.58C3 18.35 3.65 19 4.42 19H19.58c.77 0 1.42-.65 1.42-1.42L16.4 2.59c-.16-.36-.51-.59-.9-.59zm.79 17H7.71l-1.63-8h13.84l-1.63 8zM12 4c.31 0 .59.13.78.36L14 5.5l-2 2-2-2 .88-1.14c.19-.23.47-.36.78-.36zM13 14h-2v-2h2v2zm-2-3h2V9h-2v2z"/></symbol>
-        <symbol id="sc-globe" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.83-7-7.93 0-.61.08-1.21.21-1.79l5.44 5.44-1.65 4.28zm2 0V14.75l4.31-4.31c.14.49.21 1.02.21 1.56 0 4.1-3.05 7.44-7 7.93zm4.72-7.83l-5.44-5.44c.58-.13 1.18-.21 1.79-.21 4.1 0 7.44 3.05 7.93 7h-4.28zM12 4.07V9.25l4.31 4.31c.49-.14 1.02-.21 1.56-.21 4.1 0 7.44 3.05 7.93 7h-4.28zM16.93 7.28l-5.44 5.44c-.58-.13-1.18-.21-1.79-.21-4.1 0-7.44 3.05-7.93 7h4.28z"/></symbol>
-        <symbol id="sc-pen" viewBox="0 0 24 24"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></symbol>
-        
-        <symbol id="det-clock" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.75 13H11V7h1.75v8z"/></symbol>
-        <symbol id="det-tasks" viewBox="0 0 24 24"><path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 14H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></symbol>
+        <symbol id="sc-flask" viewBox="0 0 24 24"><path fill="currentColor" d="M15.5 2H8.5c-.39 0-.74.23-.9.59L3 17.58C3 18.35 3.65 19 4.42 19H19.58c.77 0 1.42-.65 1.42-1.42L16.4 2.59c-.16-.36-.51-.59-.9-.59zm.79 17H7.71l-1.63-8h13.84l-1.63 8zM12 4c.31 0 .56.25.56.56s-.25.56-.56.56s-.56-.25-.56-.56s.25-.56.56-.56z"/></symbol>
+        <symbol id="i-filters" viewBox="0 0 24 24"><path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></symbol>
+        <symbol id="i-time" viewBox="0 0 24 24"><path fill="currentColor" d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm4.24 14.53L11 11.96V7h2v4.44l4.5 4.5-.76.77z"/></symbol>
+        <symbol id="i-star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2l-2.81 6.63L2 9.24l5.46 4.73L5.82 21z"/></symbol>
     </svg>
-    <aside class="sidebar">
-        <div>
+
+    <div class="sidebar">
+        <div class="sidebar-top">
             <div class="sidebar-header">
-                <h1>Painel</h1>
-                <div class="separator"></div>
+                <h1>StudyFlow</h1>
             </div>
             
             <div class="theme-switcher">
-                <span>Tema</span>
+                <span>Tema Escuro</span>
                 <label class="toggle-switch">
                     <input type="checkbox" id="theme-toggle">
                     <span class="slider"></span>
                 </label>
             </div>
             
-            <ul class="sidebar-nav">
-                <li class="nav-item active-nav"><a href="index.html"><svg><use href="#i-home"></use></svg> Início</a></li>
-                <li class="nav-item"><a href="flashcards01.html"><svg><use href="#i-flashcards"></use></svg> Flashcards</a></li>
-                <li class="nav-item"><a href="#" data-nav-target="questoes-tab"><svg><use href="#i-questions"></use></svg> Questões</a></li>
-                <li class="nav-item"><a href="#" data-nav-target="simulados-tab"><svg><use href="#i-simulados"></use></svg> Simulados</a></li>
-                <li class="nav-item"><a href="#"><svg><use href="#i-games"></use></svg> Jogos</a></li>
-                <li class="nav-item"><a href="#"><svg><use href="#i-desempenho"></use></svg> Desempenho</a></li>
-                <li class="nav-item"><a href="#"><svg><use href="#i-ranking"></use></svg> Ranking</a></li>
-                <li class="nav-item"><a href="#"><svg><use href="#i-calendario"></use></svg> Calendário</a></li>
-            </ul>
+            <nav>
+                <ul class="sidebar-nav">
+                    <li class="nav-item active-nav"><a href="index.html"><svg><use href="#i-home"></use></svg> Início</a></li>
+                    <li class="nav-item"><a href="flashcards01.html"><svg><use href="#i-flashcards"></use></svg> Flashcards</a></li>
+                    <div class="separator"></div>
+                    <li class="nav-item"><a href="#" data-nav-target="questoes-tab"><svg><use href="#i-questions"></use></svg> Banco de Questões</a></li>
+                    <li class="nav-item"><a href="#" data-nav-target="simulados-tab"><svg><use href="#i-simulados"></use></svg> Simulados</a></li>
+                    <div class="separator"></div>
+                    <li class="nav-item"><a href="#"><svg><use href="#i-desempenho"></use></svg> Desempenho</a></li>
+                    <li class="nav-item"><a href="#"><svg><use href="#i-ranking"></use></svg> Ranking</a></li>
+                    <li class="nav-item"><a href="#"><svg><use href="#i-calendario"></use></svg> Calendário</a></li>
+                </ul>
+            </nav>
         </div>
-        <div>
-            <div class="separator"></div>
+        
+        <div class="sidebar-bottom">
             <ul class="sidebar-nav">
                 <li class="nav-item"><a href="#"><svg><use href="#i-perfil"></use></svg> Perfil</a></li>
                 <li class="nav-item"><a href="#"><svg><use href="#i-config"></use></svg> Configurações</a></li>
             </ul>
         </div>
-    </aside>
-    <div class='hamburger' id='hamburguer-btn'>☰</div>
+    </div>
 
     <div class="main-content">
         <div class="container">
@@ -857,188 +868,192 @@
 
             <div class="nav-tabs-container">
                 <div class="nav-tabs">
-                    <div class="nav-tab active" data-target="questoes"><span>📝</span> Questões</div>
-                    <div class="nav-tab" data-target="simulados"><span>⏱️</span> Simulados</div>
+                    <div class="nav-tab active" data-target="questoes">
+                        <span>💡</span> Questões
+                    </div>
+                    <div class="nav-tab" data-target="simulados">
+                        <span>⏱️</span> Simulados
+                    </div>
                 </div>
             </div>
 
             <div id="content-questoes" class="tab-content active">
                 <div class="content-grid">
+                    
                     <section class="filters-section">
                         <div class="filters-title">
                             <svg width="24" height="24" style="margin-right: 8px;"><use href="#i-filters"></use></svg>
                             Filtros
                         </div>
+                        
+                        <div class="filter-group">
+                            <label for="quantidade">Quantidade de Questões</label>
+                            <select id="quantidade">
+                                <option value="5">5 Questões</option>
+                                <option value="10" selected>10 Questões</option>
+                                <option value="20">20 Questões</option>
+                                <option value="50">50 Questões</option>
+                            </select>
+                        </div>
+                        
                         <div class="filter-group">
                             <label for="materia">Matéria</label>
                             <select id="materia">
                                 <option value="">Todas as Matérias</option>
-                                <option value="matematica">Matemática</option>
+                                <option value="ciencias-natureza">Ciências da Natureza</option>
                                 <option value="linguagens">Linguagens</option>
-                                <option value="natureza">Ciências da Natureza</option>
-                                <option value="humanas">Ciências Humanas</option>
+                                <option value="matematica">Matemática</option>
+                                <option value="ciencias-humanas">Ciências Humanas</option>
                             </select>
                         </div>
                         <div class="filter-group">
                             <label for="topico">Tópico</label>
                             <select id="topico">
                                 <option value="">Todos os Tópicos</option>
-                                <option value="algebra">Álgebra</option>
-                                <option value="geometria">Geometria</option>
-                                <option value="interpretacao">Interpretação</option>
+                                <option value="geometria">Geometria Espacial</option>
+                                <option value="literatura">Literatura Brasileira</option>
                             </select>
                         </div>
                         <div class="filter-group">
                             <label for="dificuldade">Dificuldade</label>
                             <select id="dificuldade">
-                                <option value="">Qualquer Dificuldade</option>
+                                <option value="">Todas as Dificuldades</option>
                                 <option value="facil">Fácil</option>
                                 <option value="medio">Médio</option>
                                 <option value="dificil">Difícil</option>
                             </select>
                         </div>
                         
-                        <button class="apply-button">Aplicar Filtros</button>
+                        <div class="filter-group">
+                            <label>Status da Questão</label>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <div style="display: flex; align-items: center;">
+                                    <input type="checkbox" id="status-acertadas" value="acertada" style="margin-right: 10px; width: 16px; height: 16px;">
+                                    <label for="status-acertadas" style="margin: 0; font-weight: 400; font-size: 1em;">Esconder Acertadas</label>
+                                </div>
+                                <div style="display: flex; align-items: center;">
+                                    <input type="checkbox" id="status-erradas" value="errada" style="margin-right: 10px; width: 16px; height: 16px;">
+                                    <label for="status-erradas" style="margin: 0; font-weight: 400; font-size: 1em;">Esconder Erradas</label>
+                                </div>
+                                <div style="display: flex; align-items: center;">
+                                    <input type="checkbox" id="status-favoritas" value="favorita" style="margin-right: 10px; width: 16px; height: 16px;">
+                                    <label for="status-favoritas" style="margin: 0; font-weight: 400; font-size: 1em;">Mostrar Apenas Favoritas</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button id="apply-filters-btn" class="apply-button">Aplicar Filtros</button>
                         
                         <div class="tip-card">
                             <strong>Dica de Estudo</strong>
-                            <p>Comece com questões "Fáceis" e vá progredindo gradualmente para as "Difíceis". A consistência é a chave.</p>
+                            <p>A prática consistente em diferentes áreas é a chave para o sucesso no ENEM. Use o filtro de Tópico para focar em suas fraquezas.</p>
                         </div>
                     </section>
-
+                    
                     <section class="question-section">
                         <p style="text-align: center; color: var(--cinza-texto);">Carregando questões...</p>
-                    </section>
+                        </section>
                 </div>
             </div>
 
             <div id="content-simulados" class="tab-content">
                 <div class="simulados-grid">
-                    
                     <div class="simulado-card">
                         <div class="card-header">
-                            <span class="card-icon"><svg width="24" height="24"><use href="#sc-document"></use></svg></span> 
-                            <div class="card-xp"><div class="xp-value">+250 XP</div><div class="xp-level level-oficial">Oficial</div></div>
-                        </div>
-                        <div class="card-content">
-                            <h3>Simulado ENEM - Dia 1</h3>
-                            <p>Linguagens (45), Humanas (45) e Redação</p>
-                            <div class="card-details">
-                                <span><svg><use href="#det-clock"></use></svg> 5h 30m</span>
-                                <span><svg><use href="#det-tasks"></use></svg> 90 questões + Redação</span>
+                            <div>
+                                <h3>Simulado Oficial ENEM 2023</h3>
+                                <p style="font-size: 0.9em; color: var(--cinza-texto);">Um teste completo com 45 questões.</p>
                             </div>
-                            <a href="#" class="card-button btn-primary">▷ Iniciar</a>
+                            <div class="card-xp">
+                                <div class="card-icon" style="background-color: #3776ab;">
+                                    <svg><use href="#sc-document"></use></svg>
+                                </div>
+                                <div class="xp-level level-oficial">OFICIAL</div>
+                            </div>
                         </div>
+                        <div class="card-details">
+                            <span><svg><use href="#i-questions"></use></svg> 45 Questões</span>
+                            <span><svg><use href="#i-time"></use></svg> 2.5 Horas</span>
+                        </div>
+                        <div class="progress-bar"><div class="progress-bar-fill" style="width: 75%;"></div></div>
+                        <div class="progress-label">75% Concluído</div>
+                        <button class="card-button btn-success">Continuar Simulado</button>
                     </div>
-                    
-                    <div class="simulado-card">
+
+                    <div class="simulado-card active-card">
                         <div class="card-header">
-                            <span class="card-icon"><svg width="24" height="24"><use href="#sc-calculator"></use></svg></span>
-                            <div class="card-xp"><div class="xp-value">+250 XP</div><div class="xp-level level-oficial">Oficial</div></div>
-                        </div>
-                        <div class="card-content">
-                            <h3>Simulado ENEM - Dia 2</h3>
-                            <p>Matemática (45) e Ciências da Natureza (45)</p>
-                            <div class="card-details">
-                                <span><svg><use href="#det-clock"></use></svg> 5h 00m</span>
-                                <span><svg><use href="#det-tasks"></use></svg> 90 questões</span>
+                            <div>
+                                <h3>Matemática & Natureza</h3>
+                                <p style="font-size: 0.9em; color: var(--cinza-texto);">Foco em Geometria e Química Orgânica.</p>
                             </div>
-                            <a href="#" class="card-button btn-primary">▷ Iniciar</a>
+                            <div class="card-xp">
+                                <div class="card-icon" style="background-color: var(--verde-progresso);">
+                                    <svg><use href="#sc-calculator"></use></svg>
+                                </div>
+                                <div class="xp-level level-medio">MÉDIO</div>
+                            </div>
                         </div>
+                         <div class="card-details">
+                            <span><svg><use href="#i-questions"></use></svg> 30 Questões</span>
+                            <span><svg><use href="#i-time"></use></svg> 1.5 Horas</span>
+                        </div>
+                        <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%;"></div></div>
+                        <div class="progress-label">0% Concluído</div>
+                        <button class="card-button btn-primary">Iniciar Simulado</button>
                     </div>
 
                     <div class="simulado-card">
                         <div class="card-header">
-                            <span class="card-icon"><svg width="24" height="24"><use href="#sc-calculator"></use></svg></span>
-                            <div class="card-xp"><div class="xp-value">+150 XP</div><div class="xp-level level-dificil">Difícil</div></div>
-                        </div>
-                        <div class="card-content">
-                            <h3>Matemática Intensiva</h3>
-                            <p>45 questões focadas em matemática e suas tecnologias</p>
-                            <div class="card-details">
-                                <span><svg><use href="#det-clock"></use></svg> 1h 30m</span>
-                                <span><svg><use href="#det-tasks"></use></svg> 45 questões</span>
+                            <div>
+                                <h3>Humanas Avançado</h3>
+                                <p style="font-size: 0.9em; color: var(--cinza-texto);">Foco em História Contemporânea e Filosofia.</p>
                             </div>
-                            <a href="#" class="card-button btn-primary">▷ Iniciar</a>
-                        </div>
-                    </div>
-                    
-                    <div class="simulado-card active-card">
-                        <div class="card-header">
-                            <span class="card-icon"><svg width="24" height="24"><use href="#sc-book"></use></svg></span>
-                            <div class="card-xp"><div class="xp-value">+100 XP</div><div class="xp-level level-medio">Médio</div></div>
-                        </div>
-                        <div class="card-content">
-                            <h3>Linguagens Express</h3>
-                            <p>Revisão rápida com 30 questões de linguagens</p>
-                            <div class="card-details">
-                                <span><svg><use href="#det-clock"></use></svg> 45m</span>
-                                <span><svg><use href="#det-tasks"></use></svg> 30 questões</span>
+                            <div class="card-xp">
+                                <div class="card-icon" style="background-color: #9370DB;">
+                                    <svg><use href="#sc-book"></use></svg>
+                                </div>
+                                <div class="xp-level level-dificil">DIFÍCIL</div>
                             </div>
-                            
-                            <a href="#" class="card-button btn-primary">▷ Iniciar</a>
                         </div>
+                        <div class="card-details">
+                            <span><svg><use href="#i-questions"></use></svg> 20 Questões</span>
+                            <span><svg><use href="#i-time"></use></svg> 1 Hora</span>
+                        </div>
+                        <div class="progress-bar"><div class="progress-bar-fill" style="width: 100%;"></div></div>
+                        <div class="progress-label">100% Concluído</div>
+                        <button class="card-button btn-secondary" style="border: 1px solid var(--cor-medio); color: var(--cor-medio);">Ver Resultados</button>
                     </div>
                     
                     <div class="simulado-card">
                         <div class="card-header">
-                            <span class="card-icon"><svg width="24" height="24"><use href="#sc-flask"></use></svg></span>
-                            <div class="card-xp"><div class="xp-value">+150 XP</div><div class="xp-level level-dificil">Difícil</div></div>
-                        </div>
-                        <div class="card-content">
-                            <h3>Ciências da Natureza</h3>
-                            <p>Física, Química e Biologia em 45 questões desafiadoras</p>
-                            <div class="card-details">
-                                <span><svg><use href="#det-clock"></use></svg> 1h 30m</span>
-                                <span><svg><use href="#det-tasks"></use></svg> 45 questões</span>
+                            <div>
+                                <h3>Linguagens e Códigos</h3>
+                                <p style="font-size: 0.9em; color: var(--cinza-texto);">Análise de Textos e Artes.</p>
                             </div>
-                            <a href="#" class="card-button btn-primary">▷ Iniciar</a>
-                        </div>
-                    </div>
-                    
-                    <div class="simulado-card">
-                        <div class="card-header">
-                            <span class="card-icon"><svg width="24" height="24"><use href="#sc-globe"></use></svg></span>
-                            <div class="card-xp"><div class="xp-value">+120 XP</div><div class="xp-level level-medio">Médio</div></div>
-                        </div>
-                        <div class="card-content">
-                            <h3>Ciências Humanas</h3>
-                            <p>História, Geografia, Filosofia e Sociologia</p>
-                            <div class="card-details">
-                                <span><svg><use href="#det-clock"></use></svg> 1h 30m</span>
-                                <span><svg><use href="#det-tasks"></use></svg> 45 questões</span>
+                            <div class="card-xp">
+                                <div class="card-icon" style="background-color: #FFD700; color: #444;">
+                                     <svg><use href="#sc-flask"></use></svg>
+                                </div>
+                                <div class="xp-level level-facil">FÁCIL</div>
                             </div>
-                            <a href="#" class="card-button btn-primary">▷ Iniciar</a>
                         </div>
+                        <div class="card-details">
+                            <span><svg><use href="#i-questions"></use></svg> 30 Questões</span>
+                            <span><svg><use href="#i-time"></use></svg> 1.5 Horas</span>
+                        </div>
+                        <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%;"></div></div>
+                        <div class="progress-label">Bloqueado</div>
+                        <button class="card-button btn-locked" disabled>Bloqueado (Próximo Mês)</button>
                     </div>
-                    
-                    <div class="simulado-card">
-                        <div class="card-header">
-                            <span class="card-icon"><svg width="24" height="24"><use href="#sc-pen"></use></svg></span>
-                            <div class="card-xp"><div class="xp-value">+200 XP</div><div class="xp-level level-especial">Especial</div></div>
-                        </div>
-                        <div class="card-content">
-                            <h3>Redação Temática
-                            </h3>
-                            <p>Prática de redação com temas atuais e relevantes</p>
-                            <div class="card-details">
-                                <span><svg><use href="#det-clock"></use></svg> 1h 30m</span>
-                                <span><svg><use href="#det-tasks"></use></svg> 1 questões</span>
-                            </div>
-                            <a href="#" class="card-button btn-primary">▷ Iniciar</a>
-                        </div>
-                    </div>
-                
                 </div>
             </div>
         </div>
     </div>
 
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, limit, query } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-        // Importa apenas o necessário para checar o estado de autenticação
+        // Importa limit, query e where (essenciais para o filtro)
+        import { getFirestore, collection, getDocs, limit, query, where } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"; 
 
 
@@ -1063,125 +1078,208 @@
         const db = getFirestore(app);
         const auth = getAuth(app); 
         
-        // 2. Função para Renderizar as Questões (ATUALIZADA)
+        // VARIÁVEIS GLOBAIS DE ESTADO (Para simular o progresso do usuário)
+        // ** No mundo real, você buscaria isso de um banco de dados de usuário (ex: Firestore) **
+        const USER_PROGRESS = {
+            'doc-id-1': 'acertada',
+            'doc-id-2': 'errada',
+            'doc-id-3': 'nao-respondida',
+            'doc-id-4': 'acertada',
+            'doc-id-5': 'errada'
+        };
+        const USER_FAVORITES = ['doc-id-1', 'doc-id-3']; // Exemplo de IDs favoritas
+
+
+        /**
+         * 2. Função para Obter os Filtros Atuais
+         * @returns {object} Um objeto contendo todos os valores de filtro.
+         */
+        function getCurrentFilters() {
+            return {
+                quantidade: parseInt(document.getElementById('quantidade').value) || 10,
+                materia: document.getElementById('materia').value,
+                topico: document.getElementById('topico').value,
+                dificuldade: document.getElementById('dificuldade').value,
+                // Novos checkboxes
+                hideCorrect: document.getElementById('status-acertadas').checked,
+                hideWrong: document.getElementById('status-erradas').checked,
+                showFavorites: document.getElementById('status-favoritas').checked
+            };
+        }
+
+        // 3. Função para Renderizar as Questões (ATUALIZADA)
         async function fetchAndRenderQuestions() {
             const questionSection = document.querySelector('.question-section');
             if (!questionSection) return;
 
-            questionSection.innerHTML = '';
+            questionSection.innerHTML = '<p style="text-align: center; color: var(--cinza-texto);">Buscando questões com os filtros aplicados...</p>';
             
-            const q = query(collection(db, "questoes"), limit(5)); 
+            const filters = getCurrentFilters();
+            
+            let q_filters = [];
+
+            // 1. FILTRO DE DIFICULDADE (APLICADO NO FIREBASE) - CORREÇÃO AQUI
+            if (filters.dificuldade) {
+                // Aplica o filtro 'where' no Firestore. Usa toLowerCase() para garantir correspondência.
+                q_filters.push(where("dificuldade", "==", filters.dificuldade.toLowerCase())); 
+            }
+            
+            // FILTRO DE MATÉRIA (adicione se necessário no Firestore)
+            if (filters.materia) {
+                 // ** ATENÇÃO: Se o campo 'materia' não estiver indexado ou não for exato, pode falhar. **
+                 // q_filters.push(where("materia", "==", filters.materia));
+            }
+
+            // 2. FILTRO DE QUANTIDADE (APLICADO NO FIREBASE)
+            q_filters.push(limit(filters.quantidade)); 
+
+            const q = query(collection(db, "questoes"), ...q_filters); 
 
             try {
                 const querySnapshot = await getDocs(q);
-                let questionCounter = 1;
-                const totalQuestions = querySnapshot.size;
+                let questionsToRender = [];
 
-                if (totalQuestions === 0) {
-                     questionSection.innerHTML = '<p style="text-align: center; color: var(--cinza-texto);">Nenhuma questão encontrada no banco de dados.</p>';
-                     return;
-                }
-                 
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
+                    const questionId = doc.id;
                     
-                    if (!data.alternativas || typeof data.alternativas !== 'object') {
-                        console.warn("Documento sem alternativas válidas, pulando:", doc.id);
-                        return; 
-                    }
-                    
-                    // --- NOVO/ATUALIZADO: Lógica para incluir a imagem. Verifica imagemUrl ou imageUrl ---
-                    let imageHtml = '';
-                    const url = data.imagemUrl || data.imageUrl; // Tenta 'imagemUrl' primeiro, depois 'imageUrl'
-                    
-                    if (url) {
-                        imageHtml = `<img src="${url}" alt="Imagem da Questão">`;
-                    }
-                    // --------------------------------------------------------------------------------------
+                    // --- 3. FILTRAGEM DE STATUS (CLIENT-SIDE) ---
+                    // Pega o status do usuário (simulado)
+                    const progress = USER_PROGRESS[questionId];
+                    const isFavorite = USER_FAVORITES.includes(questionId);
 
-                    const optionsHtml = Object.keys(data.alternativas).sort().map(key => {
-                        const letterCode = 65 + parseInt(key); 
-                        const letter = String.fromCharCode(letterCode); 
-                        const text = data.alternativas[key];
-                        
-                        return `
-                            <div class="answer-option" data-option="${letter}">
-                                <span class="answer-letter">${letter})</span> ${text}
-                            </div>
-                        `;
-                    }).join('');
-                    
-                    // Lógica para determinar a classe de cor da dificuldade (CORRIGIDO)
-                    const dificuldade = data.dificuldade ? data.dificuldade.toLowerCase() : 'n/a';
-                    let levelClass = '';
-                    switch (dificuldade) {
-                        case 'fácil': // Alterado de 'facil' para 'fácil' caso o valor do Firebase seja acentuado
-                        case 'facil': 
-                            levelClass = 'level-facil';
-                            break;
-                        case 'médio': // Alterado de 'medio' para 'médio'
-                        case 'medio':
-                            levelClass = 'level-medio';
-                            break;
-                        case 'difícil': // Alterado de 'dificil' para 'difícil'
-                        case 'dificil':
-                            levelClass = 'level-dificil';
-                            break;
-                        default:
-                            levelClass = ''; // Usa o estilo base
+                    if (filters.showFavorites && !isFavorite) {
+                        return; // Pula se não for favorita e o filtro "apenas favoritas" estiver ativo
                     }
 
-                    const questionCardHtml = `
-                        <div class="question-card" data-question-id="${doc.id}" data-correct-answer="${data.correta || ''}">
-                            <div class="question-header">
-                                <div class="question-tags">
-                                    <span>${data.materia || 'N/A'}</span>
-                                    <span>${data.topico || 'N/A'}</span>
-                                    </div>
-                                <div class="question-info">
-                                    <div class="level ${levelClass}">${data.dificuldade || 'N/A'}</div>
-                                </div>
-                            </div>
+                    if (filters.hideCorrect && progress === 'acertada') {
+                        return; // Pula se for acertada e o filtro "esconder acertadas" estiver ativo
+                    }
 
-                            <div class="question-body">
-                                <h2>Questão ${questionCounter} de ${totalQuestions}</h2>
-                                <p>${data.enunciado || 'Enunciado não disponível.'}</p>
-                                
-                                ${imageHtml} <div class="options">
-                                    ${optionsHtml}
-                                </div>
-
-                                <div class="confirm-actions">
-                                    <button class="confirm-button" disabled>Confirmar Resposta</button>
-                                    <div class="action-button-group">
-                                        <button class="action-button">Favoritar</button>
-                                        <button class="action-button">Comentários</button>
-                                    </div>
-                                </div>
-                                <div class="feedback-message" style="margin-top: 15px; font-size: 0.9em; display: none;"></div>
-                            </div>
-                        </div>
-                    `;
-
-                    questionSection.insertAdjacentHTML('beforeend', questionCardHtml);
-                    questionCounter++;
+                    if (filters.hideWrong && progress === 'errada') {
+                        return; // Pula se for errada e o filtro "esconder erradas" estiver ativo
+                    }
+                    
+                    // Se a questão passou pelos filtros, adiciona para renderização
+                    questionsToRender.push({ id: questionId, data: data, isFavorite: isFavorite });
                 });
                 
-                addQuestionInteractionListeners();
+                // Renderiza as Questões Filtradas
+                renderQuestionCards(questionSection, questionsToRender);
                 
             } catch (error) {
                 console.error("Erro ao buscar questões:", error);
                 // Exibe uma mensagem de erro na tela de questões
-                questionSection.innerHTML = '<p style="text-align: center; color: red;">Erro ao carregar as questões. Verifique as permissões do Firestore.</p>';
+                questionSection.innerHTML = '<p style="text-align: center; color: red;">Erro ao carregar as questões. Verifique as permissões do Firestore e as regras de indexação.</p>';
             }
         }
 
-        // 3. Lógica de Interação da Questão (MANTIDA)
+        // NOVA FUNÇÃO: Renderiza os cards de questões com base na lista filtrada
+        function renderQuestionCards(questionSection, questionsToRender) {
+            questionSection.innerHTML = '';
+            let questionCounter = 1;
+            const totalQuestions = questionsToRender.length;
+
+            if (totalQuestions === 0) {
+                 questionSection.innerHTML = '<p style="text-align: center; color: var(--cinza-texto);">Nenhuma questão encontrada com os filtros selecionados.</p>';
+                 return;
+            }
+
+            questionsToRender.forEach(({ id, data, isFavorite }) => {
+                if (!data.alternativas || typeof data.alternativas !== 'object') {
+                    console.warn("Documento sem alternativas válidas, pulando:", id);
+                    return; 
+                }
+                
+                let imageHtml = '';
+                const url = data.imagemUrl || data.imageUrl;
+                
+                if (url) {
+                    imageHtml = `<img src="${url}" alt="Imagem da Questão">`;
+                }
+
+                // Cria as opções de resposta (A, B, C...)
+                const optionsHtml = Object.keys(data.alternativas).sort().map(key => {
+                    const letterCode = 65 + parseInt(key); 
+                    const letter = String.fromCharCode(letterCode); 
+                    const text = data.alternativas[key];
+                    
+                    return `
+                        <div class="answer-option" data-option="${letter}">
+                            <span class="answer-letter">${letter})</span> ${text}
+                        </div>
+                    `;
+                }).join('');
+                
+                // Lógica para determinar a classe de cor da dificuldade
+                const dificuldade = data.dificuldade ? data.dificuldade.toLowerCase() : 'n/a';
+                let levelClass = '';
+                switch (dificuldade) {
+                    case 'facil':
+                        levelClass = 'level-facil';
+                        break;
+                    case 'medio':
+                        levelClass = 'level-medio';
+                        break;
+                    case 'dificil':
+                        levelClass = 'level-dificil';
+                        break;
+                    default:
+                        levelClass = '';
+                }
+
+                // Adiciona classe 'favorited' para estilo visual
+                const favoriteClass = isFavorite ? 'favorited' : ''; 
+                
+                const questionCardHtml = `
+                    <div class="question-card ${favoriteClass}" data-question-id="${id}" data-correct-answer="${data.correta || ''}">
+                        <div class="question-header">
+                            <div class="question-tags">
+                                <span>${data.materia || 'N/A'}</span>
+                                <span>${data.topico || 'N/A'}</span>
+                                </div>
+                            <div class="question-info">
+                                <div class="level ${levelClass}">${data.dificuldade || 'N/A'}</div>
+                            </div>
+                        </div>
+
+                        <div class="question-body">
+                            <h2>Questão ${questionCounter} de ${totalQuestions}</h2>
+                            <p>${data.enunciado || 'Enunciado não disponível.'}</p>
+                            
+                            ${imageHtml} <div class="options">
+                                ${optionsHtml}
+                            </div>
+
+                            <div class="confirm-actions">
+                                <button class="confirm-button" disabled>Confirmar Resposta</button>
+                                <div class="action-button-group">
+                                    <button class="action-button favoritar-btn" data-id="${id}">
+                                        ${isFavorite ? '★ Desfavoritar' : '☆ Favoritar'}
+                                    </button>
+                                    <button class="action-button">Comentários</button>
+                                </div>
+                            </div>
+                            <div class="feedback-message" style="margin-top: 15px; font-size: 0.9em; display: none;"></div>
+                        </div>
+                    </div>
+                `;
+
+                questionSection.insertAdjacentHTML('beforeend', questionCardHtml);
+                questionCounter++;
+            });
+            
+            addQuestionInteractionListeners();
+            addFavoritarListener(); // Chama a nova função para o botão Favoritar
+        }
+
+        // Lógica de Interação da Questão (Atualizada para status)
         function addQuestionInteractionListeners() {
             document.querySelectorAll('.question-card').forEach(card => {
                 const options = card.querySelectorAll('.answer-option');
                 const confirmButton = card.querySelector('.confirm-button');
                 const feedbackMessage = card.querySelector('.feedback-message');
+                const questionId = card.getAttribute('data-question-id');
                 let selectedOption = null;
 
                 options.forEach(option => {
@@ -1208,6 +1306,8 @@
                         selectedOption.classList.add('correct');
                         feedbackMessage.textContent = '✅ Resposta Correta! Parabéns!';
                         feedbackMessage.style.color = 'var(--verde-progresso)';
+                        // ATUALIZA O PROGRESSO DO USUÁRIO (SIMULADO)
+                        USER_PROGRESS[questionId] = 'acertada'; 
                     } else {
                         selectedOption.classList.add('incorrect');
                         
@@ -1218,6 +1318,8 @@
                         
                         feedbackMessage.textContent = `❌ Resposta Incorreta. A resposta certa era a letra ${correctAnswer}.`;
                         feedbackMessage.style.color = 'crimson';
+                        // ATUALIZA O PROGRESSO DO USUÁRIO (SIMULADO)
+                        USER_PROGRESS[questionId] = 'errada'; 
                     }
                     
                     feedbackMessage.style.display = 'block';
@@ -1227,13 +1329,53 @@
             });
         }
 
+        // NOVA FUNÇÃO: Adiciona lógica para o botão Favoritar
+        function addFavoritarListener() {
+            document.querySelectorAll('.favoritar-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    // Previne o recarregamento acidental
+                    e.preventDefault();
+                    
+                    const id = button.getAttribute('data-id');
+                    const index = USER_FAVORITES.indexOf(id);
+                    const card = button.closest('.question-card');
+
+                    if (index > -1) {
+                        // Remover dos favoritos
+                        USER_FAVORITES.splice(index, 1);
+                        button.innerHTML = '☆ Favoritar';
+                        card.classList.remove('favorited');
+                    } else {
+                        // Adicionar aos favoritos
+                        USER_FAVORITES.push(id);
+                        button.innerHTML = '★ Desfavoritar';
+                        card.classList.add('favorited');
+                    }
+                    
+                    // Opcional: Recarregar as questões se o filtro 'Mostrar Apenas Favoritas' estiver ativo
+                    if (document.getElementById('status-favoritas').checked) {
+                        fetchAndRenderQuestions();
+                    }
+
+                    console.log("Favoritos atuais:", USER_FAVORITES);
+                });
+            });
+        }
+
 
         document.addEventListener('DOMContentLoaded', () => {
+            const applyFiltersBtn = document.getElementById('apply-filters-btn');
+            if (applyFiltersBtn) {
+                // Evento de clique para o botão Aplicar Filtros
+                applyFiltersBtn.addEventListener('click', fetchAndRenderQuestions);
+            }
+            
             // VERIFICAÇÃO DE AUTENTICAÇÃO AO CARREGAR A PÁGINA
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     // Usuário logado: Carrega o conteúdo
                     console.log("Usuário autenticado. Carregando questões.");
+                    // CHAMA A FUNÇÃO DE BUSCA AO INICIAR
                     fetchAndRenderQuestions();
                 } else {
                     // Usuário NÃO logado: Redireciona para a página de login
