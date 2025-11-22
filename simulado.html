@@ -19,6 +19,11 @@
         --cinza-texto: #4B5563; /* Cor comum de texto para melhor contraste */
         --verde-progresso: #4CB452; 
 
+        /* Cores para Dificuldade */
+        --cor-facil: #4CB452;    /* Verde */
+        --cor-medio: #FF8C00;    /* Laranja (DarkOrange, um bom tom) */
+        --cor-dificil: #DC143C;  /* Vermelho (Crimson, forte) */
+
         /* Novas Variáveis da Sidebar, usando cores existentes */
         --bg-sidebar: #FFFFFF;
         --sidebar-text: var(--cinza-texto);
@@ -26,7 +31,7 @@
         --sidebar-active-text: #FFFFFF;
         --sidebar-border: #E2E8F0;
 
-        /* VARIÁVEIS DO NOVO SIDEBAR - MODO ESCURO (Tons mais escuros, se não houver 'dark') */
+        /* VARIÁVEIS DO NOVO SIDEBAR - MODO ESCURO */
         --bg-sidebar-nav: #1f2937;
         --bg-card-hover: #374151;
         --bg-active-nav: #4a5568;
@@ -34,11 +39,6 @@
         --text-primary-nav: #f0f0f0;
         --text-secondary-nav: #9ca3af;
         --accent-blue-nav: #3b82f6;
-
-        /* CORES DE DIFICULDADE (NOVAS VARIÁVEIS) */
-        --cor-facil: #4CB452; /* Verde */
-        --cor-medio: #FFB300; /* Laranja/Amarelo - COR SOLICITADA */
-        --cor-dificil: #D32F2F; /* Vermelho */
     }
 
     /* ------------------------------------------------ */
@@ -71,6 +71,11 @@
         --sidebar-active-text: #1D2B3C; /* Texto escuro no botão azul */
         --sidebar-border: #4B607A; /* Borda mais escura */
         --verde-progresso: #81C784; /* Verde mais claro */
+
+        /* Cores para Dificuldade (Ajuste para Dark Mode) */
+        --cor-facil: #81C784; 
+        --cor-medio: #FFB347; /* Laranja mais claro */
+        --cor-dificil: #EF5350; /* Vermelho mais claro */
         
         /* VARIÁVEIS DO NOVO SIDEBAR - MODO ESCURO (Ajustadas para a nova paleta) */
         --bg-sidebar-nav: var(--bg-sidebar);
@@ -426,7 +431,7 @@
     .question-card { margin-bottom: 30px; border-radius: 12px; overflow: hidden; }
     .question-section { flex: 1; }
     
-    /* ESTILO DO CABEÇALHO DA QUESTÃO (AJUSTADO CONFORME SOLICITADO) */
+    /* ESTILO DO CABEÇALHO DA QUESTÃO */
     .question-header { 
         background-color: #1D2B3C; /* Fundo escuro */
         color: white; 
@@ -442,7 +447,7 @@
         box-shadow: none;
     }
 
-    /* Tags Arredondadas (Matéria, Tópico, Dificuldade) */
+    /* Tags Arredondadas (Matéria, Tópico) */
     .question-tags {
         display: flex;
         gap: 8px; /* Espaçamento entre as tags */
@@ -458,7 +463,7 @@
         display: inline-block;
     }
 
-    /* Bloco de Informações (Tempo e Nível) */
+    /* Bloco de Informações (Nível) */
     .question-info {
         display: flex;
         flex-direction: column;
@@ -466,34 +471,59 @@
         text-align: right;
         gap: 3px;
     }
-    .question-info .time {
-        color: white;
-        font-size: 1.1em;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-    }
-    /* Estilo BASE para a tag de nível (com fundo claro e borda no modo escuro) */
+    
+    /* Estilo BASE para o nível (dificuldade) */
     .question-info .level {
-        background-color: rgba(255, 255, 255, 0.2);
-        color: white;
         padding: 4px 10px;
         border-radius: 15px;
         font-size: 0.85em;
-        font-weight: 500;
+        font-weight: 600; /* Aumenta o peso para destaque */
+        
+        /* Estilo base para tags sem nível definido ou tags padrão no Header Escuro */
+        background-color: rgba(255, 255, 255, 0.2); 
+        color: white;
+        border: 2px solid transparent; 
+        transition: background-color 0.2s, color 0.2s, border-color 0.2s;
     }
-    
-    /* Estilos de Cores para as Tags de Dificuldade */
-    .question-info .level.level-facil { 
-        background-color: var(--cor-facil); 
+
+    /* --- ESTILOS DE DIFICULDADE PERSONALIZADOS (QUESTÕES) --- */
+    .question-info .level.level-facil {
+        background-color: var(--cor-facil);
+        border: 2px solid var(--cor-facil);
+        color: white; 
     }
-    .question-info .level.level-medio { 
-        background-color: var(--cor-medio); /* Laranja */
+    .question-info .level.level-medio {
+        background-color: var(--cor-medio);
+        border: 2px solid var(--cor-medio);
+        color: white; 
     }
-    .question-info .level.level-dificil { 
-        background-color: var(--cor-dificil); /* Vermelho */
+    .question-info .level.level-dificil {
+        background-color: var(--cor-dificil);
+        border: 2px solid var(--cor-dificil);
+        color: white; 
     }
     /* FIM DOS ESTILOS DO CABEÇALHO */
+    
+    
+    /* --- NOVO: ESTILOS DE DIFICULDADE PARA SIMULADOS --- */
+    .simulado-card .xp-level {
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.75em; 
+        font-weight: 600;
+        margin-top: 3px;
+        display: inline-block; 
+        line-height: 1.5; /* Ajusta a altura da linha para o padding */
+    }
+
+    .simulado-card .xp-level.level-facil { background-color: var(--cor-facil); color: white; }
+    .simulado-card .xp-level.level-medio { background-color: var(--cor-medio); color: white; }
+    .simulado-card .xp-level.level-dificil { background-color: var(--cor-dificil); color: white; }
+    .simulado-card .xp-level.level-oficial { background-color: var(--azul-principal); color: white; }
+    .simulado-card .xp-level.level-especial { background-color: #9370DB; color: white; } 
+    
+    /* FIM DOS ESTILOS DE SIMULADOS */
+
     
     .question-body { 
         background-color: var(--bg-sidebar); 
@@ -609,40 +639,9 @@
 
     .card-xp { text-align: right; color: var(--cinza-texto); }
     .xp-value { font-weight: 700; font-size: 1.1em; }
+    /* REMOVIDO: .xp-level { font-size: 0.8em; color: var(--cinza-texto); } */
     
-    /* Estilo Base para Nível do Simulado (para cores dinâmicas) */
-    .xp-level { 
-        font-size: 0.8em; 
-        color: white; 
-        font-weight: 500;
-        padding: 2px 8px;
-        border-radius: 12px;
-        line-height: 1.5; /* Ajuste para o padding */
-        display: inline-block;
-        background-color: var(--cinza-texto); /* Cor padrão caso a classe dinâmica não seja encontrada */
-    }
-
-    /* Estilos de Cores para as Tags de Dificuldade do Simulado */
-    .simulado-card .xp-level.level-facil, .simulado-card .xp-level[data-level="Fácil"] { 
-        background-color: var(--cor-facil); 
-    }
-    .simulado-card .xp-level.level-medio, .simulado-card .xp-level[data-level="Médio"] { 
-        background-color: var(--cor-medio); /* Laranja */
-    }
-    .simulado-card .xp-level.level-dificil, .simulado-card .xp-level[data-level="Difícil"] { 
-        background-color: var(--cor-dificil); /* Vermelho */
-    }
-    /* Estilo para "Oficial" e "Especial" (Cores fixas, mantendo o estilo de tag) */
-    .simulado-card .xp-level[data-level="Oficial"] {
-        background-color: var(--azul-principal);
-    }
-    .simulado-card .xp-level[data-level="Especial"] {
-        background-color: #9370DB; /* Roxo */
-    }
-
-    /* Fim do Estilo Dinâmico de Nível do Simulado */
-
-
+    /* APRIMORAMENTO NO CSS PARA OS ÍCONES DE DETALHES DO SIMULADO */
     .card-details { 
         display: flex; 
         gap: 20px; /* Adiciona espaçamento entre os detalhes */
@@ -725,7 +724,6 @@
     .btn-locked { 
         background-color: var(--cinza-medio); 
         color: var(--cinza-texto); 
-        border: none; 
         cursor: not-allowed; 
     }
     
@@ -742,52 +740,52 @@
     .simulado-card:nth-child(1) .card-icon { background-color: #3776ab; color: white; } 
     .simulado-card:nth-child(2) .card-icon { background-color: var(--verde-progresso); color: white; } 
     .simulado-card:nth-child(3) .card-icon { background-color: #FFD700; color: #444; } 
-    .simulado-card:nth-child(4) .card-icon { background-color: #F8A771; color: white; } 
-    .simulado-card:nth-child(5) .card-icon { background-color: #9370DB; color: white; } 
-    .simulado-card:nth-child(6) .card-icon { background-color: #FF69B4; color: white; } 
-    .simulado-card:nth-child(7) .card-icon { background-color: #c9519c; color: white; } 
-    
+    .simulado-card:nth-child(4) .card-icon { background-color: #9370DB; color: white; } 
+    .simulado-card:nth-child(5) .card-icon { background-color: #F8A771; color: white; } 
+    .simulado-card:nth-child(6) .card-icon { background-color: #9370DB; color: white; } /* Cor roxa para Humanas */
+    .simulado-card:nth-child(7) .card-icon { background-color: #c9519c; color: white; } /* Cor nova para Redação */
+
     /* Cores dos ícones no Dark Mode (ajustado para melhor contraste) */
     body.dark .simulado-card:nth-child(3) .card-icon { background-color: #FFD700; color: #1D2B3C; } 
 
     /* Ajuste para mover PERFIL e CONFIGURAÇÕES um pouco para cima */
-.sidebar > div:last-child {
-    margin-bottom: 30px; /* você pode aumentar ou diminuir */
-}
+    .sidebar > div:last-child {
+        margin-bottom: 30px; 
+    }
 
-/* --- RESPONSIVE SIDEBAR FIX --- */
-@media (max-width: 768px) {
-    .sidebar {
-        position: fixed;
-        left: -250px;
-        top: 0;
-        height: 100vh;
-        transition: left .3s ease;
-        z-index: 2000;
+    /* --- RESPONSIVE SIDEBAR FIX --- */
+    @media (max-width: 768px) {
+        .sidebar {
+            position: fixed;
+            left: -250px;
+            top: 0;
+            height: 100vh;
+            transition: left .3s ease;
+            z-index: 2000;
+        }
+        .sidebar.active {
+            left: 0;
+        }
+        .hamburger {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 2500;
+            width: 35px;
+            height: 28px;
+            background: var(--azul-principal);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+        }
+        .main-content {
+            margin-left: 0 !important;
+            padding-top: 60px;
+        }
     }
-    .sidebar.active {
-        left: 0;
-    }
-    .hamburger {
-        position: fixed;
-        top: 15px;
-        left: 15px;
-        z-index: 2500;
-        width: 35px;
-        height: 28px;
-        background: var(--azul-principal);
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 22px;
-    }
-    .main-content {
-        margin-left: 0 !important;
-        padding-top: 60px;
-    }
-}
 
 </style>
 </head>
@@ -804,7 +802,7 @@
         <symbol id="i-ranking" viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27l6.18 3.73-1.64-7.03 5.46-4.71-7.19-.61L12 2.5 9.19 9.65l-7.19.61 5.46 4.71-1.64 7.03L12 17.27z"/></symbol>
         <symbol id="i-calendario" viewBox="0 0 24 24"><path fill="currentColor" d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM5 7V6h14v1H5z"/></symbol>
         <symbol id="i-perfil" viewBox="0 0 24 24"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
-        <symbol id="i-config" viewBox="0 0 24 24"><path fill="currentColor" d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.2-.15.25-.43.12-.67l-2-3.46c-.12-.25-.4-.32-.61-.22l-2.49 1.01c-.52-.39-1.09-.72-1.71-.96L14 2h-4L9.43 4.35c-.62.24-1.19.57-1.71.96l-2.49-1.01c-.2-.08-.48-.03-.61.22l-2 3.46c-.13.24-.08.52.12.67l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.2.15-.25.43-.12.67l2 3.46c.13.25.41.32.61.22l2.49-1.01c.52.39 1.09.72 1.71.96L9.43 22h4l.57-2.35c.62-.24 1.19-.57 1.71-.96l2.49 1.01c.2.08.48.03.61-.22l2-3.46c.12-.25.08-.52-.12-.67l-2.11-1.65zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></symbol>
+        <symbol id="i-config" viewBox="0 0 24 24"><path fill="currentColor" d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.2-.15.25-.43.12-.67l-2-3.46c-.12-.25-.4-.32-.61-.22l-2.49 1.01c-.52-.39-1.09-.72-1.71-.96L14 2h-4L9.43 4.35c-.62.24-1.19.57-1.71.96l-2.49-1.01c-.2-.08-.48-.03-.61.22l-2 3.46c-.13.24-.08.52-.12.67l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.2.15-.25.43-.12.67l2 3.46c.13.25.41.32.61.22l2.49-1.01c.52.39 1.09.72 1.71.96L9.43 22h4l.57-2.35c.62-.24 1.19-.57 1.71-.96l2.49 1.01c.2.08.48.03.61-.22l2-3.46c.12-.25.08-.52-.12-.67l-2.11-1.65zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></symbol>
         
         <symbol id="sc-document" viewBox="0 0 24 24"><path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></symbol>
         <symbol id="sc-calculator" viewBox="0 0 24 24"><path fill="currentColor" d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 4h2v2h-2V7zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zM8 7h2v2H8V7zm0 4h2v2H8v-2zm0 4h2v2H8v-2zm7 4h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/></symbol>
@@ -922,7 +920,7 @@
                     <div class="simulado-card">
                         <div class="card-header">
                             <span class="card-icon"><svg width="24" height="24"><use href="#sc-document"></use></svg></span> 
-                            <div class="card-xp"><div class="xp-value">+250 XP</div><div class="xp-level" data-level="Oficial">Oficial</div></div>
+                            <div class="card-xp"><div class="xp-value">+250 XP</div><div class="xp-level level-oficial">Oficial</div></div>
                         </div>
                         <div class="card-content">
                             <h3>Simulado ENEM - Dia 1</h3>
@@ -938,7 +936,7 @@
                     <div class="simulado-card">
                         <div class="card-header">
                             <span class="card-icon"><svg width="24" height="24"><use href="#sc-calculator"></use></svg></span>
-                            <div class="card-xp"><div class="xp-value">+250 XP</div><div class="xp-level" data-level="Oficial">Oficial</div></div>
+                            <div class="card-xp"><div class="xp-value">+250 XP</div><div class="xp-level level-oficial">Oficial</div></div>
                         </div>
                         <div class="card-content">
                             <h3>Simulado ENEM - Dia 2</h3>
@@ -954,7 +952,7 @@
                     <div class="simulado-card">
                         <div class="card-header">
                             <span class="card-icon"><svg width="24" height="24"><use href="#sc-calculator"></use></svg></span>
-                            <div class="card-xp"><div class="xp-value">+150 XP</div><div class="xp-level level-dificil" data-level="Difícil">Difícil</div></div>
+                            <div class="card-xp"><div class="xp-value">+150 XP</div><div class="xp-level level-dificil">Difícil</div></div>
                         </div>
                         <div class="card-content">
                             <h3>Matemática Intensiva</h3>
@@ -970,7 +968,7 @@
                     <div class="simulado-card active-card">
                         <div class="card-header">
                             <span class="card-icon"><svg width="24" height="24"><use href="#sc-book"></use></svg></span>
-                            <div class="card-xp"><div class="xp-value">+100 XP</div><div class="xp-level level-medio" data-level="Médio">Médio</div></div>
+                            <div class="card-xp"><div class="xp-value">+100 XP</div><div class="xp-level level-medio">Médio</div></div>
                         </div>
                         <div class="card-content">
                             <h3>Linguagens Express</h3>
@@ -987,7 +985,7 @@
                     <div class="simulado-card">
                         <div class="card-header">
                             <span class="card-icon"><svg width="24" height="24"><use href="#sc-flask"></use></svg></span>
-                            <div class="card-xp"><div class="xp-value">+150 XP</div><div class="xp-level level-dificil" data-level="Difícil">Difícil</div></div>
+                            <div class="card-xp"><div class="xp-value">+150 XP</div><div class="xp-level level-dificil">Difícil</div></div>
                         </div>
                         <div class="card-content">
                             <h3>Ciências da Natureza</h3>
@@ -1003,7 +1001,7 @@
                     <div class="simulado-card">
                         <div class="card-header">
                             <span class="card-icon"><svg width="24" height="24"><use href="#sc-globe"></use></svg></span>
-                            <div class="card-xp"><div class="xp-value">+120 XP</div><div class="xp-level level-medio" data-level="Médio">Médio</div></div>
+                            <div class="card-xp"><div class="xp-value">+120 XP</div><div class="xp-level level-medio">Médio</div></div>
                         </div>
                         <div class="card-content">
                             <h3>Ciências Humanas</h3>
@@ -1019,7 +1017,7 @@
                     <div class="simulado-card">
                         <div class="card-header">
                             <span class="card-icon"><svg width="24" height="24"><use href="#sc-pen"></use></svg></span>
-                            <div class="card-xp"><div class="xp-value">+200 XP</div><div class="xp-level" data-level="Especial">Especial</div></div>
+                            <div class="card-xp"><div class="xp-value">+200 XP</div><div class="xp-level level-especial">Especial</div></div>
                         </div>
                         <div class="card-content">
                             <h3>Redação Temática
@@ -1067,7 +1065,7 @@
         const db = getFirestore(app);
         const auth = getAuth(app); 
         
-        // 2. Função para Renderizar as Questões (ATUALIZADA PARA O CAMPO DE IMAGEM E DIFICULDADE)
+        // 2. Função para Renderizar as Questões (ATUALIZADA)
         async function fetchAndRenderQuestions() {
             const questionSection = document.querySelector('.question-section');
             if (!questionSection) return;
@@ -1094,14 +1092,14 @@
                         return; 
                     }
                     
-                    // --- Lógica para incluir a imagem ---
+                    // --- NOVO/ATUALIZADO: Lógica para incluir a imagem. Verifica imagemUrl ou imageUrl ---
                     let imageHtml = '';
-                    const url = data.imagemUrl || data.imageUrl; 
+                    const url = data.imagemUrl || data.imageUrl; // Tenta 'imagemUrl' primeiro, depois 'imageUrl'
                     
                     if (url) {
                         imageHtml = `<img src="${url}" alt="Imagem da Questão">`;
                     }
-                    // ------------------------------------
+                    // --------------------------------------------------------------------------------------
 
                     const optionsHtml = Object.keys(data.alternativas).sort().map(key => {
                         const letterCode = 65 + parseInt(key); 
@@ -1115,13 +1113,22 @@
                         `;
                     }).join('');
                     
-                    const minutes = Math.floor((data.tempo || 0) / 60);
-                    const seconds = ((data.tempo || 0) % 60).toString().padStart(2, '0');
-                    const formattedTime = `${minutes}:${seconds}`;
-
-                    // NOVO: Define a classe de cor baseada na dificuldade (ex: 'level-medio')
+                    // Lógica para determinar a classe de cor da dificuldade (NOVO)
                     const dificuldade = data.dificuldade ? data.dificuldade.toLowerCase() : 'n/a';
-                    const levelClass = `level-${dificuldade}`; 
+                    let levelClass = '';
+                    switch (dificuldade) {
+                        case 'facil':
+                            levelClass = 'level-facil';
+                            break;
+                        case 'medio':
+                            levelClass = 'level-medio';
+                            break;
+                        case 'dificil':
+                            levelClass = 'level-dificil';
+                            break;
+                        default:
+                            levelClass = ''; // Usa o estilo base
+                    }
 
                     const questionCardHtml = `
                         <div class="question-card" data-question-id="${doc.id}" data-correct-answer="${data.correta || ''}">
@@ -1129,11 +1136,9 @@
                                 <div class="question-tags">
                                     <span>${data.materia || 'N/A'}</span>
                                     <span>${data.topico || 'N/A'}</span>
-                                    <span>${data.dificuldade || 'N/A'}</span> 
-                                </div>
+                                    </div>
                                 <div class="question-info">
-                                    <div class="time">🕒 ${formattedTime}</div>
-                                    <div class="level ${levelClass}">Nível ${data.dificuldade || 'N/A'}</div> 
+                                    <div class="level ${levelClass}">${data.dificuldade || 'N/A'}</div>
                                 </div>
                             </div>
 
