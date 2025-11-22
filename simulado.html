@@ -487,6 +487,7 @@
     }
 
     /* --- ESTILOS DE DIFICULDADE PERSONALIZADOS (QUESTÕES) --- */
+    /* ESTES SÃO OS ESTILOS QUE DÃO COR À DIFICULDADE DAS QUESTÕES */
     .question-info .level.level-facil {
         background-color: var(--cor-facil);
         border: 2px solid var(--cor-facil);
@@ -505,7 +506,7 @@
     /* FIM DOS ESTILOS DO CABEÇALHO */
     
     
-    /* --- NOVO: ESTILOS DE DIFICULDADE PARA SIMULADOS --- */
+    /* --- ESTILOS DE DIFICULDADE PARA SIMULADOS (NEUTROS) --- */
     .simulado-card .xp-level {
         padding: 2px 8px;
         border-radius: 12px;
@@ -513,14 +514,10 @@
         font-weight: 600;
         margin-top: 3px;
         display: inline-block; 
-        line-height: 1.5; /* Ajusta a altura da linha para o padding */
+        line-height: 1.5; 
     }
 
-    /* REMOVIDAS AS REGRAS ABAIXO para que a cor de dificuldade não se aplique aos Simulados, conforme solicitado:
-    .simulado-card .xp-level.level-facil { background-color: var(--cor-facil); color: white; }
-    .simulado-card .xp-level.level-medio { background-color: var(--cor-medio); color: white; }
-    .simulado-card .xp-level.level-dificil { background-color: var(--cor-dificil); color: white; }
-    */
+    /* Apenas "Oficial" e "Especial" terão cor nos Simulados */
     .simulado-card .xp-level.level-oficial { background-color: var(--azul-principal); color: white; }
     .simulado-card .xp-level.level-especial { background-color: #9370DB; color: white; } 
     
@@ -641,7 +638,6 @@
 
     .card-xp { text-align: right; color: var(--cinza-texto); }
     .xp-value { font-weight: 700; font-size: 1.1em; }
-    /* REMOVIDO: .xp-level { font-size: 0.8em; color: var(--cinza-texto); } */
     
     /* APRIMORAMENTO NO CSS PARA OS ÍCONES DE DETALHES DO SIMULADO */
     .card-details { 
@@ -1115,16 +1111,19 @@
                         `;
                     }).join('');
                     
-                    // Lógica para determinar a classe de cor da dificuldade (NOVO)
+                    // Lógica para determinar a classe de cor da dificuldade (CORRIGIDO)
                     const dificuldade = data.dificuldade ? data.dificuldade.toLowerCase() : 'n/a';
                     let levelClass = '';
                     switch (dificuldade) {
-                        case 'facil':
+                        case 'fácil': // Alterado de 'facil' para 'fácil' caso o valor do Firebase seja acentuado
+                        case 'facil': 
                             levelClass = 'level-facil';
                             break;
+                        case 'médio': // Alterado de 'medio' para 'médio'
                         case 'medio':
                             levelClass = 'level-medio';
                             break;
+                        case 'difícil': // Alterado de 'dificil' para 'difícil'
                         case 'dificil':
                             levelClass = 'level-dificil';
                             break;
