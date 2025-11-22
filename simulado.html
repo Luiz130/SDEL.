@@ -479,14 +479,14 @@
         font-size: 0.85em;
         font-weight: 600; /* Aumenta o peso para destaque */
         
-        /* Estilo base para quando não houver cor (ou cor padrão) */
-        background-color: rgba(255, 255, 255, 0.2);
+        /* Estilo base para tags sem nível definido ou tags padrão no Header Escuro */
+        background-color: rgba(255, 255, 255, 0.2); 
         color: white;
         border: 2px solid transparent; 
         transition: background-color 0.2s, color 0.2s, border-color 0.2s;
     }
 
-    /* --- ESTILOS DE DIFICULDADE PERSONALIZADOS --- */
+    /* --- ESTILOS DE DIFICULDADE PERSONALIZADOS (QUESTÕES) --- */
     .question-info .level.level-facil {
         background-color: var(--cor-facil);
         border: 2px solid var(--cor-facil);
@@ -503,6 +503,27 @@
         color: white; 
     }
     /* FIM DOS ESTILOS DO CABEÇALHO */
+    
+    
+    /* --- NOVO: ESTILOS DE DIFICULDADE PARA SIMULADOS --- */
+    .simulado-card .xp-level {
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.75em; 
+        font-weight: 600;
+        margin-top: 3px;
+        display: inline-block; 
+        line-height: 1.5; /* Ajusta a altura da linha para o padding */
+    }
+
+    .simulado-card .xp-level.level-facil { background-color: var(--cor-facil); color: white; }
+    .simulado-card .xp-level.level-medio { background-color: var(--cor-medio); color: white; }
+    .simulado-card .xp-level.level-dificil { background-color: var(--cor-dificil); color: white; }
+    .simulado-card .xp-level.level-oficial { background-color: var(--azul-principal); color: white; }
+    .simulado-card .xp-level.level-especial { background-color: #9370DB; color: white; } 
+    
+    /* FIM DOS ESTILOS DE SIMULADOS */
+
     
     .question-body { 
         background-color: var(--bg-sidebar); 
@@ -618,7 +639,7 @@
 
     .card-xp { text-align: right; color: var(--cinza-texto); }
     .xp-value { font-weight: 700; font-size: 1.1em; }
-    .xp-level { font-size: 0.8em; color: var(--cinza-texto); }
+    /* REMOVIDO: .xp-level { font-size: 0.8em; color: var(--cinza-texto); } */
     
     /* APRIMORAMENTO NO CSS PARA OS ÍCONES DE DETALHES DO SIMULADO */
     .card-details { 
@@ -899,7 +920,7 @@
                     <div class="simulado-card">
                         <div class="card-header">
                             <span class="card-icon"><svg width="24" height="24"><use href="#sc-document"></use></svg></span> 
-                            <div class="card-xp"><div class="xp-value">+250 XP</div><div class="xp-level">Oficial</div></div>
+                            <div class="card-xp"><div class="xp-value">+250 XP</div><div class="xp-level level-oficial">Oficial</div></div>
                         </div>
                         <div class="card-content">
                             <h3>Simulado ENEM - Dia 1</h3>
@@ -915,7 +936,7 @@
                     <div class="simulado-card">
                         <div class="card-header">
                             <span class="card-icon"><svg width="24" height="24"><use href="#sc-calculator"></use></svg></span>
-                            <div class="card-xp"><div class="xp-value">+250 XP</div><div class="xp-level">Oficial</div></div>
+                            <div class="card-xp"><div class="xp-value">+250 XP</div><div class="xp-level level-oficial">Oficial</div></div>
                         </div>
                         <div class="card-content">
                             <h3>Simulado ENEM - Dia 2</h3>
@@ -931,7 +952,7 @@
                     <div class="simulado-card">
                         <div class="card-header">
                             <span class="card-icon"><svg width="24" height="24"><use href="#sc-calculator"></use></svg></span>
-                            <div class="card-xp"><div class="xp-value">+150 XP</div><div class="xp-level">Difícil</div></div>
+                            <div class="card-xp"><div class="xp-value">+150 XP</div><div class="xp-level level-dificil">Difícil</div></div>
                         </div>
                         <div class="card-content">
                             <h3>Matemática Intensiva</h3>
@@ -947,7 +968,7 @@
                     <div class="simulado-card active-card">
                         <div class="card-header">
                             <span class="card-icon"><svg width="24" height="24"><use href="#sc-book"></use></svg></span>
-                            <div class="card-xp"><div class="xp-value">+100 XP</div><div class="xp-level">Médio</div></div>
+                            <div class="card-xp"><div class="xp-value">+100 XP</div><div class="xp-level level-medio">Médio</div></div>
                         </div>
                         <div class="card-content">
                             <h3>Linguagens Express</h3>
@@ -964,7 +985,7 @@
                     <div class="simulado-card">
                         <div class="card-header">
                             <span class="card-icon"><svg width="24" height="24"><use href="#sc-flask"></use></svg></span>
-                            <div class="card-xp"><div class="xp-value">+150 XP</div><div class="xp-level">Difícil</div></div>
+                            <div class="card-xp"><div class="xp-value">+150 XP</div><div class="xp-level level-dificil">Difícil</div></div>
                         </div>
                         <div class="card-content">
                             <h3>Ciências da Natureza</h3>
@@ -980,7 +1001,7 @@
                     <div class="simulado-card">
                         <div class="card-header">
                             <span class="card-icon"><svg width="24" height="24"><use href="#sc-globe"></use></svg></span>
-                            <div class="card-xp"><div class="xp-value">+120 XP</div><div class="xp-level">Médio</div></div>
+                            <div class="card-xp"><div class="xp-value">+120 XP</div><div class="xp-level level-medio">Médio</div></div>
                         </div>
                         <div class="card-content">
                             <h3>Ciências Humanas</h3>
@@ -996,7 +1017,7 @@
                     <div class="simulado-card">
                         <div class="card-header">
                             <span class="card-icon"><svg width="24" height="24"><use href="#sc-pen"></use></svg></span>
-                            <div class="card-xp"><div class="xp-value">+200 XP</div><div class="xp-level">Especial</div></div>
+                            <div class="card-xp"><div class="xp-value">+200 XP</div><div class="xp-level level-especial">Especial</div></div>
                         </div>
                         <div class="card-content">
                             <h3>Redação Temática
@@ -1117,7 +1138,7 @@
                                     <span>${data.topico || 'N/A'}</span>
                                     </div>
                                 <div class="question-info">
-                                    <div class="level ${levelClass}">Nível ${data.dificuldade || 'N/A'}</div>
+                                    <div class="level ${levelClass}">${data.dificuldade || 'N/A'}</div>
                                 </div>
                             </div>
 
